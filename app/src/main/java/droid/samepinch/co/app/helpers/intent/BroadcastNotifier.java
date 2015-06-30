@@ -15,16 +15,16 @@ public class BroadcastNotifier {
         mBroadcaster = LocalBroadcastManager.getInstance(context);
     }
 
-    public void broadcastIntentWithState(String status) {
-        broadcastIntentWithState(Integer.valueOf(status));
-    }
+//    public void broadcastIntentWithState(AppConstants.APP_INTENT status) {
+//        broadcastIntentWithState(status.getValue());
+//    }
 
-    public void broadcastIntentWithState(int status) {
+    public void broadcastIntentWithState(AppConstants.APP_INTENT status) {
         Intent localIntent = new Intent();
-        localIntent.setAction(AppConstants.KV.BROADCAST_ACTION.getValue());
+        localIntent.setAction(AppConstants.APP_INTENT.BROADCAST_ACTION.getValue());
 
         // Puts the status into the Intent
-        localIntent.putExtra(AppConstants.KV.EXTENDED_DATA_STATUS.getValue(), status);
+        localIntent.putExtra(AppConstants.APP_INTENT.EXTENDED_DATA_STATUS.getValue(), status.name());
         localIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
         // Broadcasts the Intent
@@ -37,16 +37,15 @@ public class BroadcastNotifier {
      *
      * @param logData a {@link String} to insert into the log.
      */
-    public void notifyProgress(String logData) {
-
-        Intent localIntent = new Intent();
-
-        localIntent.setAction(AppConstants.KV.BROADCAST_ACTION.getValue());
-        localIntent.putExtra(AppConstants.KV.EXTENDED_DATA_STATUS.getValue(), -1);
-
-        localIntent.putExtra(AppConstants.KV.EXTENDED_STATUS_LOG.getValue(), logData);
-        localIntent.addCategory(Intent.CATEGORY_DEFAULT);
-
-        mBroadcaster.sendBroadcast(localIntent);
-    }
+//    public void notifyProgress(String logData) {
+//
+//        Intent localIntent = new Intent();
+//
+//        localIntent.setAction(AppConstants.KV.BROADCAST_ACTION.getValue());
+//        localIntent.putExtra(AppConstants.KV.EXTENDED_DATA_STATUS.getValue(), -1);
+//        localIntent.putExtra(AppConstants.KV.EXTENDED_STATUS_LOG.getValue(), logData);
+//        localIntent.addCategory(Intent.CATEGORY_DEFAULT);
+//
+//        mBroadcaster.sendBroadcast(localIntent);
+//    }
 }

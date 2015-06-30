@@ -16,14 +16,19 @@
 
 package droid.samepinch.co.app;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +37,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.ext.AppCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
 import droid.samepinch.co.data.WallContract;
@@ -39,6 +45,7 @@ import droid.samepinch.co.data.WallDbHelper;
 
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = PostListFragment.class.getSimpleName();
+    PostListFragmentUpdater postListFragmentUpdater = new PostListFragmentUpdater();
     // Intent for starting the IntentService that downloads the Picasa featured picture RSS feed
     private Intent mServiceIntent;
 
@@ -48,6 +55,15 @@ public class PostListFragment extends Fragment {
         RecyclerView rv = (RecyclerView) inflater.inflate(
                 R.layout.fragment_cheese_list, container, false);
         setupRecyclerView(rv);
+
+        // The filter's action is BROADCAST_ACTION
+        IntentFilter statusIntentFilter = new IntentFilter(
+                AppConstants.APP_INTENT.BROADCAST_ACTION.getValue());
+        statusIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        // Registers the PostListFragmentUpdater and its intent filters
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                postListFragmentUpdater,
+                statusIntentFilter);
 
         Uri postsUri = WallContract.Posts.CONTENT_URI;
 
@@ -76,5 +92,22 @@ public class PostListFragment extends Fragment {
         recyclerView.setAdapter(new AppCursorRecyclerViewAdapter(getActivity(), cursor));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
+
+
+    private class PostListFragmentUpdater extends BroadcastReceiver {
+        private PostListFragmentUpdater() {
+
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String intentName = intent.getStringExtra(AppConstants.APP_INTENT.EXTENDED_DATA_STATUS.getValue());
+            AppConstants.APP_INTENT intentNameConst = AppConstants.APP_INTENT.valueOf(intentName);
+            Snackbar.make(getActivity().findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+    }
+
+
 
 }

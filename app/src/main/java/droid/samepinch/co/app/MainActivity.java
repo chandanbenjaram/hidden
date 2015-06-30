@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(new PostListFragment(), "Category 1");
-        adapter.addFragment(new PostListFragment(), "Category 2");
+//        adapter.addFragment(new PostListFragment(), "Category 2");
         viewPager.setAdapter(adapter);
     }
 
