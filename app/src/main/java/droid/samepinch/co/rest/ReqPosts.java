@@ -47,14 +47,23 @@ public class ReqPosts extends RestBase<Map<String, String>> {
 
     @Override
     public Map<String, String> getBody() {
+        return body;
+    }
+
+    @Override
+    public void setBody(Map<String, String> body) {
+        this.body = body;
+    }
+
+    public ReqPosts build() {
         Map<String, String> body = new HashMap<>();
         body.put("post_count", Integer.toString(postCount == null ? 25 : postCount));
         //body.put("lastModified", System);
         body.put("lastModified", "");
         body.put("step", "");
         body.put("etag", "");
+        this.setBody(body);
 
-        return body;
+        return this;
     }
-
 }

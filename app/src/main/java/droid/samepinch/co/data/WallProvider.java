@@ -1,5 +1,4 @@
 package droid.samepinch.co.data;
-import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -12,17 +11,16 @@ import android.net.Uri;
  */
 public class WallProvider extends ContentProvider {
 
+    static final int POSTS = 108;
         // The URI Matcher used by this content provider.
         private static final UriMatcher sUriMatcher = buildUriMatcher();
-        private WallDbHelper mOpenHelper;
-
-        static final int POSTS = 108;
-
         private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
 
         static{
             sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
         }
+
+    private DbHelper mOpenHelper;
 
         static UriMatcher buildUriMatcher() {
 
@@ -30,7 +28,7 @@ public class WallProvider extends ContentProvider {
             final String authority = WallContract.CONTENT_AUTHORITY;
 
             // For each type of URI you want to add, create a corresponding code.
-            matcher.addURI(authority, WallContract.PATH_POSTS, POSTS);
+            matcher.addURI(authority, WallContract.PATH_POST, POSTS);
             return matcher;
         }
 
@@ -40,7 +38,7 @@ public class WallProvider extends ContentProvider {
          */
         @Override
         public boolean onCreate() {
-            mOpenHelper = new WallDbHelper(getContext());
+            mOpenHelper = new DbHelper(getContext());
             return true;
         }
 
@@ -54,7 +52,7 @@ public class WallProvider extends ContentProvider {
             final int match = sUriMatcher.match(uri);
             switch (match) {
                 case POSTS:
-                    return WallContract.Posts.CONTENT_TYPE;
+                    return WallContract.Post.CONTENT_TYPE;
                 default:
                     throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
@@ -69,7 +67,7 @@ public class WallProvider extends ContentProvider {
             switch (sUriMatcher.match(uri)) {
                 case POSTS: {
                     retCursor = mOpenHelper.getReadableDatabase().query(
-                            WallContract.Posts.TABLE_NAME,
+                            WallContract.Post.TABLE_NAME,
                             projection,
                             selection,
                             selectionArgs,
@@ -98,7 +96,7 @@ public class WallProvider extends ContentProvider {
 
             switch (match) {
                 case POSTS: {
-                    long _id = db.insert(WallContract.Posts.TABLE_NAME, null, values);
+                    long _id = db.insert(WallContract.Post.TABLE_NAME, null, values);
                     if ( _id <= 0 )
                         throw new android.database.SQLException("Failed to insert row into " + uri);
                     break;

@@ -40,8 +40,8 @@ import android.view.ViewGroup;
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.ext.AppCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
+import droid.samepinch.co.data.DbHelper;
 import droid.samepinch.co.data.WallContract;
-import droid.samepinch.co.data.WallDbHelper;
 
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = PostListFragment.class.getSimpleName();
@@ -65,15 +65,15 @@ public class PostListFragment extends Fragment {
                 postListFragmentUpdater,
                 statusIntentFilter);
 
-        Uri postsUri = WallContract.Posts.CONTENT_URI;
+        Uri postsUri = WallContract.Post.CONTENT_URI;
 
         ContentValues testValues = new ContentValues();
-        testValues.put(WallContract.Posts.COLUMN_POST_ID, Math.random());
-        testValues.put(WallContract.Posts.COLUMN_CONTENT, "CB " + Math.random());
+        testValues.put(WallContract.Post.COLUMN_POST_ID, Math.random());
+        testValues.put(WallContract.Post.COLUMN_CONTENT, "CB " + Math.random());
 
-        WallDbHelper dbHelper = new WallDbHelper(getActivity());
+        DbHelper dbHelper = new DbHelper(getActivity());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.insert(WallContract.Posts.TABLE_NAME, null, testValues);
+        db.insert(WallContract.Post.TABLE_NAME, null, testValues);
 
         Log.i(LOG_TAG, "creating posts pull intent...");
         mServiceIntent =
@@ -86,7 +86,7 @@ public class PostListFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        Uri postsUri = WallContract.Posts.CONTENT_URI;
+        Uri postsUri = WallContract.Post.CONTENT_URI;
         Cursor cursor = getActivity().getContentResolver().query(postsUri, null, null, null, null);
 
         recyclerView.setAdapter(new AppCursorRecyclerViewAdapter(getActivity(), cursor));

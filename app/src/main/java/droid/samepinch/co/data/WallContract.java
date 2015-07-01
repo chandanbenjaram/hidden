@@ -1,11 +1,9 @@
 package droid.samepinch.co.data;
 
-import android.net.Uri;
-
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.net.Uri;
 import android.provider.BaseColumns;
-import android.text.format.Time;
 
 /**
  * Created by imaginationcoder on 6/24/15.
@@ -21,27 +19,28 @@ public class WallContract {
     // the content provider.
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    // Possible paths (appended to base content URI for possible URI's)
-    // For instance, content://com.example.android.sunshine.app/weather/ is a valid path for
-    // looking at weather data. content://com.example.android.sunshine.app/givemeroot/ will fail,
-    // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
-    // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
-    public static final String PATH_POSTS = "posts";
+    public static final String PATH_POST = "post";
 
-    public static final class Posts implements BaseColumns {
+    public static final class Post implements BaseColumns {
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_POSTS).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_POST).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POSTS;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POST;
+
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POSTS;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POST;
 
-        public static final String TABLE_NAME = "posts";
+        public static final String TABLE_NAME = "post";
 
-
-        public static final String COLUMN_POST_ID = "post_id";
+        public static final String COLUMN_POST_ID = "uid";
         public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_COMMENT_COUNT = "comment_count";
+        public static final String COLUMN_UPVOTE_COUNT = "upvote_count";
+        public static final String COLUMN_VIEWS = "views";
+        public static final String COLUMN_ANONYMOUS = "anonymous";
+        public static final String COLUMN_CREATED_AT = "createdAt";
+
 
         public static Uri buildPostUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

@@ -16,11 +16,11 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.Cheeses;
+import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
+import droid.samepinch.co.data.DbHelper;
 import droid.samepinch.co.data.WallContract;
-import droid.samepinch.co.data.WallDbHelper;
 
 /**
  * Created by imaginationcoder on 6/25/15.
@@ -29,33 +29,31 @@ public class SimpleStringRecyclerViewAdapter
         extends RecyclerView.Adapter<PostViewHolder> {
 
     private final TypedValue mTypedValue = new TypedValue();
+    Cursor mCursor;
     private int mBackground;
     private List<String> mValues;
-
-    Cursor mCursor;
-
-    public String getValueAt(int position) {
-        return mValues.get(position);
-    }
 
     public SimpleStringRecyclerViewAdapter(Context context, List<String> items) {
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
         mValues = items;
 
-        Uri postsUri = WallContract.Posts.CONTENT_URI;
+        Uri postsUri = WallContract.Post.CONTENT_URI;
 
         ContentValues testValues = new ContentValues();
-        testValues.put(WallContract.Posts.COLUMN_POST_ID, Math.random());
-        testValues.put(WallContract.Posts.COLUMN_CONTENT, "CB " + Math.random());
+        testValues.put(WallContract.Post.COLUMN_POST_ID, Math.random());
+        testValues.put(WallContract.Post.COLUMN_CONTENT, "CB " + Math.random());
 
-        WallDbHelper dbHelper = new WallDbHelper(context);
+        DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.insert(WallContract.Posts.TABLE_NAME, null, testValues);
+        db.insert(WallContract.Post.TABLE_NAME, null, testValues);
 
         mCursor = context.getContentResolver().query(postsUri, null, null, null, null);
     }
 
+    public String getValueAt(int position) {
+        return mValues.get(position);
+    }
 
     // called only when we need to create view
     // inflates view
@@ -73,7 +71,7 @@ public class SimpleStringRecyclerViewAdapter
     public void onBindViewHolder(final PostViewHolder holder, int position) {
         holder.mBoundString = mValues.get(position);
             holder.mTextView.setText(mValues.get(position));
-        int contentIdx = mCursor.getColumnIndex(WallContract.Posts.COLUMN_CONTENT);
+        int contentIdx = mCursor.getColumnIndex(WallContract.Post.COLUMN_CONTENT);
         if (!mCursor.moveToPosition(position)) {
             throw new IllegalStateException("couldn't move mCursor to position " + position);
         } else {

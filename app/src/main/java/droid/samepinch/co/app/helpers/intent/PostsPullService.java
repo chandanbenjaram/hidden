@@ -6,17 +6,24 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.bind.DateTypeAdapter;
 
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.rest.ReqPosts;
+import droid.samepinch.co.rest.RespPosts;
 
 import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_ID;
 import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_SECRET;
@@ -56,9 +63,27 @@ public class PostsPullService extends IntentService {
         postsReq.setStep(1);
         postsReq.setEtag("");
 
-        Gson gson = new Gson();
         try {
-            String postsReqJson = gson.toJson(postsReq, ReqPosts.class);
+            Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new DateTypeAdapter()).create();
+
+            String reqData = gson.toJson(postsReq.build());
+            System.out.println("reqData...\n" + reqData);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+            HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
+            ResponseEntity<String> response = rest.exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+
+            String respStr = response.getBody();
+            System.out.println("responseStr...\n" + respStr);
+
+            RespPosts respData = gson.fromJson(respStr, RespPosts.class);
+            System.out.println(respData);
+
+//            Map<String, String> responseEntity = response.getBody();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,13 +109,8 @@ public class PostsPullService extends IntentService {
             payload.put(SCOPE.getKey(), SCOPE.getValue());
             payload.put(GRANT_TYPE.getKey(), GRANT_TYPE.getValue());
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
             ResponseEntity<Map> response = rest.postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
-            Log.i(LOG_TAG, "result=" + response.getBody());
             Map<String, String> responseEntity = response.getBody();
-
             // populate to shared prefs
             SharedPreferences.Editor editor = settings.edit();
             for (Map.Entry<String, String> entry : responseEntity.entrySet()) {
