@@ -17,13 +17,9 @@
 package droid.samepinch.co.app;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -37,11 +33,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import droid.samepinch.co.app.helpers.AppConstants;
-import droid.samepinch.co.app.helpers.ext.AppCursorRecyclerViewAdapter;
+import droid.samepinch.co.app.helpers.adapters.PostListRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
-import droid.samepinch.co.data.DbHelper;
-import droid.samepinch.co.data.WallContract;
+import droid.samepinch.co.data.DB;
+import droid.samepinch.co.data.dto.Post;
 
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = PostListFragment.class.getSimpleName();
@@ -52,10 +50,6 @@ public class PostListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RecyclerView rv = (RecyclerView) inflater.inflate(
-                R.layout.fragment_cheese_list, container, false);
-        setupRecyclerView(rv);
-
         // The filter's action is BROADCAST_ACTION
         IntentFilter statusIntentFilter = new IntentFilter(
                 AppConstants.APP_INTENT.BROADCAST_ACTION.getValue());
@@ -65,38 +59,31 @@ public class PostListFragment extends Fragment {
                 postListFragmentUpdater,
                 statusIntentFilter);
 
-        Uri postsUri = WallContract.Post.CONTENT_URI;
-
-        ContentValues testValues = new ContentValues();
-        testValues.put(WallContract.Post.COLUMN_POST_ID, Math.random());
-        testValues.put(WallContract.Post.COLUMN_CONTENT, "CB " + Math.random());
-
-        DbHelper dbHelper = new DbHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.insert(WallContract.Post.TABLE_NAME, null, testValues);
-
         Log.i(LOG_TAG, "creating posts pull intent...");
         mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
         Log.i(LOG_TAG, "starting service intent...");
         getActivity().startService(mServiceIntent);
+
+        RecyclerView rv = (RecyclerView) inflater.inflate(
+                R.layout.fragment_cheese_list, container, false);
+        setupRecyclerView(rv);
+
         return rv;
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        List<Post> posts = DB.mPostDAO.fetchAllPosts();
 
-        Uri postsUri = WallContract.Post.CONTENT_URI;
-        Cursor cursor = getActivity().getContentResolver().query(postsUri, null, null, null, null);
 
-        recyclerView.setAdapter(new AppCursorRecyclerViewAdapter(getActivity(), cursor));
+        recyclerView.setAdapter(new PostListRecyclerViewAdapter(getActivity(), posts));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
 
     private class PostListFragmentUpdater extends BroadcastReceiver {
         private PostListFragmentUpdater() {
-
         }
 
         @Override
@@ -107,7 +94,5 @@ public class PostListFragment extends Fragment {
                     .setAction("Action", null).show();
         }
     }
-
-
 
 }

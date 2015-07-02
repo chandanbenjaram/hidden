@@ -3,6 +3,11 @@ package droid.samepinch.co.rest;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+import java.util.List;
+
+import droid.samepinch.co.data.dto.Post;
+
 /**
  * Created by imaginationcoder on 7/1/15.
  */
@@ -28,7 +33,10 @@ public class RespPosts extends RestBase<RespPosts.Body> {
 
         @SerializedName("last_modified")
         @Expose(deserialize = false)
-        String lastModified;
+        String lastModifiedStr;
+
+        @Expose(deserialize = false, serialize = false)
+        Date lastModified;
 
         @Expose
         String etag;
@@ -37,9 +45,12 @@ public class RespPosts extends RestBase<RespPosts.Body> {
         @SerializedName("anonymous_image")
         String anonymousImage;
 
+        List<Post> posts;
+
         public Body() {
 
         }
+
 
         public Integer getPostCount() {
             return postCount;
@@ -49,11 +60,19 @@ public class RespPosts extends RestBase<RespPosts.Body> {
             this.postCount = postCount;
         }
 
-        public String getLastModified() {
+        public String getLastModifiedStr() {
+            return lastModifiedStr;
+        }
+
+        public void setLastModifiedStr(String lastModifiedStr) {
+            this.lastModifiedStr = lastModifiedStr;
+        }
+
+        public Date getLastModified() {
             return lastModified;
         }
 
-        public void setLastModified(String lastModified) {
+        public void setLastModified(Date lastModified) {
             this.lastModified = lastModified;
         }
 
@@ -72,5 +91,16 @@ public class RespPosts extends RestBase<RespPosts.Body> {
         public void setAnonymousImage(String anonymousImage) {
             this.anonymousImage = anonymousImage;
         }
+
+        public List<Post> getPosts() {
+            return posts;
+        }
+
+        public void setPosts(List<Post> posts) {
+            this.posts = posts;
+        }
+
+
+
     }
 }

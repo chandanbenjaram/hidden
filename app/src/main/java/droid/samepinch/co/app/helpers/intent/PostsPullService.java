@@ -19,9 +19,12 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
+import droid.samepinch.co.data.DB;
+import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.rest.ReqPosts;
 import droid.samepinch.co.rest.RespPosts;
 
@@ -67,19 +70,25 @@ public class PostsPullService extends IntentService {
             Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new DateTypeAdapter()).create();
 
             String reqData = gson.toJson(postsReq.build());
-            System.out.println("reqData...\n" + reqData);
 
+
+            //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
+            // call
+//            rest.setMessageConverters();
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
-            ResponseEntity<String> response = rest.exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+            ResponseEntity<RespPosts> resp = rest.exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
-            String respStr = response.getBody();
-            System.out.println("responseStr...\n" + respStr);
+//            String respStr = response.getBody();
+//            System.out.println("responseStr...\n" + respStr);
+//
+            RespPosts respData = resp.getBody();
+            List<Post> postsToInsert = respData.getBody().getPosts();
+            DB.mPostDAO.addPosts(postsToInsert);
 
-            RespPosts respData = gson.fromJson(respStr, RespPosts.class);
             System.out.println(respData);
 
 //            Map<String, String> responseEntity = response.getBody();

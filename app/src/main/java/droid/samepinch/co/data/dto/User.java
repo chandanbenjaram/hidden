@@ -7,6 +7,7 @@ import android.os.Parcelable;
  * Created by imaginationcoder on 7/1/15.
  */
 public class User implements Parcelable {
+
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         @Override
@@ -23,6 +24,8 @@ public class User implements Parcelable {
     String fname;
     String lname;
     String photo;
+    String prefName;
+    String pinchHandle;
 
     public User() {
     }
@@ -32,6 +35,31 @@ public class User implements Parcelable {
         fname = in.readString();
         lname = in.readString();
         photo = in.readString();
+        prefName = in.readString();
+        pinchHandle = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uid);
+        dest.writeString(fname);
+        dest.writeString(lname);
+        dest.writeString(photo);
+        dest.writeString(prefName);
+        dest.writeString(pinchHandle);
+    }
+
+    public String getPinchHandle() {
+        return pinchHandle;
+    }
+
+    public void setPinchHandle(String pinchHandle) {
+        this.pinchHandle = pinchHandle;
     }
 
     public String getUid() {
@@ -66,38 +94,11 @@ public class User implements Parcelable {
         this.photo = photo;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getPrefName() {
+        return prefName;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
-        dest.writeString(fname);
-        dest.writeString(lname);
-        dest.writeString(photo);
+    public void setPrefName(String prefName) {
+        this.prefName = prefName;
     }
-//
-//    @Override
-//    public int hashCode() {
-//        final int prime = 31;
-//        int result = 1;
-//        result = prime * result + uid;
-//        return result;
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj)
-//            return true;
-//        if (obj == null)
-//            return false;
-//        if (getClass() != obj.getClass())
-//            return false;
-//        User other = (User) obj;
-//        if (uid != other.uid)
-//            return false;
-//        return true;
-//    }
 }

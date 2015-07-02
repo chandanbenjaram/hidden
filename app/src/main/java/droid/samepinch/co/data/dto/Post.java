@@ -3,9 +3,13 @@ package droid.samepinch.co.data.dto;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +29,7 @@ public class Post implements Parcelable {
             return new Post[size];
         }
     };
+    @SerializedName("uid")
     String uid;
     String content;
     @SerializedName("comment_count")
@@ -35,6 +40,10 @@ public class Post implements Parcelable {
     List<String> commenters;
     List<String> tags;
     Boolean anonymous;
+    @SerializedName("createdAt")
+    String createdAtStr;
+    @Expose(deserialize = false, serialize = false)
+    @SerializedName("createdAtDB")
     Date createdAt;
     User owner;
 
@@ -48,7 +57,7 @@ public class Post implements Parcelable {
         upvoteCount = in.readByte() == 0x00 ? null : in.readInt();
         views = in.readByte() == 0x00 ? null : in.readInt();
         if (in.readByte() == 0x01) {
-            commenters = new ArrayList<>();
+            commenters = new ArrayList<String>();
             in.readList(commenters, String.class.getClassLoader());
         } else {
             commenters = null;
@@ -61,9 +70,8 @@ public class Post implements Parcelable {
         }
         byte anonymousVal = in.readByte();
         anonymous = anonymousVal == 0x02 ? null : anonymousVal != 0x00;
-        long tmpCreatedAt = in.readLong();
-        createdAt = tmpCreatedAt != -1 ? new Date(tmpCreatedAt) : null;
-        owner = in.readParcelable(User.class.getClassLoader());
+        createdAtStr = in.readString();
+        owner = (User) in.readValue(User.class.getClassLoader());
     }
 
     public String getUid() {
@@ -130,7 +138,19 @@ public class Post implements Parcelable {
         this.anonymous = anonymous;
     }
 
+    public String getCreatedAtStr() {
+        return createdAtStr;
+    }
+
+    public void setCreatedAtStr(String createdAtStr) {
+        this.createdAtStr = createdAtStr;
+    }
+
     public Date getCreatedAt() {
+        if (createdAt == null && createdAtStr != null) {
+            //TODO
+            setCreatedAt(new Date());
+        }
         return createdAt;
     }
 
@@ -144,6 +164,36 @@ public class Post implements Parcelable {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public void setCommentersFromDB(String commenters) {
+        if (commenters != null) {
+            setCommenters(Arrays.asList(commenters.split(",")));
+        } else {
+            setCommenters(null);
+        }
+    }
+
+    public String getCommentersForDB() {
+        if (getCommenters() == null || getCommenters().isEmpty()) {
+            return null;
+        }
+        return StringUtils.arrayToDelimitedString(getCommenters().toArray(), ",");
+    }
+
+    public void setTagsFromDB(String tags) {
+        if (tags != null) {
+            setTags(Arrays.asList(tags.split(",")));
+        } else {
+            setTags(null);
+        }
+    }
+
+    public String getTagsForDB() {
+        if (getTags() == null || getTags().isEmpty()) {
+            return null;
+        }
+        return StringUtils.arrayToDelimitedString(getTags().toArray(), ",");
     }
 
     @Override
@@ -190,7 +240,7 @@ public class Post implements Parcelable {
         } else {
             dest.writeByte((byte) (anonymous ? 0x01 : 0x00));
         }
-        dest.writeLong(createdAt != null ? createdAt.getTime() : -1L);
-        dest.writeParcelable(owner, flags);
+        dest.writeString(createdAtStr);
+        dest.writeValue(owner);
     }
 }
