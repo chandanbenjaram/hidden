@@ -29,6 +29,7 @@ public class Post implements Parcelable {
             return new Post[size];
         }
     };
+
     @SerializedName("uid")
     String uid;
     String content;

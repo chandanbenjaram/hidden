@@ -7,7 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
+import droid.samepinch.co.app.Cheeses;
 import droid.samepinch.co.app.R;
+import droid.samepinch.co.data.DB;
+import droid.samepinch.co.data.dto.Post;
 
 /**
  * Created by imaginationcoder on 7/2/15.
@@ -35,10 +40,10 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
     @Override
     public void onBindViewHolder(final PostRecyclerViewHolder holder, Cursor cursor) {
-//        PostItem postItem = IPostDAOImpl.(cursor);
-//        holder.mBoundString = String.valueOf(postItem.getId());
-//
-//        holder.mTextView.setText(postItem.getContent());
+        Post post = DB.mPostDAO.cursorToEntity(cursor);
+        holder.mBoundString = String.valueOf(post.getUid());
+
+        holder.mTextView.setText(post.getContent());
 //        holder.mView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -49,11 +54,11 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 //                context.startActivity(intent);
 //            }
 //        });
-//
-//        Glide.with(holder.mImageView.getContext())
-//                .load(Cheeses.getRandomCheeseDrawable())
-//                .fitCenter()
-//                .into(holder.mImageView);
+
+        Glide.with(holder.mImageView.getContext())
+                .load(Cheeses.getRandomCheeseDrawable())
+                .fitCenter()
+                .into(holder.mImageView);
     }
 
 }

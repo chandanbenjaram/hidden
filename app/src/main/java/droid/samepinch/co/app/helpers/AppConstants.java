@@ -12,7 +12,8 @@ public class AppConstants {
         BASE("https://msocl.herokuapp.com/"),
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         USERS(BASE.getValue().concat("api/users")),
-        POSTS(BASE.getValue().concat("api/posts")),;
+        POSTS(BASE.getValue().concat("api/posts")),
+        CONTENT_AUTHORITY("droid.samepinch.co.app");
 
         private final String value;
 
@@ -33,7 +34,6 @@ public class AppConstants {
         REFRESH_ACTION_FAILED("failed to refresh"),
         REFRESH_ACTION_COMPLETE("refresh complete"),
         AUTHENTICATING_CLIENT("authenticating client..."),
-
         REFRESH_ACTION_LOAD("load refreshed content");
 
         private final String value;
