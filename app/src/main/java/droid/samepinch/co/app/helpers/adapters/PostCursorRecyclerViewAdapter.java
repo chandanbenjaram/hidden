@@ -1,6 +1,7 @@
 package droid.samepinch.co.app.helpers.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -10,8 +11,9 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 
 import droid.samepinch.co.app.Cheeses;
+import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
-import droid.samepinch.co.data.DB;
+import droid.samepinch.co.data.dao.IPostDAOImpl;
 import droid.samepinch.co.data.dto.Post;
 
 /**
@@ -40,20 +42,22 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
     @Override
     public void onBindViewHolder(final PostRecyclerViewHolder holder, Cursor cursor) {
-        Post post = DB.mPostDAO.cursorToEntity(cursor);
+        IPostDAOImpl postDao = new IPostDAOImpl();
+        Post post = postDao.cursorToEntity(cursor);
+
         holder.mBoundString = String.valueOf(post.getUid());
 
         holder.mTextView.setText(post.getContent());
-//        holder.mView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Context context = v.getContext();
-//                Intent intent = new Intent(context, PostDetailActivity.class);
-//
-//                intent.putExtra(PostDetailActivity.EXTRA_NAME, holder.mBoundString);
-//                context.startActivity(intent);
-//            }
-//        });
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, PostDetailActivity.class);
+
+                intent.putExtra(PostDetailActivity.EXTRA_NAME, holder.mBoundString);
+                context.startActivity(intent);
+            }
+        });
 
         Glide.with(holder.mImageView.getContext())
                 .load(Cheeses.getRandomCheeseDrawable())
@@ -61,4 +65,8 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
                 .into(holder.mImageView);
     }
 
+    @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        return super.swapCursor(newCursor);
+    }
 }

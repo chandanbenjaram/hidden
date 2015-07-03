@@ -1,6 +1,7 @@
 package droid.samepinch.co.app.helpers.intent;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
-import droid.samepinch.co.data.DB;
+import droid.samepinch.co.data.dao.IPostDAOImpl;
+import droid.samepinch.co.data.dao.IPostSchema;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.rest.ReqPosts;
 import droid.samepinch.co.rest.RespPosts;
@@ -86,19 +89,35 @@ public class PostsPullService extends IntentService {
 //            System.out.println("responseStr...\n" + respStr);
 //
             RespPosts respData = resp.getBody();
-            List<Post> postsToInsert = respData.getBody().getPosts();
-            DB.mPostDAO.addPosts(postsToInsert);
-
             System.out.println(respData);
+
+            String ts = "..." + System.currentTimeMillis();
+            List<Post> postsToInsert = respData.getBody().getPosts();
+            List<ContentValues> postsAsCVs = new ArrayList<>();
+            for (Post post : postsToInsert) {
+                ContentValues postCV = new ContentValues();
+                postCV.put(IPostSchema.COLUMN_UID, post.getUid());
+                postCV.put(IPostSchema.COLUMN_CONTENT, post.getContent() + ts);
+                postCV.put(IPostSchema.COLUMN_COMMENT_COUNT, post.getCommentCount());
+                postCV.put(IPostSchema.COLUMN_UPVOTE_COUNT, post.getUpvoteCount());
+                postCV.put(IPostSchema.COLUMN_VIEWS, post.getViews());
+                postCV.put(IPostSchema.COLUMN_ANONYMOUS, post.getAnonymous());
+                postCV.put(IPostSchema.COLUMN_CREATED_AT, post.getCreatedAt().getTime());
+                postCV.put(IPostSchema.COLUMN_COMMENTERS, post.getCommentersForDB());
+                postCV.put(IPostSchema.COLUMN_TAGS, post.getTagsForDB());
+                postsAsCVs.add(postCV);
+            }
+            getContentResolver().bulkInsert(IPostDAOImpl.CONTENT_URI, postsAsCVs.toArray(new ContentValues[]{}));
+            mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE);
 
 //            Map<String, String> responseEntity = response.getBody();
 
         } catch (Exception e) {
             e.printStackTrace();
+            mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_FAILED);
         }
 
 
-        mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE);
     }
 
     public String getAppToken() {

@@ -1,8 +1,12 @@
 package droid.samepinch.co.data.dao;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 
 import java.sql.SQLException;
@@ -17,17 +21,26 @@ import droid.samepinch.co.data.dto.Post;
  * Created by cbenjaram on 7/1/15.
  */
 public class IPostDAOImpl extends DBContentProvider implements IPostDAO, IPostSchema {
-    public static final String LOG_TAG = IPostDAOImpl.class.getSimpleName();
-
+    public static final String LOG_TAG = "IPostDAOImpl";
+    static final int POST = 108;
+    static final int POST_WITH_ID = 109;
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
     private Cursor cursor;
     private ContentValues initialValues;
 
-    public IPostDAOImpl(SQLiteDatabase db) {
-        super(db);
+    public IPostDAOImpl() {
+    }
+
+    static UriMatcher buildUriMatcher() {
+        final String authority = IContract.CONTENT_AUTHORITY;
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        matcher.addURI(authority, IPostSchema.PATH_POST, POST);
+        matcher.addURI(authority, IPostSchema.PATH_POST + "/*", POST_WITH_ID);
+        return matcher;
     }
 
     @Override
-    protected Post cursorToEntity(Cursor cursor) {
+    public Post cursorToEntity(Cursor cursor) {
         Post post = new Post();
         if (cursor == null) {
             return post;
@@ -154,19 +167,20 @@ public class IPostDAOImpl extends DBContentProvider implements IPostDAO, IPostSc
 
     @Override
     public boolean addPosts(List<Post> posts) {
-        mDb.beginTransaction();
+        SQLiteDatabase writeDB = mDBHelper.getWritableDatabase();
+        writeDB.beginTransaction();
         try {
             for (Post post : posts) {
                 if (!addPost(post)) {
                     throw new SQLException("Failed to insert row into " + post.getUid());
                 }
             }
-            mDb.setTransactionSuccessful();
+            writeDB.setTransactionSuccessful();
         } catch (SQLException ex) {
             Log.w("Database", ex.getMessage());
             return false;
         } finally {
-            mDb.endTransaction();
+            writeDB.endTransaction();
         }
         return true;
     }
@@ -191,5 +205,89 @@ public class IPostDAOImpl extends DBContentProvider implements IPostDAO, IPostSc
         initialValues.put(COLUMN_CREATED_AT, post.getCreatedAt().getTime());
         initialValues.put(COLUMN_COMMENTERS, post.getCommentersForDB());
         initialValues.put(COLUMN_TAGS, post.getTagsForDB());
+    }
+
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
+        Cursor retCursor;
+        switch (sUriMatcher.match(uri)) {
+            case POST: {
+                retCursor = super.query(POST_TABLE, projection, selection,
+                        selectionArgs, sortOrder);
+                break;
+            }
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return retCursor;
+    }
+
+    @Override
+    public String getType(Uri uri) {
+        switch (sUriMatcher.match(uri)) {
+            case POST:
+                return IPostSchema.CONTENT_TYPE;
+            case POST_WITH_ID:
+                return IPostSchema.CONTENT_ITEM_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+    }
+
+    @Override
+    public Uri insert(Uri uri, ContentValues cv) {
+        Long rowId = upSert(cv);
+        Uri returnUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
+    }
+
+    public Long upSert(ContentValues cv) {
+        String uid = cv.getAsString(COLUMN_UID);
+        final String selectionArgs[] = {uid};
+        final String selection = COLUMN_UID + " = ?";
+        Long rowId = null;
+        if (super.update(POST_TABLE, cv, selection, selectionArgs) > 0) {
+            Cursor cursor = super.query(POST_TABLE, new String[]{_ID}, selection,
+                    selectionArgs, _ID);
+            if (cursor != null && cursor.moveToFirst()) {
+
+                int idIndex;
+                if ((idIndex = cursor.getColumnIndex(_ID)) != -1) {
+                    rowId = cursor.getLong(idIndex);
+                }
+                cursor.close();
+            }
+        } else {
+            rowId = super.insertOrThrow(POST_TABLE, cv);
+        }
+
+        return rowId;
+    }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        int count = 0;
+        ContentResolver resolver = getContext().getContentResolver();
+        for (ContentValues cv : values) {
+            count += 1;
+            Long rowId = upSert(cv);
+            Uri itemUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
+            resolver.notifyChange(itemUri, null);
+        }
+        return count;
+    }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        return 0;
+    }
+
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        return 0;
     }
 }

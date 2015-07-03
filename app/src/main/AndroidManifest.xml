@@ -38,6 +38,12 @@
 
         <activity android:name=".PostDetailActivity" />
 
+        <provider
+            android:name="droid.samepinch.co.data.dao.IPostDAOImpl"
+            android:authorities="@string/content_authority"
+            android:exported="false"
+            android:syncable="true" />
+
         <service
             android:name=".helpers.intent.PostsPullService"
             android:exported="false"/>

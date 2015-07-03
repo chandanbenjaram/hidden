@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -29,18 +29,20 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import droid.samepinch.co.app.helpers.AppConstants;
+import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
+import droid.samepinch.co.data.dao.IPostDAOImpl;
 
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = PostListFragment.class.getSimpleName();
+
     PostListFragmentUpdater postListFragmentUpdater = new PostListFragmentUpdater();
-    // Intent for starting the IntentService that downloads the Picasa featured picture RSS feed
+    PostCursorRecyclerViewAdapter mViewAdapter;
     private Intent mServiceIntent;
 
     @Nullable
@@ -58,12 +60,8 @@ public class PostListFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 postListFragmentUpdater,
                 statusIntentFilter);
-
-
-        Log.i(LOG_TAG, "creating posts pull intent...");
         mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
-        Log.i(LOG_TAG, "starting service intent...");
         getActivity().startService(mServiceIntent);
         return rv;
     }
@@ -71,10 +69,10 @@ public class PostListFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        Uri postsUri = WallContract.Post.CONTENT_URI;
-        Cursor cursor = getActivity().getContentResolver().query(postsUri, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(IPostDAOImpl.CONTENT_URI, null, null, null, null);
+        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
-        recyclerView.setAdapter(new AppCursorRecyclerViewAdapter(getActivity(), cursor));
+        recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
@@ -90,6 +88,9 @@ public class PostListFragment extends Fragment {
             AppConstants.APP_INTENT intentNameConst = AppConstants.APP_INTENT.valueOf(intentName);
             Snackbar.make(getActivity().findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
+
+            Cursor newCursor = getActivity().getContentResolver().query(IPostDAOImpl.CONTENT_URI, null, null, null, null);
+            mViewAdapter.swapCursor(newCursor);
         }
     }
 

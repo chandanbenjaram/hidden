@@ -1,11 +1,22 @@
 package droid.samepinch.co.data.dao;
 
+import android.content.ContentResolver;
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
  * Created by cbenjaram on 7/1/15.
  */
-public interface IUserSchema extends BaseColumns {
+public interface IUserSchema extends BaseColumns, IContract {
+    // provider related stuff
+    String PATH_USER = "user";
+    Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
+    String CONTENT_TYPE =
+            ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+    String CONTENT_ITEM_TYPE =
+            ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+
+    // DB related stuff
     String USER_TABLE = "users";
     String COLUMN_UID = "uid";
     String COLUMN_FNAME = "first_name";

@@ -16,10 +16,9 @@ public class DB {
     static final int DATABASE_VERSION = 7;
     public static IUserDAOImpl mUserDao;
     public static IPostDAOImpl mPostDAO;
+    public static DBHelper mDBHelper;
+
     private final Context mContext;
-    private DBHelper mDBHelper;
-
-
     public DB(Context context) {
         this.mContext = context;
     }
@@ -29,8 +28,11 @@ public class DB {
         SQLiteDatabase mDB = mDBHelper.getWritableDatabase();
 
         // app DAOs
-        mUserDao = new IUserDAOImpl(mDB);
-        mPostDAO = new IPostDAOImpl(mDB);
+        mUserDao = new IUserDAOImpl();
+        mUserDao.onCreate();
+
+        mPostDAO = new IPostDAOImpl();
+        mPostDAO.onCreate();
 
         return this;
     }

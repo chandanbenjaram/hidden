@@ -3,7 +3,7 @@ package droid.samepinch.co.data.dao;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -19,12 +19,12 @@ public class IUserDAOImpl extends DBContentProvider implements IUserDAO, IUserSc
     private Cursor cursor;
     private ContentValues initialValues;
 
-    public IUserDAOImpl(SQLiteDatabase db) {
-        super(db);
+    public IUserDAOImpl() {
+//        super(db);
     }
 
     @Override
-    protected User cursorToEntity(Cursor cursor) {
+    public User cursorToEntity(Cursor cursor) {
         User user = new User();
         if (cursor == null) {
             return user;
@@ -134,5 +134,30 @@ public class IUserDAOImpl extends DBContentProvider implements IUserDAO, IUserSc
         initialValues.put(COLUMN_LNAME, user.getLname());
         initialValues.put(COLUMN_PREF_NAME, user.getPrefName());
         initialValues.put(COLUMN_PINCH_HANDLE, user.getPinchHandle());
+    }
+
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return null;
+    }
+
+    @Override
+    public String getType(Uri uri) {
+        return null;
+    }
+
+    @Override
+    public Uri insert(Uri uri, ContentValues values) {
+        return null;
+    }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        return 0;
+    }
+
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        return 0;
     }
 }
