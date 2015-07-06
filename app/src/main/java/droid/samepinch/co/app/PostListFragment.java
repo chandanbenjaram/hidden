@@ -36,7 +36,7 @@ import android.view.ViewGroup;
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
-import droid.samepinch.co.data.dao.IPostDAOImpl;
+import droid.samepinch.co.data.dao.SchemaPosts;
 
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = PostListFragment.class.getSimpleName();
@@ -69,9 +69,12 @@ public class PostListFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        Cursor cursor = getActivity().getContentResolver().query(IPostDAOImpl.CONTENT_URI, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+//        if(cursor.moveToFirst()){
+//
+//        }
+//        cursor.moveToFirst();
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
-
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
@@ -79,7 +82,6 @@ public class PostListFragment extends Fragment {
 
     private class PostListFragmentUpdater extends BroadcastReceiver {
         private PostListFragmentUpdater() {
-
         }
 
         @Override
@@ -89,10 +91,10 @@ public class PostListFragment extends Fragment {
             Snackbar.make(getActivity().findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
 
-            Cursor newCursor = getActivity().getContentResolver().query(IPostDAOImpl.CONTENT_URI, null, null, null, null);
-            mViewAdapter.swapCursor(newCursor);
+            if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {
+                Cursor newCursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                mViewAdapter.swapCursor(newCursor);
+            }
         }
     }
-
-
 }

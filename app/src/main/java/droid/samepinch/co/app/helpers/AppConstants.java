@@ -9,14 +9,13 @@ public class AppConstants {
         SHARED_PREFS_NAME("AppPref"),
         ACCESS_TOKEN("access_token"),
 
-        BASE("https://msocl.herokuapp.com/"),
+        BASE("https://posts.samepinch.co/"),
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         USERS(BASE.getValue().concat("api/users")),
         POSTS(BASE.getValue().concat("api/posts")),
         CONTENT_AUTHORITY("droid.samepinch.co.app");
 
         private final String value;
-
         API(String value) {
             this.value = value;
         }
@@ -37,7 +36,6 @@ public class AppConstants {
         REFRESH_ACTION_LOAD("load refreshed content");
 
         private final String value;
-
         APP_INTENT(String value) {
             this.value = value;
         }
@@ -50,14 +48,11 @@ public class AppConstants {
 
     public enum KV {
         GRANT_TYPE("grant_type", "client_credentials"),
-        CLIENT_ID("client_id", "3e0786a2f258e6f9b08250dbd7f35010480988e0d3d1ef373b79e07884be79f9"),
-        CLIENT_SECRET("client_secret", "813c95cc2eb6c0cf4f49d30d0add0c6fc3ea82863d30507beb6733c0e643927c"),
-        SCOPE("scope", "imsocl"),
-        LOGV("", "false"),
-        LOGD("", "true");
+        CLIENT_ID("client_id", "07b71e492ccb9de623cfa8d151157b5452ad52eae7197fe85689a07876960f8f"),
+        CLIENT_SECRET("client_secret", "2e716b657cd8d0a85ea632a915d0a3c699bd7bc2be326ecec167d26bba159a9b"),
+        SCOPE("scope", "imsocl");
 
         private final String key, value;
-
         KV(String key, String value) {
             this.key = key;
             this.value = value;

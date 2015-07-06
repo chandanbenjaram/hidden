@@ -1,14 +1,11 @@
 package droid.samepinch.co.app.helpers.intent;
 
 import android.app.IntentService;
-import android.content.ContentValues;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.DateTypeAdapter;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,15 +16,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
-import droid.samepinch.co.data.dao.IPostDAOImpl;
-import droid.samepinch.co.data.dao.IPostSchema;
+import droid.samepinch.co.data.dao.SchemaDots;
+import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
+import droid.samepinch.co.data.dto.User;
 import droid.samepinch.co.rest.ReqPosts;
 import droid.samepinch.co.rest.RespPosts;
 
@@ -70,54 +67,64 @@ public class PostsPullService extends IntentService {
         postsReq.setEtag("");
 
         try {
-            Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new DateTypeAdapter()).create();
-
-            String reqData = gson.toJson(postsReq.build());
-
-
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
             // call
-//            rest.setMessageConverters();
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
             ResponseEntity<RespPosts> resp = rest.exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
-//            String respStr = response.getBody();
-//            System.out.println("responseStr...\n" + respStr);
-//
             RespPosts respData = resp.getBody();
-            System.out.println(respData);
 
-            String ts = "..." + System.currentTimeMillis();
             List<Post> postsToInsert = respData.getBody().getPosts();
-            List<ContentValues> postsAsCVs = new ArrayList<>();
+            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+            String anonymImage = respData.getBody().getAnonymousImage();
+            String anonymUId = "0";
+            int opsCounter = -1;
             for (Post post : postsToInsert) {
-                ContentValues postCV = new ContentValues();
-                postCV.put(IPostSchema.COLUMN_UID, post.getUid());
-                postCV.put(IPostSchema.COLUMN_CONTENT, post.getContent() + ts);
-                postCV.put(IPostSchema.COLUMN_COMMENT_COUNT, post.getCommentCount());
-                postCV.put(IPostSchema.COLUMN_UPVOTE_COUNT, post.getUpvoteCount());
-                postCV.put(IPostSchema.COLUMN_VIEWS, post.getViews());
-                postCV.put(IPostSchema.COLUMN_ANONYMOUS, post.getAnonymous());
-                postCV.put(IPostSchema.COLUMN_CREATED_AT, post.getCreatedAt().getTime());
-                postCV.put(IPostSchema.COLUMN_COMMENTERS, post.getCommentersForDB());
-                postCV.put(IPostSchema.COLUMN_TAGS, post.getTagsForDB());
-                postsAsCVs.add(postCV);
+                User postOwner = post.getOwner();
+                if (post.getAnonymous()) {
+                    // TODO
+                    ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
+                            .withValue(SchemaDots.COLUMN_UID, anonymUId)
+                            .withValue(SchemaDots.COLUMN_FNAME, "anonymous")
+                            .withValue(SchemaDots.COLUMN_LNAME, "anonymous")
+                            .withValue(SchemaDots.COLUMN_PREF_NAME, "anonymous")
+                            .withValue(SchemaDots.COLUMN_PINCH_HANDLE, "anonymous")
+                            .withValue(SchemaDots.COLUMN_PHOTO_URL, anonymImage).build());
+                } else {
+                    ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
+                            .withValue(SchemaDots.COLUMN_UID, postOwner.getUid())
+                            .withValue(SchemaDots.COLUMN_FNAME, postOwner.getFname())
+                            .withValue(SchemaDots.COLUMN_LNAME, postOwner.getLname())
+                            .withValue(SchemaDots.COLUMN_PREF_NAME, postOwner.getPrefName())
+                            .withValue(SchemaDots.COLUMN_PINCH_HANDLE, postOwner.getPinchHandle())
+                            .withValue(SchemaDots.COLUMN_PHOTO_URL, postOwner.getPhoto()).build());
+//                    opsCounter+=1;
+                }
+
+                ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
+                        .withValue(SchemaPosts.COLUMN_UID, post.getUid())
+                        .withValue(SchemaPosts.COLUMN_CONTENT, post.getContent())
+                        .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, post.getCommentCount())
+                        .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, post.getUpvoteCount())
+                        .withValue(SchemaPosts.COLUMN_VIEWS, post.getViews())
+                        .withValue(SchemaPosts.COLUMN_ANONYMOUS, post.getAnonymous())
+                        .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
+                        .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
+                        .withValue(SchemaPosts.COLUMN_OWNER, (post.getAnonymous() ? anonymUId : postOwner.getUid()))
+                        .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB()).build());
             }
-            getContentResolver().bulkInsert(IPostDAOImpl.CONTENT_URI, postsAsCVs.toArray(new ContentValues[]{}));
+
+            ContentProviderResult[] result = getContentResolver().
+                    applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
             mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE);
-
-//            Map<String, String> responseEntity = response.getBody();
-
         } catch (Exception e) {
             e.printStackTrace();
             mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_FAILED);
         }
-
-
     }
 
     public String getAppToken() {
@@ -125,7 +132,7 @@ public class PostsPullService extends IntentService {
         SharedPreferences settings = getSharedPreferences(AppConstants.API.SHARED_PREFS_NAME.getValue(), 0);
         String token = settings.getString(accessToken, null);
         if (token != null) {
-            return token;
+            //return token;
         }
         mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.AUTHENTICATING_CLIENT);
 

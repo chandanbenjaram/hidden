@@ -3,18 +3,18 @@ package droid.samepinch.co.app.helpers.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-
-import droid.samepinch.co.app.Cheeses;
 import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
-import droid.samepinch.co.data.dao.IPostDAOImpl;
+import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.data.dto.Post;
+import droid.samepinch.co.data.dto.User;
 
 /**
  * Created by imaginationcoder on 7/2/15.
@@ -42,12 +42,18 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
     @Override
     public void onBindViewHolder(final PostRecyclerViewHolder holder, Cursor cursor) {
-        IPostDAOImpl postDao = new IPostDAOImpl();
-        Post post = postDao.cursorToEntity(cursor);
-
+        Post post = Utils.cursorToPostEntity(cursor);
         holder.mBoundString = String.valueOf(post.getUid());
-
         holder.mTextView.setText(post.getContent());
+
+        User user = post.getOwner();
+        Uri userPhotoUri;
+        if (user == null || TextUtils.isEmpty(user.getPhoto())) {
+            userPhotoUri = Uri.parse("http://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+        } else {
+            userPhotoUri = Uri.parse(user.getPhoto());
+        }
+        holder.mImageView.setImageURI(userPhotoUri);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,14 +65,15 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             }
         });
 
-        Glide.with(holder.mImageView.getContext())
-                .load(Cheeses.getRandomCheeseDrawable())
-                .fitCenter()
-                .into(holder.mImageView);
+//        Glide.with(holder.mImageView.getContext())
+//                .load(Cheeses.getRandomCheeseDrawable())
+//                .fitCenter()
+//                .into(holder.mImageView);
     }
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
         return super.swapCursor(newCursor);
     }
+
 }

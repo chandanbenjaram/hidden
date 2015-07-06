@@ -25,8 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-
 public class PostDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_NAME = "cheese_name";
@@ -62,7 +60,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private void loadBackdrop() {
         final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-        Glide.with(this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
+//        Glide.with(this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
     }
 
     @Override

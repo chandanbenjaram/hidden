@@ -26,5 +26,7 @@
   <string name="checkin">Checkin</string>
   <string name="menu_settings">Settings</string>
   <string name="action_settings">Settings</string>
-  <string name="content_authority">droid.samepinch.co.app</string>
+  <string name="content_authority_posts">droid.samepinch.co.app.posts</string>
+  <string name="content_authority_users">droid.samepinch.co.app.users</string>
+
 </resources>

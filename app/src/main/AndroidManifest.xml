@@ -38,10 +38,16 @@
         <activity android:name=".PostDetailActivity" />
 
         <provider
-            android:name="droid.samepinch.co.data.dao.IPostDAOImpl"
-            android:authorities="@string/content_authority"
+            android:name="droid.samepinch.co.data.dao.SPContentProvider"
+            android:authorities="droid.samepinch.co.app"
             android:exported="false"
             android:syncable="true" />
+
+        <!--<provider-->
+        <!--android:name="droid.samepinch.co.data.dao.IUserDAOImpl"-->
+        <!--android:authorities="@string/content_authority_users"-->
+        <!--android:exported="false"-->
+        <!--android:syncable="true" />-->
 
         <service
             android:name=".helpers.intent.PostsPullService"
