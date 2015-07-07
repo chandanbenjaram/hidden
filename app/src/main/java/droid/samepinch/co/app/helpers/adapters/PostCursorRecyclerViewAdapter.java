@@ -44,7 +44,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
     public void onBindViewHolder(final PostRecyclerViewHolder holder, Cursor cursor) {
         Post post = Utils.cursorToPostEntity(cursor);
         holder.mBoundString = String.valueOf(post.getUid());
-        holder.mTextView.setText(post.getContent());
+//        holder.mTextView.setText(post.getContent());
 
         User user = post.getOwner();
         Uri userPhotoUri;
@@ -53,7 +53,12 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         } else {
             userPhotoUri = Uri.parse(user.getPhoto());
         }
-        holder.mImageView.setImageURI(userPhotoUri);
+        holder.mAvatarView.setImageURI(userPhotoUri);
+        holder.mWallPostDotView.setText(post.getOwner() == null || post.getOwner().getFname() == null ? "dummy" : post.getOwner().getFname());
+        holder.mWallPostContentView.setText(post.getContent());
+        holder.mWallPostCommentersView.setText(post.getCommentersForDB() == null ? "dummy c" : post.getCommentersForDB());
+        holder.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
+
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -67,13 +67,9 @@ public class PostListFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-//        if(cursor.moveToFirst()){
-//
-//        }
-//        cursor.moveToFirst();
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -91,6 +87,7 @@ public class PostListFragment extends Fragment {
             Snackbar.make(getActivity().findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
 
+            // swap on success
             if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {
                 Cursor newCursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
                 mViewAdapter.swapCursor(newCursor);

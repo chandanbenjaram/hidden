@@ -1,7 +1,9 @@
 package droid.samepinch.co.app.helpers.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import java.util.List;
 
 import droid.samepinch.co.app.R;
 import droid.samepinch.co.data.dto.Post;
+import droid.samepinch.co.data.dto.User;
 
 /**
  * Created by imaginationcoder on 7/2/15.
@@ -40,10 +43,23 @@ public class PostListRecyclerViewAdapter extends RecyclerView.Adapter<PostRecycl
     }
 
     @Override
-    public void onBindViewHolder(PostRecyclerViewHolder viewHolder, int position) {
-        viewHolder.mTextView.setText(mData
-                .get(position)
-                .getContent());
+    public void onBindViewHolder(PostRecyclerViewHolder holder, int position) {
+        Post post = mData.get(position);
+//        viewHolder.mTextView.setText(mData
+//                .get(position)
+//                .getContent());
+        User user = post.getOwner();
+        Uri userPhotoUri;
+        if (user == null || TextUtils.isEmpty(user.getPhoto())) {
+            userPhotoUri = Uri.parse("http://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+        } else {
+            userPhotoUri = Uri.parse(user.getPhoto());
+        }
+        holder.mAvatarView.setImageURI(userPhotoUri);
+        holder.mWallPostDotView.setText(post.getOwner().getFname());
+        holder.mWallPostContentView.setText(post.getContent());
+        holder.mWallPostCommentersView.setText(post.getCommentersForDB());
+        holder.mWallPostViewsView.setText(post.getViews());
     }
 
     @Override
