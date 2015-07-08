@@ -27,4 +27,6 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
         mWallPostCommentersView = (TextView) view.findViewById(R.id.wall_post_commenters);
         mWallPostViewsView = (TextView) view.findViewById(R.id.wall_post_views);
     }
+
+
 }

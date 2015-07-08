@@ -36,6 +36,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item, parent, false);
         view.setBackgroundResource(mBackground);
+
         return new PostRecyclerViewHolder(view);
     }
 
@@ -70,6 +71,24 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             }
         });
 
+//        ImageView[] arrayofImages = new ImageView[2];
+//        for (int i = 0; i < 2; i++) {
+//
+//            arrayofImages[i] = new ImageView(holder.mView.getContext());
+//            arrayofImages[i].setImageURI(Uri.parse("http://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png"));
+//            arrayofImages[i].setId(i);
+//            if (i != 0) {
+//                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                params.addRule(RelativeLayout.LEFT_OF, arrayofImages[i - 1].getId());
+//                //arrayofImages[i].setLayoutParams(params);
+////                holder.(arrayofImages[i],params);
+//            } else {
+////                nn.addView(arrayofImages[i]);
+//            }
+//
+//            holder.mView.getParen
+//        }
+
 //        Glide.with(holder.mImageView.getContext())
 //                .load(Cheeses.getRandomCheeseDrawable())
 //                .fitCenter()
@@ -81,4 +100,9 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         return super.swapCursor(newCursor);
     }
 
+
+    @Override
+    public void onBindViewHolder(PostRecyclerViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
+    }
 }
