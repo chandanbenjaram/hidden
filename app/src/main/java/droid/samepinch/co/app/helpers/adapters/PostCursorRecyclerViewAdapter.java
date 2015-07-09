@@ -3,15 +3,24 @@ package droid.samepinch.co.app.helpers.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.TypedValue;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
+import droid.samepinch.co.app.TagWallActivity;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
@@ -20,32 +29,34 @@ import droid.samepinch.co.data.dto.User;
  * Created by imaginationcoder on 7/2/15.
  */
 public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<PostRecyclerViewHolder> {
-    private final TypedValue mTypedValue = new TypedValue();
-    private int mBackground;
+    //    private final TypedValue mTypedValue = new TypedValue();
+    private final Context context;
 
     public PostCursorRecyclerViewAdapter(Context context, Cursor cursor) {
         super(context, cursor);
+        this.context = context;
 
-        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-        mBackground = mTypedValue.resourceId;
+//        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+//        mBackground = mTypedValue.resourceId;
     }
 
 
     @Override
     public PostRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        View v = LayoutInflater.from(context)
                 .inflate(R.layout.list_item, parent, false);
-        view.setBackgroundResource(mBackground);
+//        v.setBackgroundResource(mBackground);
 
-        return new PostRecyclerViewHolder(view);
+        PostRecyclerViewHolder vh = new PostRecyclerViewHolder(v);
+        return vh;
     }
 
 
     @Override
-    public void onBindViewHolder(final PostRecyclerViewHolder holder, Cursor cursor) {
+    public void onBindViewHolder(final PostRecyclerViewHolder vh, Cursor cursor) {
         Post post = Utils.cursorToPostEntity(cursor);
-        holder.mBoundString = String.valueOf(post.getUid());
-//        holder.mTextView.setText(post.getContent());
+        vh.mBoundString = String.valueOf(post.getUid());
+//        vh.mTextView.setText(post.getContent());
 
         User user = post.getOwner();
         Uri userPhotoUri;
@@ -54,45 +65,68 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         } else {
             userPhotoUri = Uri.parse(user.getPhoto());
         }
-        holder.mAvatarView.setImageURI(userPhotoUri);
-        holder.mWallPostDotView.setText(post.getOwner() == null || post.getOwner().getFname() == null ? "dummy" : post.getOwner().getFname());
-        holder.mWallPostContentView.setText(post.getContent());
-        holder.mWallPostCommentersView.setText(post.getCommentersForDB() == null ? "dummy c" : post.getCommentersForDB());
-        holder.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
+        vh.mAvatarView.setImageURI(userPhotoUri);
+        vh.mWallPostDotView.setText(post.getOwner() == null || post.getOwner().getFname() == null ? "dummy" : post.getOwner().getFname());
+        vh.mWallPostContentView.setText(post.getContent());
+//        vh.mWallPostCommentersView.setText(post.getCommentersForDB() == null ? "dummy c" : post.getCommentersForDB());
+        vh.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        vh.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = v.getContext();
                 Intent intent = new Intent(context, PostDetailActivity.class);
 
-                intent.putExtra(PostDetailActivity.EXTRA_NAME, holder.mBoundString);
+                intent.putExtra(PostDetailActivity.EXTRA_NAME, vh.mBoundString);
                 context.startActivity(intent);
             }
         });
 
-//        ImageView[] arrayofImages = new ImageView[2];
-//        for (int i = 0; i < 2; i++) {
-//
-//            arrayofImages[i] = new ImageView(holder.mView.getContext());
-//            arrayofImages[i].setImageURI(Uri.parse("http://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png"));
-//            arrayofImages[i].setId(i);
-//            if (i != 0) {
-//                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//                params.addRule(RelativeLayout.LEFT_OF, arrayofImages[i - 1].getId());
-//                //arrayofImages[i].setLayoutParams(params);
-////                holder.(arrayofImages[i],params);
-//            } else {
-////                nn.addView(arrayofImages[i]);
-//            }
-//
-//            holder.mView.getParen
-//        }
+        if (post.getCommentersForDB() != null) {
+            String[] commenterImageArr = post.getCommentersForDB().split(",");
+            int chidViewsCnt = vh.mWallPostCommentersLayout.getChildCount();
+            for (int i = 0; i < chidViewsCnt && i < commenterImageArr.length; i++) {
+                View child = vh.mWallPostCommentersLayout.getChildAt(i);
+                if (child instanceof SimpleDraweeView) {
+                    SimpleDraweeView cImageView = (SimpleDraweeView) child;
+                    Uri commenterImageUri = Uri.parse(commenterImageArr[i]);
+                    cImageView.setImageURI(commenterImageUri);
+                    cImageView.setVisibility(View.VISIBLE);
+                }
+            }
+            vh.mCommentersCount.setText(commenterImageArr.length + "");
+        }
 
-//        Glide.with(holder.mImageView.getContext())
-//                .load(Cheeses.getRandomCheeseDrawable())
-//                .fitCenter()
-//                .into(holder.mImageView);
+        customTextView(vh.mWallTags, post.getTagsForDB().split(","));
+    }
+
+    private void customTextView(TextView view, String[] tags) {
+        SpannableStringBuilder spanTxt = new SpannableStringBuilder();
+
+        for (final String tag : tags) {
+            spanTxt.append(tag);
+            spanTxt.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Toast.makeText(context, tag,
+                            Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, TagWallActivity.class);
+
+                    intent.putExtra(PostDetailActivity.EXTRA_NAME, tag);
+                    context.startActivity(intent);
+                }
+
+                @Override
+                public void updateDrawState(TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setUnderlineText(false);
+                    ds.setColor(Color.BLUE);
+                }
+            }, spanTxt.length() - tag.length(), spanTxt.length(), 0);
+            spanTxt.append(" ");
+        }
+
+        view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setText(spanTxt, TextView.BufferType.SPANNABLE);
     }
 
     @Override

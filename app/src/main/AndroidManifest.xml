@@ -36,6 +36,8 @@
         </activity>
 
         <activity android:name=".PostDetailActivity" />
+        <activity android:name=".TagWallActivity" />
+
 
         <provider
             android:name="droid.samepinch.co.data.dao.SPContentProvider"

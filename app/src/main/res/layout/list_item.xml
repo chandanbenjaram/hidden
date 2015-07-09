@@ -32,17 +32,6 @@
                 fresco:progressBarImage="@drawable/loader_red_64"
                 fresco:roundAsCircle="true" />
 
-            <!--<TextView-->
-            <!--android:id="@+id/wall_post_dot"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textAppearance="?attr/textAppearanceListItem"-->
-            <!--android:layout_toRightOf="@+id/avatar"-->
-            <!--android:layout_marginLeft="5dp"-->
-            <!--android:text="dot..."-->
-            <!--android:gravity="left"-->
-            <!--/>-->
-
             <TextView
                 android:id="@+id/wall_post_dot"
                 android:layout_width="wrap_content"
@@ -63,15 +52,6 @@
                 android:text="content"
                 android:textColor="@color/grey_900" />
 
-            <TextView
-                android:id="@+id/wall_post_commenters"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/wall_post_content"
-                android:layout_toRightOf="@+id/avatar"
-                android:gravity="center_vertical"
-                android:text="commenters"
-                android:textColor="@color/grey_900" />
 
             <TextView
                 android:id="@+id/wall_post_views"
@@ -84,6 +64,103 @@
                 android:text="views"
                 android:textColor="@color/grey_500"
                 android:textSize="10dp" />
+
+
+            <TextView
+                android:id="@+id/wall_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/wall_post_content"
+                android:layout_centerHorizontal="true"
+                android:padding="5dp"
+                android:text="#tags"
+                android:textColor="@color/blue_900"
+                android:textSize="10dp" />
+
+            <LinearLayout
+                android:id="@+id/wall_post_commenters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/wall_tags"
+                android:layout_centerHorizontal="true">
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/wall_commenter_0"
+                    android:layout_width="@dimen/wall_commenter_size"
+                    android:layout_height="@dimen/wall_commenter_size"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="@dimen/wall_commenter_margin"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    fresco:placeholderImageScaleType="fitCenter"
+                    fresco:progressBarImage="@drawable/loader_red_64"
+                    fresco:roundAsCircle="true" />
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/wall_commenter_1"
+                    android:layout_width="@dimen/wall_commenter_size"
+                    android:layout_height="@dimen/wall_commenter_size"
+                    android:layout_margin="@dimen/wall_commenter_margin"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    fresco:placeholderImageScaleType="fitCenter"
+                    fresco:progressBarImage="@drawable/loader_red_64"
+                    fresco:roundAsCircle="true" />
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/wall_commenter_2"
+                    android:layout_width="@dimen/wall_commenter_size"
+                    android:layout_height="@dimen/wall_commenter_size"
+                    android:layout_margin="@dimen/wall_commenter_margin"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    fresco:placeholderImageScaleType="fitCenter"
+                    fresco:progressBarImage="@drawable/loader_red_64"
+                    fresco:roundAsCircle="true" />
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/wall_commenter_3"
+                    android:layout_width="@dimen/wall_commenter_size"
+                    android:layout_height="@dimen/wall_commenter_size"
+                    android:layout_margin="@dimen/wall_commenter_margin"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    fresco:placeholderImageScaleType="fitCenter"
+                    fresco:progressBarImage="@drawable/loader_red_64"
+                    fresco:roundAsCircle="true" />
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/wall_commenter_4"
+                    android:layout_width="@dimen/wall_commenter_size"
+                    android:layout_height="@dimen/wall_commenter_size"
+                    android:layout_margin="@dimen/wall_commenter_margin"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    fresco:placeholderImageScaleType="fitCenter"
+                    fresco:progressBarImage="@drawable/loader_red_64"
+                    fresco:roundAsCircle="true" />
+
+
+                <LinearLayout
+                    android:layout_width="@dimen/wall_commenter_size"
+                    android:layout_height="@dimen/wall_commenter_size"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/comment_count_1x"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/wall_commenters_count"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginBottom="2dp"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@color/grey_600"
+                        android:textSize="9dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

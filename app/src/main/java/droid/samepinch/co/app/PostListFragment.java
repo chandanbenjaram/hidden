@@ -23,7 +23,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -44,12 +43,17 @@ public class PostListFragment extends Fragment {
     PostListFragmentUpdater postListFragmentUpdater = new PostListFragmentUpdater();
     PostCursorRecyclerViewAdapter mViewAdapter;
     private Intent mServiceIntent;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         RecyclerView rv = (RecyclerView) inflater.inflate(
                 R.layout.fragment_cheese_list, container, false);
+        mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(rv);
 
         // The filter's action is BROADCAST_ACTION
@@ -67,8 +71,8 @@ public class PostListFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+//        recyclerView.setHasFixedSize(true);
+//        recyclerView.setLayoutManager();
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         recyclerView.setAdapter(mViewAdapter);
@@ -84,8 +88,8 @@ public class PostListFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             String intentName = intent.getStringExtra(AppConstants.APP_INTENT.EXTENDED_DATA_STATUS.getValue());
             AppConstants.APP_INTENT intentNameConst = AppConstants.APP_INTENT.valueOf(intentName);
-            Snackbar.make(getActivity().findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+//            Snackbar.make(getActivity().findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show();
 
             // swap on success
             if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {

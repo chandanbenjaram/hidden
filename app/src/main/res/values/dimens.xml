@@ -20,4 +20,6 @@
     <dimen name="card_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="list_item_avatar_size">55dp</dimen>
+    <dimen name="wall_commenter_size">15dp</dimen>
+    <dimen name="wall_commenter_margin">2dp</dimen>
 </resources>
