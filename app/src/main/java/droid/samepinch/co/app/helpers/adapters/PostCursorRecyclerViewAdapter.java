@@ -14,13 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
-import droid.samepinch.co.app.TagWallActivity;
+import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
@@ -107,10 +106,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             spanTxt.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
-                    Toast.makeText(context, tag,
-                            Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(context, TagWallActivity.class);
-
+                    Intent intent = new Intent(context, ActivityFragment.class);
                     intent.putExtra(PostDetailActivity.EXTRA_NAME, tag);
                     context.startActivity(intent);
                 }

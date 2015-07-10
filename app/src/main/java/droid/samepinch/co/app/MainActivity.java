@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Create Post", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Create Post", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
                 setFragment(new TagWallFragment());
             }
@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-//        adapterViewPager = new Adapter(getSupportFragmentManager());
         adapterViewPager = new Adapter(getSupportFragmentManager());
         viewPager.setAdapter(adapterViewPager);
     }

@@ -19,31 +19,45 @@ package droid.samepinch.co.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-public class TagWallActivity extends AppCompatActivity {
+public class ActivityFragment extends AppCompatActivity {
 
-    public static final String EXTRA_NAME = "tag";
+    public static final String EXTRA_NAME = "ActivityFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tag_wall);
+        setContentView(R.layout.activity_fragment);
 
         Intent intent = getIntent();
         final String tag = intent.getStringExtra(EXTRA_NAME);
 
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//        ft.add(R.id.tag_wall_fragment_0, new PostListFragment());
-//        ft.commit();
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(tag);
 
-        loadBackdrop();
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.fragment_container, new TagWallFragment()).addToBackStack(null);
+        ft.commit();
+
+
+//        CollapsingToolbarLayout collapsingToolbar =
+//                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+//        collapsingToolbar.setTitle(tag);
+//
+//        loadBackdrop();
     }
 
     @Override

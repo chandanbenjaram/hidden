@@ -61,7 +61,7 @@ public class PostListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         RecyclerView rv = (RecyclerView) inflater.inflate(
-                R.layout.fragment_cheese_list, container, false);
+                R.layout.posts_recycler_view, container, false);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(rv);
