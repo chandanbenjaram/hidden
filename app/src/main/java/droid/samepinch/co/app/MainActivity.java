@@ -23,7 +23,6 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -36,12 +35,7 @@ import android.view.View;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
-import droid.samepinch.co.app.helpers.module.DataModule;
-import droid.samepinch.co.app.helpers.module.StorageComponent;
+import droid.samepinch.co.app.helpers.SmartFragmentStatePagerAdapter;
 
 /**
  * TODO
@@ -49,6 +43,8 @@ import droid.samepinch.co.app.helpers.module.StorageComponent;
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+
+    Adapter adapterViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +81,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Create Post", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                setFragment(new TagWallFragment());
             }
         });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    public void setFragment(Fragment frag) {
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.findFragmentById(R.id.fragment_container) == null) {
+            fm.beginTransaction().add(R.id.fragment_container, frag).addToBackStack(null).commit();
+        }
     }
 
     @Override
@@ -109,10 +114,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new PostListFragment(), "WALL");
-//        adapter.addFragment(new PostListFragment(), "Category 2");
-        viewPager.setAdapter(adapter);
+//        adapterViewPager = new Adapter(getSupportFragmentManager());
+        adapterViewPager = new Adapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapterViewPager);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -127,32 +131,40 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    static class Adapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragments = new ArrayList<>();
-        private final List<String> mFragmentTitles = new ArrayList<>();
+    // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
+    static class Adapter extends SmartFragmentStatePagerAdapter {
+        private static int NUM_ITEMS = 3;
 
-        public Adapter(FragmentManager fm) {
-            super(fm);
+        public Adapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
         }
 
-        public void addFragment(Fragment fragment, String title) {
-            mFragments.add(fragment);
-            mFragmentTitles.add(title);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragments.get(position);
-        }
-
+        // Returns total number of pages
         @Override
         public int getCount() {
-            return mFragments.size();
+            return NUM_ITEMS;
         }
 
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return new PostListFragment();
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return new PostListFragment();
+                case 2: // Fragment # 1 - This will show SecondFragment
+                    return new PostListFragment();
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return mFragmentTitles.get(position);
+            return "Page " + position;
         }
+
     }
 }

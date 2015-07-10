@@ -39,8 +39,8 @@ import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
 import droid.samepinch.co.data.dao.SchemaPosts;
 
-public class PostListFragment extends Fragment {
-    public static final String LOG_TAG = "PostListFragment";
+public class TagWallFragment extends Fragment {
+    public static final String LOG_TAG = "TagWallFragment";
 
     PostListFragmentUpdater postListFragmentUpdater = new PostListFragmentUpdater();
     PostCursorRecyclerViewAdapter mViewAdapter;
@@ -53,6 +53,11 @@ public class PostListFragment extends Fragment {
     {
         super.onAttach(activity);
         this.activity = (FragmentActivity)activity;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Nullable
@@ -96,16 +101,7 @@ public class PostListFragment extends Fragment {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String intentName = intent.getStringExtra(AppConstants.APP_INTENT.EXTENDED_DATA_STATUS.getValue());
-            AppConstants.APP_INTENT intentNameConst = AppConstants.APP_INTENT.valueOf(intentName);
-//            Snackbar.make(activity.findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show();
 
-            // swap on success
-            if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {
-                Cursor newCursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-                mViewAdapter.swapCursor(newCursor);
-            }
         }
     }
 }
