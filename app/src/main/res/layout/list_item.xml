@@ -29,7 +29,6 @@
                 android:clickable="true"
                 android:padding="5dp"
                 fresco:placeholderImageScaleType="fitCenter"
-                fresco:progressBarImage="@drawable/loader_red_64"
                 fresco:roundAsCircle="true" />
 
             <TextView
@@ -59,7 +58,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/wall_post_dot"
                 android:layout_alignParentRight="true"
-                android:drawableLeft="@drawable/icon_view_count_1x"
                 android:padding="5dp"
                 android:text="views"
                 android:textColor="@color/grey_500"
@@ -93,7 +91,6 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone"
                     fresco:placeholderImageScaleType="fitCenter"
-                    fresco:progressBarImage="@drawable/loader_red_64"
                     fresco:roundAsCircle="true" />
 
                 <com.facebook.drawee.view.SimpleDraweeView
@@ -104,7 +101,6 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone"
                     fresco:placeholderImageScaleType="fitCenter"
-                    fresco:progressBarImage="@drawable/loader_red_64"
                     fresco:roundAsCircle="true" />
 
                 <com.facebook.drawee.view.SimpleDraweeView
@@ -115,7 +111,6 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone"
                     fresco:placeholderImageScaleType="fitCenter"
-                    fresco:progressBarImage="@drawable/loader_red_64"
                     fresco:roundAsCircle="true" />
 
                 <com.facebook.drawee.view.SimpleDraweeView
@@ -126,7 +121,6 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone"
                     fresco:placeholderImageScaleType="fitCenter"
-                    fresco:progressBarImage="@drawable/loader_red_64"
                     fresco:roundAsCircle="true" />
 
                 <com.facebook.drawee.view.SimpleDraweeView
@@ -137,7 +131,6 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone"
                     fresco:placeholderImageScaleType="fitCenter"
-                    fresco:progressBarImage="@drawable/loader_red_64"
                     fresco:roundAsCircle="true" />
 
 
@@ -145,7 +138,6 @@
                     android:layout_width="@dimen/wall_commenter_size"
                     android:layout_height="@dimen/wall_commenter_size"
                     android:layout_marginTop="2dp"
-                    android:background="@drawable/comment_count_1x"
                     android:orientation="horizontal">
 
                     <TextView

@@ -20,7 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import droid.samepinch.co.app.helpers.AppConstants;
+import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
+import droid.samepinch.co.app.helpers.module.DataModule;
+import droid.samepinch.co.app.helpers.module.StorageComponent;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
@@ -37,9 +42,7 @@ import static droid.samepinch.co.app.helpers.AppConstants.KV.SCOPE;
  * Created by imaginationcoder on 6/26/15.
  */
 public class PostsPullService extends IntentService {
-    public static final String LOG_TAG = PostsPullService.class.getSimpleName();
-    private static RestTemplate rest = new RestTemplate();
-
+    public static final String LOG_TAG = "PostsPullService";
     private BroadcastNotifier mBroadcaster;
 
 
@@ -58,7 +61,9 @@ public class PostsPullService extends IntentService {
             return;
         }
 
-        ReqPosts postsReq = new ReqPosts();
+        StorageComponent component = DaggerStorageComponent.create();
+        ReqPosts postsReq = component.provideReqPosts();
+
         postsReq.setToken(appToken);
         postsReq.setCmd("all");
         postsReq.setPostCount(10);
@@ -74,10 +79,9 @@ public class PostsPullService extends IntentService {
 
             // call
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
-            ResponseEntity<RespPosts> resp = rest.exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
+            ResponseEntity<RespPosts> resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
             RespPosts respData = resp.getBody();
-
             List<Post> postsToInsert = respData.getBody().getPosts();
             ArrayList<ContentProviderOperation> ops = new ArrayList<>();
             String anonymImage = respData.getBody().getAnonymousImage();
@@ -144,7 +148,8 @@ public class PostsPullService extends IntentService {
             payload.put(SCOPE.getKey(), SCOPE.getValue());
             payload.put(GRANT_TYPE.getKey(), GRANT_TYPE.getValue());
 
-            ResponseEntity<Map> response = rest.postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
+            StorageComponent component = DaggerStorageComponent.create();
+            ResponseEntity<Map> response = component.provideRestTemplate().postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
             Map<String, String> responseEntity = response.getBody();
             // populate to shared prefs
             SharedPreferences.Editor editor = settings.edit();

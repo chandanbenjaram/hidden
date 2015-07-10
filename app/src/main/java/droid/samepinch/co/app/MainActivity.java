@@ -39,6 +39,10 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import java.util.ArrayList;
 import java.util.List;
 
+import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
+import droid.samepinch.co.app.helpers.module.DataModule;
+import droid.samepinch.co.app.helpers.module.StorageComponent;
+
 /**
  * TODO
  */
@@ -51,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Fresco.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+
+//        StorageComponent component = DaggerStorageComponent.builder().dataModule(new DataModule()).build();
+
+//        vehicle = component.provideVehicle();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

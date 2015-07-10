@@ -71,7 +71,7 @@ public class PostListFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
-//        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
 //        recyclerView.setLayoutManager();
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
