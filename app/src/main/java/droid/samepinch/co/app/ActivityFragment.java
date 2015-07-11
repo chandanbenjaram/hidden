@@ -16,68 +16,60 @@
 
 package droid.samepinch.co.app;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.ImageView;
+
+import droid.samepinch.co.app.helpers.RootFragment;
+import droid.samepinch.co.app.helpers.SmartFragmentStatePagerAdapter;
 
 public class ActivityFragment extends AppCompatActivity {
 
     public static final String EXTRA_NAME = "ActivityFragment";
 
+    ViewPager mPager;
+    Adapter mPagerAdapter;
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
-        Intent intent = getIntent();
-        final String tag = intent.getStringExtra(EXTRA_NAME);
-
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(tag);
-
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.fragment_container, new TagWallFragment()).addToBackStack(null);
-        ft.commit();
-
-
-//        CollapsingToolbarLayout collapsingToolbar =
-//                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-//        collapsingToolbar.setTitle(tag);
-//
-//        loadBackdrop();
+		/* Instantiate a ViewPager and a PagerAdapter. */
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPagerAdapter = new Adapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+    static class Adapter extends SmartFragmentStatePagerAdapter {
+        private static int NUM_ITEMS = 1;
+        public Adapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
         }
-        return super.onOptionsItemSelected(item);
-    }
 
-    private void loadBackdrop() {
-        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-//        Glide.with(this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            return new RootFragment();
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "";
+        }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sample_actions, menu);
-        return true;
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

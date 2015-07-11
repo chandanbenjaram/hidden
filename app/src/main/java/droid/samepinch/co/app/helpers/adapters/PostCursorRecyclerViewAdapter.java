@@ -17,9 +17,9 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
-import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
@@ -67,7 +67,6 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         vh.mAvatarView.setImageURI(userPhotoUri);
         vh.mWallPostDotView.setText(post.getOwner() == null || post.getOwner().getFname() == null ? "dummy" : post.getOwner().getFname());
         vh.mWallPostContentView.setText(post.getContent());
-//        vh.mWallPostCommentersView.setText(post.getCommentersForDB() == null ? "dummy c" : post.getCommentersForDB());
         vh.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
 
         vh.mView.setOnClickListener(new View.OnClickListener() {

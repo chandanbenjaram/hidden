@@ -19,7 +19,6 @@ package droid.samepinch.co.app;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -91,10 +90,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setFragment(Fragment frag) {
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentById(R.id.fragment_container) == null) {
-            fm.beginTransaction().add(R.id.fragment_container, frag).addToBackStack(null).commit();
-        }
+//        FragmentManager fm = getSupportFragmentManager();
+//        if (fm.findFragmentById(R.id.fragment_container) == null) {
+//            fm.beginTransaction().add(R.id.fragment_container, frag).addToBackStack(null).commit();
+//        }
     }
 
     @Override
