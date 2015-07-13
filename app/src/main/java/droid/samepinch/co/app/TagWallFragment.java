@@ -80,12 +80,13 @@ public class TagWallFragment extends Fragment {
         if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_PHOTO_URL)) != -1) {
             String photoUrlStr = cursor.getString(photoUrlIndex);
              imgUri = Uri.parse(photoUrlStr);
+            // tag map
+            SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
+            backdropImg.setImageURI(imgUri);
         }else{
-            imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+//            imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
         }
-        // tag map
-        SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
-        backdropImg.setImageURI(imgUri);
+
 
         // recyclers
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);

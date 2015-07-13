@@ -1,6 +1,13 @@
 package droid.samepinch.co.app.helpers;
 
 import android.database.Cursor;
+import android.net.Uri;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -56,7 +63,6 @@ public class Utils {
         int createdAtIndex;
         int commentersIndex;
         int tagsIndex;
-        int ownerUIdIndex;
         if ((uidIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_UID)) != -1) {
             post.setUid(cursor.getString(uidIndex));
         }
@@ -88,18 +94,24 @@ public class Utils {
         if ((tagsIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_TAGS)) != -1) {
             post.setTagsFromDB(cursor.getString(tagsIndex));
         }
+
 //
-        if (post.getAnonymous()) {
-            return post;
-        }
+//        if (post.getAnonymous()) {
+//            return post;
+//        }
 
         int ownerFNameIndex;
         int ownerLNameIndex;
         int ownerPrefNameIndex;
         int ownerPinchHandleIndex;
         int ownerPhotoUrlIndex;
+        int ownerUIdIndex;
 
         User user = new User();
+        if ((ownerUIdIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_OWNER)) != -1) {
+            user.setUid(cursor.getString(ownerUIdIndex));
+        }
+
         if ((ownerFNameIndex = cursor.getColumnIndex(SchemaDots.COLUMN_FNAME)) != -1) {
             user.setFname(cursor.getString(ownerFNameIndex));
         }
@@ -126,4 +138,15 @@ public class Utils {
     }
 
 
+    public static void setupLoadingImageHolder(SimpleDraweeView iView, String imageUrl) {
+        Uri uri = Uri.parse(imageUrl);
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+                .setProgressiveRenderingEnabled(true) //Progressive loading
+                .build();
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(request)
+                .setOldController(iView.getController())
+                .build();
+        iView.setController(controller);
+    }
 }

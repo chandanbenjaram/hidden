@@ -83,10 +83,10 @@ public class PostListFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setHasFixedSize(true);
+//        recyclerView.setHasFixedSize(true);
 //        recyclerView.setLayoutManager();
         Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        PostCursorRecyclerViewAdapter mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
@@ -105,8 +105,9 @@ public class PostListFragment extends Fragment {
 
             // swap on success
             if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {
-                Cursor newCursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-                mViewAdapter.swapCursor(newCursor);
+                // Cursor newCursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                //mViewAdapter.swapCursor(newCursor);
+                //mViewAdapter.notifyDataSetChanged();
             }
         }
     }

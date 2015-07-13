@@ -15,16 +15,20 @@ import droid.samepinch.co.app.R;
 public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
     public final View mView;
     public final SimpleDraweeView mAvatarView;
-    public final TextView mWallPostDotView, mWallPostContentView, mWallPostViewsView, mCommentersCount, mWallTags;
+    public final TextView mWallPostDotView;
+    public final TextView mWallPostContentView;
+    public final TextView mWallPostViewsView;
+    public final TextView mCommentersCount;
+    public final TextView mWallTags;
+    public final TextView mAvatarName;
     public final LinearLayout mWallPostCommentersLayout;
-
-
-    public String mBoundString;
 
     public PostRecyclerViewHolder(View view) {
         super(view);
         mView = view;
         mAvatarView = (SimpleDraweeView) view.findViewById(R.id.avatar);
+        mAvatarName = (TextView) view.findViewById(R.id.avatar_name);
+
         mWallPostDotView = (TextView) view.findViewById(R.id.wall_post_dot);
         mWallPostContentView = (TextView) view.findViewById(R.id.wall_post_content);
         mWallPostViewsView = (TextView) view.findViewById(R.id.wall_post_views);

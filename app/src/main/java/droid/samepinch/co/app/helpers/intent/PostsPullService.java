@@ -21,6 +21,7 @@ import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
+import droid.samepinch.co.app.helpers.module.DataModule;
 import droid.samepinch.co.app.helpers.module.StorageComponent;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -77,24 +78,29 @@ public class PostsPullService extends IntentService {
             // call
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
             ResponseEntity<RespPosts> resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
-
             RespPosts respData = resp.getBody();
+
             List<Post> postsToInsert = respData.getBody().getPosts();
             ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-            String anonymImage = respData.getBody().getAnonymousImage();
-            String anonymUId = "0";
+
+            // anonymous dot construction
+            User dfltAnonyDot = component.provideAnonymousDot();
+            String anonyImg = respData.getBody().getAnonymousImage();
+            dfltAnonyDot.setPhoto(anonyImg);
+
             for (Post post : postsToInsert) {
                 User postOwner = post.getOwner();
                 // DOTS
                 if (post.getAnonymous()) {
+//                    dfltAnonyDot.setPhoto(anonyImg);
                     // TODO
                     ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
-                            .withValue(SchemaDots.COLUMN_UID, anonymUId)
-                            .withValue(SchemaDots.COLUMN_FNAME, "anonymous")
-                            .withValue(SchemaDots.COLUMN_LNAME, "anonymous")
-                            .withValue(SchemaDots.COLUMN_PREF_NAME, "anonymous")
-                            .withValue(SchemaDots.COLUMN_PINCH_HANDLE, "anonymous")
-                            .withValue(SchemaDots.COLUMN_PHOTO_URL, anonymImage).build());
+                            .withValue(SchemaDots.COLUMN_UID, dfltAnonyDot.getUid())
+                            .withValue(SchemaDots.COLUMN_FNAME, dfltAnonyDot.getFname())
+                                    .withValue(SchemaDots.COLUMN_LNAME, dfltAnonyDot.getLname())
+                                    .withValue(SchemaDots.COLUMN_PREF_NAME, dfltAnonyDot.getPrefName())
+//                                    .withValue(SchemaDots.COLUMN_PINCH_HANDLE, "anonymous")
+                                    .withValue(SchemaDots.COLUMN_PHOTO_URL, dfltAnonyDot.getPhoto()).build());
                 } else {
                     ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
                             .withValue(SchemaDots.COLUMN_UID, postOwner.getUid())
@@ -114,9 +120,8 @@ public class PostsPullService extends IntentService {
                         .withValue(SchemaPosts.COLUMN_ANONYMOUS, post.getAnonymous())
                         .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
                         .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
-                        .withValue(SchemaPosts.COLUMN_OWNER, (post.getAnonymous() ? anonymUId : postOwner.getUid()))
+                        .withValue(SchemaPosts.COLUMN_OWNER, (post.getAnonymous() ? dfltAnonyDot.getUid() : postOwner.getUid()))
                         .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB()).build());
-
                 // TAGS
                 for (String tag : post.getTags()) {
                     ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)

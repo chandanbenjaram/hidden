@@ -56,26 +56,16 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
     @Override
     public void onBindViewHolder(final PostRecyclerViewHolder vh, Cursor cursor) {
-        Post post = Utils.cursorToPostEntity(cursor);
-        vh.mBoundString = String.valueOf(post.getUid());
-//        vh.mTextView.setText(post.getContent());
-
+        final Post post = Utils.cursorToPostEntity(cursor);
         final User user = post.getOwner();
-        Uri userPhotoUri;
-        if (user == null || TextUtils.isEmpty(user.getPhoto())) {
-            userPhotoUri = Uri.parse("http://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
-        } else {
-            userPhotoUri = Uri.parse(user.getPhoto());
-        }
-        vh.mAvatarView.setImageURI(userPhotoUri);
-        vh.mAvatarView.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener dotClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TARGET
                 Bundle args = new Bundle();
                 args.putString(K.TARGET_FRAGMENT.name(), K.FRAGMENT_DOTWALL.name());
                 // data
-                args.putString(K.KEY_TAG.name(), user.getUid());
+                args.putString(K.KEY_DOT.name(), user.getUid());
 
                 // intent
                 Intent intent = new Intent(context, ActivityFragment.class);
@@ -83,8 +73,29 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
                 context.startActivity(intent);
             }
-        });
-        vh.mWallPostDotView.setText(post.getOwner() == null || post.getOwner().getFname() == null ? "dummy" : post.getOwner().getFname());
+        };
+        if (TextUtils.isEmpty(user.getPhoto())) {
+            vh.mAvatarView.setVisibility(View.INVISIBLE);
+            if(TextUtils.isEmpty(user.getFname()) || user.getFname().length() < 1
+                    || TextUtils.isEmpty(user.getLname()) || user.getLname().length() < 1){
+                vh.mAvatarName.setText("ZZZ");
+            }else{
+                vh.mAvatarName.setText(user.getFname().substring(0, 1) + user.getLname().substring(0, 1));
+            }
+
+            vh.mAvatarName.setOnClickListener(dotClick);
+        } else {
+            vh.mAvatarName.setVisibility(View.INVISIBLE);
+            vh.mAvatarName.setText("");
+
+            Uri userPhotoUri = Uri.parse(user.getPhoto());
+            vh.mAvatarView.setImageURI(userPhotoUri);
+            vh.mAvatarView.setOnClickListener(dotClick);
+//            vh.mAvatarView.setOnClickListener(dotClick);
+            //            Utils.setupLoadingImageHolder(vh.mAvatarView, user.getPhoto());
+        }
+
+        vh.mWallPostDotView.setText(user.getFname());
         vh.mWallPostContentView.setText(post.getContent());
         vh.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
 
@@ -92,8 +103,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, PostDetailActivity.class);
-
-                intent.putExtra(PostDetailActivity.EXTRA_NAME, vh.mBoundString);
+                intent.putExtra(PostDetailActivity.EXTRA_NAME, post.getUid());
                 context.startActivity(intent);
             }
         });

@@ -32,6 +32,22 @@
                 fresco:roundAsCircle="true" />
 
             <TextView
+                android:id="@+id/avatar_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="all"
+                android:text=""
+                android:layout_alignTop="@+id/avatar"
+                android:layout_alignBottom="@+id/avatar"
+                android:layout_alignLeft="@+id/avatar"
+                android:layout_alignRight="@+id/avatar"
+                android:background="@drawable/rounded_corners"
+                android:textColor="@color/grey_500"
+                android:gravity="center"
+                android:layout_margin="5px"
+                />
+
+            <TextView
                 android:id="@+id/wall_post_dot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

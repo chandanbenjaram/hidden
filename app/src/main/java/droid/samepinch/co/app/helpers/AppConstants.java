@@ -10,7 +10,8 @@ public class AppConstants {
         TARGET_FRAGMENT,
         FRAGMENT_TAGWALL,
         FRAGMENT_DOTWALL,
-        KEY_TAG
+        KEY_TAG,
+        KEY_DOT
     }
 
     public enum API {

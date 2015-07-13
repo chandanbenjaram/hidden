@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
+import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dao.SchemaTags;
 
@@ -70,35 +71,32 @@ public class DotWallFragment extends Fragment {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar);
 
-        // tag name
-        String tag = getArguments().getString(K.KEY_TAG.name());
-        collapsingToolbar.setTitle(tag);
+        // dot uid
+        String dotUid = getArguments().getString(K.KEY_DOT.name());
+        collapsingToolbar.setTitle(dotUid);
 
-        Cursor cursor = activity.getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
-        Uri imgUri;
+        Cursor cursor = activity.getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
         int photoUrlIndex;
         if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_PHOTO_URL)) != -1) {
             String photoUrlStr = cursor.getString(photoUrlIndex);
-             imgUri = Uri.parse(photoUrlStr);
-        }else{
-            imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+            Uri imgUri = Uri.parse(photoUrlStr);
+            // tag map
+            SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
+            backdropImg.setImageURI(imgUri);
         }
-        // tag map
-        SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
-        backdropImg.setImageURI(imgUri);
 
         // recyclers
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
-        setupRecyclerView(new String[]{"%" + tag + "%"}, rv);
+        setupRecyclerView(new String[]{dotUid}, rv);
 
         return view;
     }
 
-    private void setupRecyclerView(String[] tags, RecyclerView recyclerView) {
+    private void setupRecyclerView(String[] args0, RecyclerView recyclerView) {
         recyclerView.setHasFixedSize(true);
-        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", tags, null);
+        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", args0, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
