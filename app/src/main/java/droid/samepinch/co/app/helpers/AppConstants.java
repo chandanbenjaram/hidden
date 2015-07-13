@@ -9,6 +9,7 @@ public class AppConstants {
         APP_EXTRAS,
         TARGET_FRAGMENT,
         FRAGMENT_TAGWALL,
+        FRAGMENT_DOTWALL,
         KEY_TAG
     }
 

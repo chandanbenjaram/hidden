@@ -60,7 +60,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         vh.mBoundString = String.valueOf(post.getUid());
 //        vh.mTextView.setText(post.getContent());
 
-        User user = post.getOwner();
+        final User user = post.getOwner();
         Uri userPhotoUri;
         if (user == null || TextUtils.isEmpty(user.getPhoto())) {
             userPhotoUri = Uri.parse("http://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
@@ -68,6 +68,22 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             userPhotoUri = Uri.parse(user.getPhoto());
         }
         vh.mAvatarView.setImageURI(userPhotoUri);
+        vh.mAvatarView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TARGET
+                Bundle args = new Bundle();
+                args.putString(K.TARGET_FRAGMENT.name(), K.FRAGMENT_DOTWALL.name());
+                // data
+                args.putString(K.KEY_TAG.name(), user.getUid());
+
+                // intent
+                Intent intent = new Intent(context, ActivityFragment.class);
+                intent.putExtras(args);
+
+                context.startActivity(intent);
+            }
+        });
         vh.mWallPostDotView.setText(post.getOwner() == null || post.getOwner().getFname() == null ? "dummy" : post.getOwner().getFname());
         vh.mWallPostContentView.setText(post.getContent());
         vh.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
