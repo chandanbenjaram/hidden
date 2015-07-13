@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -23,6 +24,8 @@ import droid.samepinch.co.app.R;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
+
+import static droid.samepinch.co.app.helpers.AppConstants.K;
 
 /**
  * Created by imaginationcoder on 7/2/15.
@@ -105,8 +108,16 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             spanTxt.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
+                    // TARGET
+                    Bundle args = new Bundle();
+                    args.putString(K.TARGET_FRAGMENT.name(), K.FRAGMENT_TAGWALL.name());
+                    // data
+                    args.putString(K.KEY_TAG.name(), tag);
+
+                    // intent
                     Intent intent = new Intent(context, ActivityFragment.class);
-                    intent.putExtra(PostDetailActivity.EXTRA_NAME, tag);
+                    intent.putExtras(args);
+
                     context.startActivity(intent);
                 }
 
@@ -128,7 +139,6 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
     public Cursor swapCursor(Cursor newCursor) {
         return super.swapCursor(newCursor);
     }
-
 
     @Override
     public void onBindViewHolder(PostRecyclerViewHolder viewHolder, int position) {

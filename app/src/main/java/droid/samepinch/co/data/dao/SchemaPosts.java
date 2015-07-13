@@ -61,13 +61,14 @@ public interface SchemaPosts extends BaseColumns {
             + " AS SELECT"
             + " p." + _ID
             + ", p." + COLUMN_UID
-            + ", SUBSTR(p." + COLUMN_CONTENT + ", 1, 55) " + COLUMN_CONTENT
+            + ", SUBSTR(p." + COLUMN_CONTENT + ", 1, 155) " + COLUMN_CONTENT
             + ", p." + COLUMN_COMMENT_COUNT
             + ", p." + COLUMN_UPVOTE_COUNT
             + ", p." + COLUMN_VIEWS
             + ", p." + COLUMN_ANONYMOUS
             + ", p." + COLUMN_COMMENTERS
             + ", p." + COLUMN_TAGS
+            + ", d." + SchemaDots.COLUMN_PINCH_HANDLE
             + ", d." + SchemaDots.COLUMN_FNAME
             + ", d." + SchemaDots.COLUMN_LNAME
             + ", d." + SchemaDots.COLUMN_PINCH_HANDLE
@@ -75,7 +76,6 @@ public interface SchemaPosts extends BaseColumns {
             + ", d." + SchemaDots.COLUMN_PHOTO_URL
             + " FROM " + TABLE_NAME + " p, " + SchemaDots.TABLE_NAME + " d "
             + " WHERE " + " p." + COLUMN_OWNER + "=" + "d." + SchemaDots.COLUMN_UID;
-
     String VIEW_DROP_POST_WITH_DOT = "DROP VIEW IF EXISTS " + VIEW_CREATE_POST_WITH_DOT_NAME;
 
     // provider related stuff

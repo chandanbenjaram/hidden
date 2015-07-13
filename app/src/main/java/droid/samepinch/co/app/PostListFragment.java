@@ -24,6 +24,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
@@ -70,6 +71,7 @@ public class PostListFragment extends Fragment {
         IntentFilter statusIntentFilter = new IntentFilter(
                 AppConstants.APP_INTENT.BROADCAST_ACTION.getValue());
         statusIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+
         // Registers the PostListFragmentUpdater and its intent filters
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 postListFragmentUpdater,
@@ -98,8 +100,8 @@ public class PostListFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             String intentName = intent.getStringExtra(AppConstants.APP_INTENT.EXTENDED_DATA_STATUS.getValue());
             AppConstants.APP_INTENT intentNameConst = AppConstants.APP_INTENT.valueOf(intentName);
-//            Snackbar.make(activity.findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show();
+            Snackbar.make(activity.findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
 
             // swap on success
             if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {

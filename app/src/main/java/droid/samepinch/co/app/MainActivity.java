@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 //        StorageComponent component = DaggerStorageComponent.builder().dataModule(new DataModule()).build();
-
 //        vehicle = component.provideVehicle();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -81,19 +80,12 @@ public class MainActivity extends AppCompatActivity {
 //                Snackbar.make(view, "Create Post", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
-                setFragment(new TagWallFragment());
+//                setFragment(new TagWallFragment());
             }
         });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-    }
-
-    public void setFragment(Fragment frag) {
-//        FragmentManager fm = getSupportFragmentManager();
-//        if (fm.findFragmentById(R.id.fragment_container) == null) {
-//            fm.beginTransaction().add(R.id.fragment_container, frag).addToBackStack(null).commit();
-//        }
     }
 
     @Override
@@ -151,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
                     return new PostListFragment();
                 case 1: // Fragment # 0 - This will show FirstFragment different title
                     return new PostListFragment();
-                case 2: // Fragment # 1 - This will show SecondFragment
-                    return new PostListFragment();
                 default:
                     return null;
             }
@@ -163,6 +153,5 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return "Page " + position;
         }
-
     }
 }

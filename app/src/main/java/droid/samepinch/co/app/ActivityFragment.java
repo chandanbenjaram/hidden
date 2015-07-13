@@ -37,16 +37,22 @@ public class ActivityFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
-		/* Instantiate a ViewPager and a PagerAdapter. */
         mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new Adapter(getSupportFragmentManager());
+        mPagerAdapter = new Adapter(getSupportFragmentManager(), getIntent().getExtras());
         mPager.setAdapter(mPagerAdapter);
     }
 
     static class Adapter extends SmartFragmentStatePagerAdapter {
         private static int NUM_ITEMS = 1;
+        private final Bundle args;
         public Adapter(FragmentManager fragmentManager) {
             super(fragmentManager);
+            this.args = null;
+        }
+
+        public Adapter(FragmentManager fragmentManager, Bundle args) {
+            super(fragmentManager);
+            this.args = args;
         }
 
         // Returns total number of pages
@@ -58,7 +64,9 @@ public class ActivityFragment extends AppCompatActivity {
         // Returns the fragment to display for that page
         @Override
         public Fragment getItem(int position) {
-            return new RootFragment();
+            Fragment frag = new RootFragment();
+            frag.setArguments(args);
+            return frag;
         }
 
         // Returns the page title for the top indicator

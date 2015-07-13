@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +35,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.data.dao.SchemaPosts;
+import droid.samepinch.co.data.dao.SchemaTags;
+
+import static droid.samepinch.co.app.helpers.AppConstants.K;
 
 public class TagWallFragment extends Fragment {
     public static final String LOG_TAG = "TagWallFragment";
@@ -50,11 +52,9 @@ public class TagWallFragment extends Fragment {
         this.activity = (AppCompatActivity) activity;
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         View view = inflater.inflate(R.layout.tags_wall_view, container, false);
 
         final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -63,30 +63,42 @@ public class TagWallFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() !=null){
-                    getActivity().onBackPressed();
-                }
+                // hack to get click working
+                activity.onBackPressed();
             }
         });
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("TAG");
 
+        // tag name
+        String tag = getArguments().getString(K.KEY_TAG.name());
+        collapsingToolbar.setTitle(tag);
+
+        Cursor cursor = activity.getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
+        Uri imgUri;
+        int photoUrlIndex;
+        if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_PHOTO_URL)) != -1) {
+            String photoUrlStr = cursor.getString(photoUrlIndex);
+             imgUri = Uri.parse(photoUrlStr);
+        }else{
+            imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+        }
+        // tag map
         SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
-        Uri imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
         backdropImg.setImageURI(imgUri);
 
+        // recyclers
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
-        setupRecyclerView(rv);
+        setupRecyclerView(new String[]{"%" + tag + "%"}, rv);
 
         return view;
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
+    private void setupRecyclerView(String[] tags, RecyclerView recyclerView) {
         recyclerView.setHasFixedSize(true);
-        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", tags, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

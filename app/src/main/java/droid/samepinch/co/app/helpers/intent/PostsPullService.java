@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,14 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
-import droid.samepinch.co.app.helpers.module.DataModule;
 import droid.samepinch.co.app.helpers.module.StorageComponent;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
+import droid.samepinch.co.data.dao.SchemaTags;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
 import droid.samepinch.co.rest.ReqPosts;
@@ -86,9 +83,9 @@ public class PostsPullService extends IntentService {
             ArrayList<ContentProviderOperation> ops = new ArrayList<>();
             String anonymImage = respData.getBody().getAnonymousImage();
             String anonymUId = "0";
-            int opsCounter = -1;
             for (Post post : postsToInsert) {
                 User postOwner = post.getOwner();
+                // DOTS
                 if (post.getAnonymous()) {
                     // TODO
                     ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
@@ -106,9 +103,8 @@ public class PostsPullService extends IntentService {
                             .withValue(SchemaDots.COLUMN_PREF_NAME, postOwner.getPrefName())
                             .withValue(SchemaDots.COLUMN_PINCH_HANDLE, postOwner.getPinchHandle())
                             .withValue(SchemaDots.COLUMN_PHOTO_URL, postOwner.getPhoto()).build());
-//                    opsCounter+=1;
                 }
-
+                // POSTS
                 ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
                         .withValue(SchemaPosts.COLUMN_UID, post.getUid())
                         .withValue(SchemaPosts.COLUMN_CONTENT, post.getContent())
@@ -120,6 +116,14 @@ public class PostsPullService extends IntentService {
                         .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
                         .withValue(SchemaPosts.COLUMN_OWNER, (post.getAnonymous() ? anonymUId : postOwner.getUid()))
                         .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB()).build());
+
+                // TAGS
+                for (String tag : post.getTags()) {
+                    ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
+                            .withValue(SchemaTags.COLUMN_NAME, tag)
+                            .withValue(SchemaTags.COLUMN_PHOTO_URL, "http://bigtheme.ir/wp-content/uploads/2015/06/sample.jpg")
+                            .build());
+                }
             }
 
             ContentProviderResult[] result = getContentResolver().
