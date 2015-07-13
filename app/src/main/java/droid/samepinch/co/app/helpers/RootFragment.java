@@ -15,19 +15,14 @@ import droid.samepinch.co.app.TagWallFragment;
  */
 public class RootFragment extends Fragment {
 
-
-    private static final String TAG = "RootFragment";
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        /* Inflate the layout for this fragment */
         View view = inflater.inflate(R.layout.root_fragment, container, false);
 
-        FragmentTransaction transaction = getFragmentManager()
-                .beginTransaction();
-        transaction.replace(R.id.root_frame, new TagWallFragment());
-        transaction.commit();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.root_frame, new TagWallFragment()).commit();
+
         return view;
     }
 }

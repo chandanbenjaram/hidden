@@ -18,6 +18,7 @@ package droid.samepinch.co.app;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -28,9 +29,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -38,24 +40,14 @@ import droid.samepinch.co.data.dao.SchemaPosts;
 public class TagWallFragment extends Fragment {
     public static final String LOG_TAG = "TagWallFragment";
 
+    AppCompatActivity activity;
     PostCursorRecyclerViewAdapter mViewAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    AppCompatActivity activity;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = (AppCompatActivity) activity;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Nullable
@@ -68,28 +60,26 @@ public class TagWallFragment extends Fragment {
         final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return true;
+            public void onClick(View v) {
+                if(getActivity() !=null){
+                    getActivity().onBackPressed();
+                }
             }
         });
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("Tag Wall Fragment");
+        collapsingToolbar.setTitle("TAG");
 
-//        SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
-//        Uri imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
-//        backdropImg.setImageURI(imgUri);
+        SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
+        Uri imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+        backdropImg.setImageURI(imgUri);
 
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(rv);
-
-
-
 
         return view;
     }
