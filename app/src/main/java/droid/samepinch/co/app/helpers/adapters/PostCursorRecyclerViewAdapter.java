@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -15,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.app.PostDetailActivity;
@@ -75,25 +72,24 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             }
         };
         if (TextUtils.isEmpty(user.getPhoto())) {
-            vh.mAvatarView.setVisibility(View.INVISIBLE);
-            if(TextUtils.isEmpty(user.getFname()) || user.getFname().length() < 1
-                    || TextUtils.isEmpty(user.getLname()) || user.getLname().length() < 1){
-                vh.mAvatarName.setText("ZZZ");
-            }else{
+            if (TextUtils.isEmpty(user.getFname()) || user.getFname().length() < 1
+                    || TextUtils.isEmpty(user.getLname()) || user.getLname().length() < 1) {
+                vh.mAvatarName.setText("");
+            } else {
                 vh.mAvatarName.setText(user.getFname().substring(0, 1) + user.getLname().substring(0, 1));
             }
-
-            vh.mAvatarName.setOnClickListener(dotClick);
         } else {
-            vh.mAvatarName.setVisibility(View.INVISIBLE);
             vh.mAvatarName.setText("");
-
-            Uri userPhotoUri = Uri.parse(user.getPhoto());
-            vh.mAvatarView.setImageURI(userPhotoUri);
-            vh.mAvatarView.setOnClickListener(dotClick);
-//            vh.mAvatarView.setOnClickListener(dotClick);
-            //            Utils.setupLoadingImageHolder(vh.mAvatarView, user.getPhoto());
         }
+
+//        Uri userPhotoUri = Uri.parse(user.getPhoto());
+//        vh.mAvatarView.setImageURI(userPhotoUri);
+//        Utils.setupLoadingImageHolder(vh.mAvatarView, user.getPhoto());
+        if(user.getPhoto() !=null){
+            Utils.setupLoadingImageHolder(vh.mAvatarView, user.getPhoto());
+        }
+
+        vh.mAvatarView.setOnClickListener(dotClick);
 
         vh.mWallPostDotView.setText(user.getFname());
         vh.mWallPostContentView.setText(post.getContent());
@@ -108,20 +104,23 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             }
         });
 
-        if (post.getCommentersForDB() != null) {
-            String[] commenterImageArr = post.getCommentersForDB().split(",");
-            int chidViewsCnt = vh.mWallPostCommentersLayout.getChildCount();
-            for (int i = 0; i < chidViewsCnt && i < commenterImageArr.length; i++) {
-                View child = vh.mWallPostCommentersLayout.getChildAt(i);
-                if (child instanceof SimpleDraweeView) {
-                    SimpleDraweeView cImageView = (SimpleDraweeView) child;
-                    Uri commenterImageUri = Uri.parse(commenterImageArr[i]);
-                    cImageView.setImageURI(commenterImageUri);
-                    cImageView.setVisibility(View.VISIBLE);
-                }
-            }
-            vh.mCommentersCount.setText(commenterImageArr.length + "");
-        }
+//        vh.mCommentersCount.setText(post.getCommentCount());
+
+//        List<Commenter> commenters = post.getCommenters();
+//        if (commenters != null && commenters.size() > 0) {
+//            String[] commenterImageArr = post.getCommentersForDB().split(",");
+//            int chidViewsCnt = vh.mWallPostCommentersLayout.getChildCount();
+//            for (int i = 0; i < chidViewsCnt && i < commenterImageArr.length; i++) {
+//                View child = vh.mWallPostCommentersLayout.getChildAt(i);
+//                if (child instanceof SimpleDraweeView) {
+//                    SimpleDraweeView cImageView = (SimpleDraweeView) child;
+//                    Uri commenterImageUri = Uri.parse(commenterImageArr[i]);
+//                    cImageView.setImageURI(commenterImageUri);
+//                    cImageView.setVisibility(View.VISIBLE);
+//                }
+//            }
+//            vh.mCommentersCount.setText(post.getCommentCount());
+//        }
 
         customTextView(vh.mWallTags, post.getTagsForDB().split(","));
     }

@@ -20,14 +20,12 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,7 +33,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Map;
+
 import droid.samepinch.co.app.helpers.AppConstants;
+import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -50,10 +51,9 @@ public class PostListFragment extends Fragment {
     FragmentActivity activity;
 
     @Override
-    public void onAttach(Activity activity)
-    {
+    public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (FragmentActivity)activity;
+        this.activity = (FragmentActivity) activity;
     }
 
     @Nullable
@@ -67,23 +67,29 @@ public class PostListFragment extends Fragment {
         rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(rv);
 
-        // The filter's action is BROADCAST_ACTION
-        IntentFilter statusIntentFilter = new IntentFilter(
-                AppConstants.APP_INTENT.BROADCAST_ACTION.getValue());
-        statusIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        callForRemotePosts();
 
-        // Registers the PostListFragmentUpdater and its intent filters
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                postListFragmentUpdater,
-                statusIntentFilter);
-        mServiceIntent =
-                new Intent(getActivity(), PostsPullService.class);
-        activity.startService(mServiceIntent);
         return rv;
     }
 
+    private void callForRemotePosts() {
+        // construct context from preferences if any?
+        Bundle iArgs = new Bundle();
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
+        for (Map.Entry<String, String> e : pPosts.entrySet()) {
+            iArgs.putString(e.getKey(), e.getValue());
+        }
+
+        // call for intent
+        mServiceIntent =
+                new Intent(activity, PostsPullService.class);
+        mServiceIntent.putExtras(iArgs);
+        activity.startService(mServiceIntent);
+    }
+
     private void setupRecyclerView(RecyclerView recyclerView) {
-//        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
 //        recyclerView.setLayoutManager();
         Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         PostCursorRecyclerViewAdapter mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
@@ -105,9 +111,9 @@ public class PostListFragment extends Fragment {
 
             // swap on success
             if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {
-                // Cursor newCursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-                //mViewAdapter.swapCursor(newCursor);
-                //mViewAdapter.notifyDataSetChanged();
+//                Cursor newCursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+//                mViewAdapter.swapCursor(newCursor);
+//                mViewAdapter.notifyDataSetChanged();
             }
         }
     }

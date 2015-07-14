@@ -16,6 +16,7 @@
 
 package droid.samepinch.co.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -34,7 +35,12 @@ import android.view.View;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
+import java.util.Map;
+
+import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.SmartFragmentStatePagerAdapter;
+import droid.samepinch.co.app.helpers.Utils;
+import droid.samepinch.co.app.helpers.intent.PostsPullService;
 
 /**
  * TODO
@@ -49,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fresco.initialize(getApplicationContext());
+        Utils.PreferencesManager.initializeInstance(getApplicationContext());
+
         setContentView(R.layout.activity_main);
 
 //        StorageComponent component = DaggerStorageComponent.builder().dataModule(new DataModule()).build();
@@ -81,6 +89,19 @@ public class MainActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 
 //                setFragment(new TagWallFragment());
+
+                Bundle iArgs = new Bundle();
+                Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+                Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
+                for (Map.Entry<String, String> e : pPosts.entrySet()) {
+                    iArgs.putString(e.getKey(), e.getValue());
+                }
+
+                // call for intent
+                 Intent mServiceIntent =
+                        new Intent(getApplicationContext(), PostsPullService.class);
+                mServiceIntent.putExtras(iArgs);
+                startService(mServiceIntent);
             }
         });
 
@@ -123,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
     static class Adapter extends SmartFragmentStatePagerAdapter {
-        private static int NUM_ITEMS = 3;
+        private static int NUM_ITEMS = 2;
 
         public Adapter(FragmentManager fragmentManager) {
             super(fragmentManager);

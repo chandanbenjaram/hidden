@@ -15,13 +15,14 @@ public class AppConstants {
     }
 
     public enum API {
-        SHARED_PREFS_NAME("AppPref"),
+        SHARED_PREFS_NAME("droid.samepinch.co.app.pref"),
         ACCESS_TOKEN("access_token"),
+        PREF_POSTS_LIST("posts.lists"),
 
         BASE("https://posts.samepinch.co/"),
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         USERS(BASE.getValue().concat("api/users")),
-        POSTS(BASE.getValue().concat("api/posts")),
+        POSTS(BASE.getValue().concat("api/v2/posts")),
         CONTENT_AUTHORITY("droid.samepinch.co.app");
 
         private final String value;

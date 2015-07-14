@@ -3,6 +3,8 @@ package droid.samepinch.co.data.dto;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -38,7 +40,7 @@ public class Post implements Parcelable {
     @SerializedName("upvote_count")
     Integer upvoteCount;
     Integer views;
-    List<String> commenters;
+    List<Commenter> commenters;
     List<String> tags;
     Boolean anonymous;
     @SerializedName("createdAt")
@@ -58,7 +60,7 @@ public class Post implements Parcelable {
         upvoteCount = in.readByte() == 0x00 ? null : in.readInt();
         views = in.readByte() == 0x00 ? null : in.readInt();
         if (in.readByte() == 0x01) {
-            commenters = new ArrayList<String>();
+            commenters = new ArrayList<Commenter>();
             in.readList(commenters, String.class.getClassLoader());
         } else {
             commenters = null;
@@ -115,11 +117,11 @@ public class Post implements Parcelable {
         this.views = views;
     }
 
-    public List<String> getCommenters() {
+    public List<Commenter> getCommenters() {
         return commenters;
     }
 
-    public void setCommenters(List<String> commenters) {
+    public void setCommenters(List<Commenter> commenters) {
         this.commenters = commenters;
     }
 
@@ -169,7 +171,9 @@ public class Post implements Parcelable {
 
     public void setCommentersFromDB(String commenters) {
         if (commenters != null) {
-            setCommenters(Arrays.asList(commenters.split(",")));
+            Gson g = new Gson();
+            List<Commenter> commentersList = g.fromJson(commenters, List.class);
+            setCommenters(commentersList);
         } else {
             setCommenters(null);
         }
@@ -179,7 +183,11 @@ public class Post implements Parcelable {
         if (getCommenters() == null || getCommenters().isEmpty()) {
             return null;
         }
-        return StringUtils.arrayToDelimitedString(getCommenters().toArray(), ",");
+        JsonParser parser = new JsonParser();
+        // as json string
+        Gson g = new Gson();
+        String commentsJsonStr = g.toJson(getCommenters());
+        return commentsJsonStr;
     }
 
     public void setTagsFromDB(String tags) {

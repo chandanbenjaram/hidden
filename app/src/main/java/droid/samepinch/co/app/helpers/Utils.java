@@ -1,5 +1,7 @@
 package droid.samepinch.co.app.helpers;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -9,10 +11,24 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
+import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
+import droid.samepinch.co.app.helpers.module.StorageComponent;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
+
+import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_ID;
+import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_SECRET;
+import static droid.samepinch.co.app.helpers.AppConstants.KV.GRANT_TYPE;
+import static droid.samepinch.co.app.helpers.AppConstants.KV.SCOPE;
 
 /**
  * Created by imaginationcoder on 7/4/15.
@@ -148,5 +164,103 @@ public class Utils {
                 .setOldController(iView.getController())
                 .build();
         iView.setController(controller);
+    }
+
+    public static String emptyIfNull(String arg0) {
+        return arg0 == null ? "" : arg0;
+    }
+
+
+    public static String getAppToken(boolean renew) {
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        String token = pref.getValue(AppConstants.API.ACCESS_TOKEN.getValue());
+        if (!renew && token != null) {
+            return token;
+        }
+
+        //time to fetch a token
+        final Map<String, String> payload = new HashMap<>();
+        payload.put(CLIENT_ID.getKey(), CLIENT_ID.getValue());
+        payload.put(CLIENT_SECRET.getKey(), CLIENT_SECRET.getValue());
+        payload.put(SCOPE.getKey(), SCOPE.getValue());
+        payload.put(GRANT_TYPE.getKey(), GRANT_TYPE.getValue());
+
+        StorageComponent component = DaggerStorageComponent.create();
+        ResponseEntity<Map> response = component.provideRestTemplate().postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
+        Map<String, String> responseEntity = response.getBody();
+        for (Map.Entry<String, String> entry : responseEntity.entrySet()) {
+            pref.setValue(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
+        }
+
+        return pref.getValue(AppConstants.API.ACCESS_TOKEN.getValue());
+    }
+
+    public static class PreferencesManager {
+
+        private static PreferencesManager sInstance;
+        private final SharedPreferences mPref;
+
+        private PreferencesManager(Context context) {
+            mPref = context.getSharedPreferences(AppConstants.API.SHARED_PREFS_NAME.getValue(), Context.MODE_PRIVATE);
+        }
+
+        public static synchronized void initializeInstance(Context context) {
+            if (sInstance == null) {
+                sInstance = new PreferencesManager(context);
+            }
+        }
+
+        public static synchronized PreferencesManager getInstance() {
+            if (sInstance == null) {
+                throw new IllegalStateException(PreferencesManager.class.getSimpleName() +
+                        " is not initialized, call initializeInstance(..) method first.");
+            }
+            return sInstance;
+        }
+
+        public void setValue(String key, String val) {
+            mPref.edit()
+                    .putString(key, val)
+                    .commit();
+        }
+
+        public String getValue(String key) {
+            return mPref.getString(key, "");
+        }
+
+        public void setValue(String key, Map<String, String> val) {
+            JSONObject jsonObject = new JSONObject(val);
+            String valStr = jsonObject.toString();
+            setValue(key, valStr);
+        }
+
+        public <T> Map<String, T> getValueAsMap(String key) {
+            Map<String, T> outputMap = new HashMap<>();
+            try {
+                String jsonString = mPref.getString(key, (new JSONObject()).toString());
+                JSONObject jsonObject = new JSONObject(jsonString);
+                Iterator<String> keysItr = jsonObject.keys();
+                while (keysItr.hasNext()) {
+                    String k = keysItr.next();
+                    T _value = (T) jsonObject.get(k);
+                    outputMap.put(k, _value);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return outputMap;
+        }
+
+        public void remove(String key) {
+            mPref.edit()
+                    .remove(key)
+                    .commit();
+        }
+
+        public boolean clear() {
+            return mPref.edit()
+                    .clear()
+                    .commit();
+        }
     }
 }

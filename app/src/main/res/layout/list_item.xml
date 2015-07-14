@@ -35,7 +35,6 @@
                 android:id="@+id/avatar_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:autoLink="all"
                 android:text=""
                 android:layout_alignTop="@+id/avatar"
                 android:layout_alignBottom="@+id/avatar"
