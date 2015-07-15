@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -37,6 +38,7 @@ import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.Utils;
+import droid.samepinch.co.app.helpers.adapters.EndlessRecyclerOnScrollListener;
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -47,7 +49,7 @@ public class PostListFragment extends Fragment {
     PostListFragmentUpdater postListFragmentUpdater = new PostListFragmentUpdater();
     PostCursorRecyclerViewAdapter mViewAdapter;
     private Intent mServiceIntent;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
     FragmentActivity activity;
 
     @Override
@@ -60,10 +62,38 @@ public class PostListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        RecyclerView rv = (RecyclerView) inflater.inflate(
-                R.layout.posts_recycler_view, container, false);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
+
+        // custom recycler
+        RecyclerView rv = new RecyclerView(activity.getApplicationContext()) {
+            @Override
+            public void scrollBy(int x, int y) {
+                try {
+                    super.scrollBy(x, y);
+                } catch (NullPointerException nlp) {
+                    // muted
+                }
+            }
+        };
+
+        rv.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
+            @Override
+            public void onLoadMore(RecyclerView rv, int current_page) {
+                System.out.println(this + "..." + current_page);
+
+                String sortOrder = String.format("%s limit " + current_page, BaseColumns._ID);
+
+
+                Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, sortOrder);
+                PostCursorRecyclerViewAdapter mViewAdapter = (PostCursorRecyclerViewAdapter) rv.getAdapter();
+                mViewAdapter.changeCursor(cursor);
+            }
+        });
+
+
+//        OVERRIDDENRecyclerView rv = (OVERRIDDENRecyclerView) inflater.inflate(
+//                R.layout.posts_recycler_view, container, false);
+
         rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(rv);
 
@@ -91,8 +121,13 @@ public class PostListFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setHasFixedSize(true);
 //        recyclerView.setLayoutManager();
-        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        String sortOrder = String.format("%s limit 5", BaseColumns._ID);
+
+
+        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, sortOrder);
         PostCursorRecyclerViewAdapter mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+
+
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }

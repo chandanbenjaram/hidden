@@ -14,11 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        card_view:cardCornerRadius="5dp"
         android:clipToPadding="false"
         android:clipChildren="false"
-        card_view:cardBackgroundColor="@android:color/transparent"
-        card_view:cardElevation="0dp">
+        card_view:cardElevation="0dp"
+        card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -46,6 +45,7 @@
                 android:layout_width="@dimen/list_item_avatar_size"
                 android:layout_height="@dimen/list_item_avatar_size"
                 android:text="NAME"
+                android:clickable="true"
                 android:background="@drawable/rounded_corners"
                 android:textColor="@color/blue_500"
                 android:gravity="center"

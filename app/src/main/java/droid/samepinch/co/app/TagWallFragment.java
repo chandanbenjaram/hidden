@@ -30,6 +30,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -89,7 +90,20 @@ public class TagWallFragment extends Fragment {
 
 
         // recyclers
-        RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
+        // custom recycler
+        RecyclerView rv = new RecyclerView(activity.getApplicationContext()){
+            @Override
+            public void scrollBy(int x, int y) {
+                try{
+                    super.scrollBy(x, y);
+                }catch (NullPointerException nlp){
+                    // muted
+                }
+            }
+        };
+
+        LinearLayout rvHolder = (LinearLayout) view.findViewById(R.id.holder_recyclerview);
+        rvHolder.addView(rv);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(new String[]{"%" + tag + "%"}, rv);

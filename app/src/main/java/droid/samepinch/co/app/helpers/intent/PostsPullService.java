@@ -81,8 +81,8 @@ public class PostsPullService extends IntentService {
                 payloadEntity = new HttpEntity<>(postsReq.build(), headers);
 //                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
-                ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
-                System.out.println("respStr...\n" + respStr.getBody());
+//                ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+//                System.out.println("respStr...\n" + respStr.getBody());
                 resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
             } catch (HttpStatusCodeException e) {
@@ -91,8 +91,8 @@ public class PostsPullService extends IntentService {
                     postsReq.setToken(Utils.getAppToken(true));
                     payloadEntity = new HttpEntity<>(postsReq.build(), headers);
 //                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
-                    ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
-                    System.out.println("respStr...\n" + respStr.getBody());
+//                    ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+//                    System.out.println("respStr...\n" + respStr.getBody());
                     resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
                 } else {
                     throw new IllegalStateException("un-known response code.", e);

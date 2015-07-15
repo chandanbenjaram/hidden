@@ -101,7 +101,7 @@ public class SPContentProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
-        return qb.query(mHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, null);
+        return qb.query(mHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
     }
 
     @Override

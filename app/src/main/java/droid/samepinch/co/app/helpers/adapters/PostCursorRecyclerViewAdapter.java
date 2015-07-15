@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -99,6 +98,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
         }
 
+        vh.mWallPostDotView.setOnClickListener(dotClick);
         vh.mAvatarName.setOnClickListener(dotClick);
         vh.mAvatarView.setOnClickListener(dotClick);
 
@@ -119,6 +119,15 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
         vh.mCommentersCount.setText(String.valueOf(post.getCommentCount()));
 
+        // hide needed ones
+        int commentViewsCount= vh.mWallPostCommentersLayout.getChildCount();
+        for(int i=0; i< commentViewsCount; i++){
+            View child = vh.mWallPostCommentersLayout.getChildAt(i);
+            if (child instanceof SimpleDraweeView) {
+                child.setVisibility(View.GONE);
+            }
+        }
+
         List<Commenter> commenters = post.getCommenters();
         if (commenters != null) {
             int iViewIndex = 0;
@@ -136,6 +145,7 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
                 iViewIndex +=1;
             }
         }
+
 
         if(CollectionUtils.isEmpty(post.getImages())){
             vh.mWallPostImages.setVisibility(View.GONE);
