@@ -1,5 +1,6 @@
 package droid.samepinch.co.app.helpers.module;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Singleton;
@@ -30,7 +31,7 @@ public class DataModule {
         User anonymous = new User();
         anonymous.setUid(String.valueOf(0));
         anonymous.setFname(anonymousStr);
-        anonymous.setLname(anonymousStr);
+        anonymous.setLname(StringUtils.EMPTY);
         anonymous.setPrefName(anonymousStr);
         anonymous.setPinchHandle(anonymousStr);
         return anonymous;

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -15,10 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+
 import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
 import droid.samepinch.co.app.helpers.Utils;
+import droid.samepinch.co.data.dto.Commenter;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
 
@@ -72,6 +81,8 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             }
         };
         if (TextUtils.isEmpty(user.getPhoto())) {
+            vh.mAvatarName.setVisibility(View.VISIBLE);
+            vh.mAvatarView.setVisibility(View.INVISIBLE);
             if (TextUtils.isEmpty(user.getFname()) || user.getFname().length() < 1
                     || TextUtils.isEmpty(user.getLname()) || user.getLname().length() < 1) {
                 vh.mAvatarName.setText("");
@@ -79,21 +90,23 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
                 vh.mAvatarName.setText(user.getFname().substring(0, 1) + user.getLname().substring(0, 1));
             }
         } else {
-            vh.mAvatarName.setText("");
-        }
+//            vh.mAvatarName.setText("");
+            vh.mAvatarView.setVisibility(View.VISIBLE);
+            vh.mAvatarName.setVisibility(View.GONE);
 
-//        Uri userPhotoUri = Uri.parse(user.getPhoto());
-//        vh.mAvatarView.setImageURI(userPhotoUri);
-//        Utils.setupLoadingImageHolder(vh.mAvatarView, user.getPhoto());
-        if(user.getPhoto() !=null){
+            // set image
             Utils.setupLoadingImageHolder(vh.mAvatarView, user.getPhoto());
+
         }
 
+        vh.mAvatarName.setOnClickListener(dotClick);
         vh.mAvatarView.setOnClickListener(dotClick);
 
-        vh.mWallPostDotView.setText(user.getFname());
+        vh.mWallPostDotView.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
+        vh.mWallPinchHandleView.setText("@" + user.getPinchHandle());
+
         vh.mWallPostContentView.setText(post.getContent());
-        vh.mWallPostViewsView.setText(post.getViews() == null ? "0" : post.getViews() + "");
+        vh.mWallPostViewsView.setText(String.valueOf(post.getViews() == null ? 0 : post.getViews()));
 
         vh.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,23 +117,32 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             }
         });
 
-//        vh.mCommentersCount.setText(post.getCommentCount());
+        vh.mCommentersCount.setText(String.valueOf(post.getCommentCount()));
 
-//        List<Commenter> commenters = post.getCommenters();
-//        if (commenters != null && commenters.size() > 0) {
-//            String[] commenterImageArr = post.getCommentersForDB().split(",");
-//            int chidViewsCnt = vh.mWallPostCommentersLayout.getChildCount();
-//            for (int i = 0; i < chidViewsCnt && i < commenterImageArr.length; i++) {
-//                View child = vh.mWallPostCommentersLayout.getChildAt(i);
-//                if (child instanceof SimpleDraweeView) {
-//                    SimpleDraweeView cImageView = (SimpleDraweeView) child;
-//                    Uri commenterImageUri = Uri.parse(commenterImageArr[i]);
-//                    cImageView.setImageURI(commenterImageUri);
-//                    cImageView.setVisibility(View.VISIBLE);
-//                }
-//            }
-//            vh.mCommentersCount.setText(post.getCommentCount());
-//        }
+        List<Commenter> commenters = post.getCommenters();
+        if (commenters != null) {
+            int iViewIndex = 0;
+            for(Commenter commenter: commenters){
+                if(StringUtils.isBlank(commenter.getPhoto())) {
+                    continue;
+                }
+
+                View child = vh.mWallPostCommentersLayout.getChildAt(iViewIndex);
+                if (child instanceof SimpleDraweeView) {
+                    SimpleDraweeView cImageView = (SimpleDraweeView) child;
+                    Utils.setupLoadingImageHolder(cImageView, commenter.getPhoto());
+                    cImageView.setVisibility(View.VISIBLE);
+                }
+                iViewIndex +=1;
+            }
+        }
+
+        if(CollectionUtils.isEmpty(post.getImages())){
+            vh.mWallPostImages.setVisibility(View.GONE);
+        }else{
+            Utils.setupLoadingImageHolder(vh.mWallPostImages, post.getImages().get(0));
+            vh.mWallPostImages.setVisibility(View.VISIBLE);
+        }
 
         customTextView(vh.mWallTags, post.getTagsForDB().split(","));
     }

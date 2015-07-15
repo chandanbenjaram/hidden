@@ -72,6 +72,7 @@ public class Utils {
         Post post = new Post();
         int uidIndex;
         int contentIndex;
+        int imagesIndex;
         int commentCountIndex;
         int upvoteCountIndex;
         int viewsIndex;
@@ -85,6 +86,9 @@ public class Utils {
 
         if ((contentIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_CONTENT)) != -1) {
             post.setContent(cursor.getString(contentIndex));
+        }
+        if ((imagesIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_IMAGES)) != -1) {
+            post.setImagesFromDB(cursor.getString(imagesIndex));
         }
 
         if ((commentCountIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_COMMENT_COUNT)) != -1) {
@@ -110,7 +114,6 @@ public class Utils {
         if ((tagsIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_TAGS)) != -1) {
             post.setTagsFromDB(cursor.getString(tagsIndex));
         }
-
 //
 //        if (post.getAnonymous()) {
 //            return post;
@@ -122,7 +125,6 @@ public class Utils {
         int ownerPinchHandleIndex;
         int ownerPhotoUrlIndex;
         int ownerUIdIndex;
-
         User user = new User();
         if ((ownerUIdIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_OWNER)) != -1) {
             user.setUid(cursor.getString(ownerUIdIndex));
@@ -139,7 +141,6 @@ public class Utils {
         if ((ownerPrefNameIndex = cursor.getColumnIndex(SchemaDots.COLUMN_PREF_NAME)) != -1) {
             user.setPrefName(cursor.getString(ownerPrefNameIndex));
         }
-
 
         if ((ownerPinchHandleIndex = cursor.getColumnIndex(SchemaDots.COLUMN_PINCH_HANDLE)) != -1) {
             user.setPinchHandle(cursor.getString(ownerPinchHandleIndex));

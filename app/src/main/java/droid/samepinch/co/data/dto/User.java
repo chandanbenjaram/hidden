@@ -3,6 +3,8 @@ package droid.samepinch.co.data.dto;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by imaginationcoder on 7/1/15.
  */
@@ -25,6 +27,8 @@ public class User implements Parcelable {
     String lname;
     String photo;
     String prefName;
+
+    @SerializedName("pinch_handle")
     String pinchHandle;
 
     public User() {

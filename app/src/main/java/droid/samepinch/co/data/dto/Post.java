@@ -7,9 +7,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,23 +20,11 @@ import java.util.List;
 /**
  * Created by imaginationcoder on 7/1/15.
  */
-public class Post implements Parcelable {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Post> CREATOR = new Parcelable.Creator<Post>() {
-        @Override
-        public Post createFromParcel(Parcel in) {
-            return new Post(in);
-        }
-
-        @Override
-        public Post[] newArray(int size) {
-            return new Post[size];
-        }
-    };
-
+public class Post {
     @SerializedName("uid")
     String uid;
     String content;
+    List<String> images;
     @SerializedName("comment_count")
     Integer commentCount;
     @SerializedName("upvote_count")
@@ -51,30 +41,7 @@ public class Post implements Parcelable {
     User owner;
 
     public Post() {
-    }
 
-    protected Post(Parcel in) {
-        uid = in.readString();
-        content = in.readString();
-        commentCount = in.readByte() == 0x00 ? null : in.readInt();
-        upvoteCount = in.readByte() == 0x00 ? null : in.readInt();
-        views = in.readByte() == 0x00 ? null : in.readInt();
-        if (in.readByte() == 0x01) {
-            commenters = new ArrayList<Commenter>();
-            in.readList(commenters, String.class.getClassLoader());
-        } else {
-            commenters = null;
-        }
-        if (in.readByte() == 0x01) {
-            tags = new ArrayList<String>();
-            in.readList(tags, String.class.getClassLoader());
-        } else {
-            tags = null;
-        }
-        byte anonymousVal = in.readByte();
-        anonymous = anonymousVal == 0x02 ? null : anonymousVal != 0x00;
-        createdAtStr = in.readString();
-        owner = (User) in.readValue(User.class.getClassLoader());
     }
 
     public String getUid() {
@@ -172,7 +139,8 @@ public class Post implements Parcelable {
     public void setCommentersFromDB(String commenters) {
         if (commenters != null) {
             Gson g = new Gson();
-            List<Commenter> commentersList = g.fromJson(commenters, List.class);
+            Type token = new TypeToken<List<Commenter>>() {}.getType();
+            List<Commenter> commentersList = g.fromJson(commenters, token);
             setCommenters(commentersList);
         } else {
             setCommenters(null);
@@ -205,51 +173,26 @@ public class Post implements Parcelable {
         return StringUtils.arrayToDelimitedString(getTags().toArray(), ",");
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public List<String> getImages() {
+        return images;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
-        dest.writeString(content);
-        if (commentCount == null) {
-            dest.writeByte((byte) (0x00));
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public void setImagesFromDB(String images) {
+        if (images != null) {
+            setImages(Arrays.asList(images.split(",")));
         } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(commentCount);
+            setImages(null);
         }
-        if (upvoteCount == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(upvoteCount);
+    }
+
+    public String getImagesForDB() {
+        if (getImages() == null || getImages().isEmpty()) {
+            return null;
         }
-        if (views == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(views);
-        }
-        if (commenters == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(commenters);
-        }
-        if (tags == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(tags);
-        }
-        if (anonymous == null) {
-            dest.writeByte((byte) (0x02));
-        } else {
-            dest.writeByte((byte) (anonymous ? 0x01 : 0x00));
-        }
-        dest.writeString(createdAtStr);
-        dest.writeValue(owner);
+        return StringUtils.arrayToDelimitedString(getImages().toArray(), ",");
     }
 }

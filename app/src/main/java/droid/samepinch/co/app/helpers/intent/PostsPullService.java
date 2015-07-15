@@ -133,7 +133,7 @@ public class PostsPullService extends IntentService {
                         .withValue(SchemaDots.COLUMN_FNAME, dfltAnonyDot.getFname())
                         .withValue(SchemaDots.COLUMN_LNAME, dfltAnonyDot.getLname())
                         .withValue(SchemaDots.COLUMN_PREF_NAME, dfltAnonyDot.getPrefName())
-//                                    .withValue(SchemaDots.COLUMN_PINCH_HANDLE, "anonymous")
+                        .withValue(SchemaDots.COLUMN_PINCH_HANDLE, dfltAnonyDot.getPinchHandle())
                         .withValue(SchemaDots.COLUMN_PHOTO_URL, dfltAnonyDot.getPhoto()).build());
             } else {
                 ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
@@ -148,6 +148,7 @@ public class PostsPullService extends IntentService {
             ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
                     .withValue(SchemaPosts.COLUMN_UID, post.getUid())
                     .withValue(SchemaPosts.COLUMN_CONTENT, post.getContent())
+                    .withValue(SchemaPosts.COLUMN_IMAGES, post.getImagesForDB())
                     .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, post.getCommentCount())
                     .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, post.getUpvoteCount())
                     .withValue(SchemaPosts.COLUMN_VIEWS, post.getViews())

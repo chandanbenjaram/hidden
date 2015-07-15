@@ -14,6 +14,7 @@ public interface SchemaPosts extends BaseColumns {
     String TABLE_NAME = "posts";
     String COLUMN_UID = "uid";
     String COLUMN_CONTENT = "content";
+    String COLUMN_IMAGES = "images";
     String COLUMN_COMMENT_COUNT = "comment_count";
     String COLUMN_UPVOTE_COUNT = "upvote_count";
     String COLUMN_VIEWS = "views";
@@ -30,6 +31,7 @@ public interface SchemaPosts extends BaseColumns {
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_UID + " TEXT NOT NULL UNIQUE, "
             + COLUMN_CONTENT + " TEXT DEFAULT '', "
+            + COLUMN_IMAGES + " TEXT DEFAULT '', "
             + COLUMN_COMMENT_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_VIEWS + " INTEGER DEFAULT 0, "
@@ -52,7 +54,7 @@ public interface SchemaPosts extends BaseColumns {
     String[] POST_COLUMNS = new String[]{
             _ID, COLUMN_UID, COLUMN_CONTENT, COLUMN_COMMENT_COUNT,
             COLUMN_UPVOTE_COUNT, COLUMN_VIEWS, COLUMN_ANONYMOUS,
-            COLUMN_CREATED_AT, COLUMN_COMMENTERS, COLUMN_TAGS, COLUMN_OWNER
+            COLUMN_CREATED_AT, COLUMN_COMMENTERS, COLUMN_TAGS, COLUMN_OWNER, COLUMN_IMAGES
     };
 
     String VIEW_CREATE_POST_WITH_DOT_NAME = "VIEW_POST_WITH_DOT";
@@ -69,6 +71,7 @@ public interface SchemaPosts extends BaseColumns {
             + ", p." + COLUMN_COMMENTERS
             + ", p." + COLUMN_TAGS
             + ", p." + COLUMN_OWNER
+            + ", p." + COLUMN_IMAGES
             + ", d." + SchemaDots.COLUMN_PINCH_HANDLE
             + ", d." + SchemaDots.COLUMN_FNAME
             + ", d." + SchemaDots.COLUMN_LNAME

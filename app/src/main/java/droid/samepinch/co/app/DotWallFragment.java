@@ -79,10 +79,13 @@ public class DotWallFragment extends Fragment {
         int photoUrlIndex;
         if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_PHOTO_URL)) != -1) {
             String photoUrlStr = cursor.getString(photoUrlIndex);
-            Uri imgUri = Uri.parse(photoUrlStr);
-            // tag map
-            SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
-            backdropImg.setImageURI(imgUri);
+            if(photoUrlStr != null){
+                Uri imgUri = Uri.parse(photoUrlStr);
+                // tag map
+                SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
+                backdropImg.setImageURI(imgUri);
+            }
+
         }
 
         // recyclers

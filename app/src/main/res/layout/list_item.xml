@@ -14,76 +14,121 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        card_view:cardCornerRadius="5dp">
+        card_view:cardCornerRadius="5dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        card_view:cardBackgroundColor="@android:color/transparent"
+        card_view:cardElevation="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/borderframe"
+            android:layout_marginTop="35dp"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            >
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/avatar"
                 android:layout_width="@dimen/list_item_avatar_size"
                 android:layout_height="@dimen/list_item_avatar_size"
-                android:layout_centerVertical="true"
                 android:adjustViewBounds="true"
                 android:clickable="true"
-                android:padding="5dp"
                 fresco:placeholderImageScaleType="fitCenter"
-                fresco:roundAsCircle="true" />
+                fresco:roundAsCircle="true"
+                android:background="@drawable/avatar_border"
+                android:layout_marginTop="-35dp"
+                android:layout_marginLeft="9dp" />
 
             <TextView
                 android:id="@+id/avatar_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:layout_alignTop="@+id/avatar"
-                android:layout_alignBottom="@+id/avatar"
-                android:layout_alignLeft="@+id/avatar"
-                android:layout_alignRight="@+id/avatar"
+                android:layout_width="@dimen/list_item_avatar_size"
+                android:layout_height="@dimen/list_item_avatar_size"
+                android:text="NAME"
                 android:background="@drawable/rounded_corners"
-                android:textColor="@color/grey_500"
+                android:textColor="@color/blue_500"
                 android:gravity="center"
-                android:layout_margin="5px"
-                />
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="-35dp"
+                android:layout_marginLeft="9dp" />
+
 
             <TextView
                 android:id="@+id/wall_post_dot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/avatar"
                 android:gravity="center_vertical"
                 android:text="DOT"
-                android:textColor="@color/grey_900"
-                android:textStyle="bold" />
+                android:textColor="@color/blue_500"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/avatar"
+                android:layout_toEndOf="@+id/avatar"
+                android:layout_marginTop="-18dp"
+                android:layout_marginLeft="5dp"
+                android:textAllCaps="true"/>
 
             <TextView
-                android:id="@+id/wall_post_content"
+                android:id="@+id/wall_pinch_handle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/wall_post_dot"
-                android:layout_toRightOf="@+id/avatar"
                 android:gravity="center_vertical"
-                android:text="content"
-                android:textColor="@color/grey_900" />
-
+                android:text="PINCH HANDLE"
+                android:textColor="@color/grey_700"
+                android:layout_below="@+id/wall_post_dot"
+                android:layout_toRightOf="@+id/avatar"
+                android:layout_toEndOf="@+id/avatar"
+                android:layout_marginTop="-3dp"
+                android:layout_marginLeft="5dp" />
 
             <TextView
                 android:id="@+id/wall_post_views"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/wall_post_dot"
+                android:layout_alignBaseline="@id/wall_pinch_handle"
                 android:layout_alignParentRight="true"
-                android:padding="5dp"
+                android:gravity="center_vertical"
+                android:paddingRight="5dp"
                 android:text="views"
                 android:textColor="@color/grey_500"
-                android:textSize="10dp" />
+                android:textSize="10dp"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:id="@+id/wall_post_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="CONTENT"
+                android:textColor="@color/grey_900"
+                android:layout_below="@+id/wall_pinch_handle"
+                android:layout_toRightOf="@+id/avatar"
+                android:layout_toEndOf="@+id/avatar"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp" />
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/wall_post_images"
+                android:layout_width="@dimen/wall_content_image_size"
+                android:layout_height="@dimen/wall_content_image_size"
+                android:adjustViewBounds="true"
+                fresco:placeholderImageScaleType="fitCenter"
+                fresco:roundAsCircle="false"
+                android:padding="5dp"
+                android:gravity="center"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/wall_post_content"
+                />
 
 
             <TextView
                 android:id="@+id/wall_tags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/wall_post_content"
+                android:layout_below="@id/wall_post_images"
                 android:layout_centerHorizontal="true"
                 android:padding="5dp"
                 android:text="#tags"
