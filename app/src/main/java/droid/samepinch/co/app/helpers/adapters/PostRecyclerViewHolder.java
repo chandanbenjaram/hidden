@@ -3,6 +3,7 @@ package droid.samepinch.co.app.helpers.adapters;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -14,7 +15,10 @@ import droid.samepinch.co.app.R;
  */
 public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
     public final View mView;
+    public final RelativeLayout mLayoutPostItem;
+
     public final SimpleDraweeView mAvatarView;
+    public final TextView mAvatarName;
 
     public final TextView mWallPostDotView;
     public final TextView mWallPinchHandleView;
@@ -24,12 +28,12 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
     public final TextView mWallPostViewsView;
     public final TextView mCommentersCount;
     public final TextView mWallTags;
-    public final TextView mAvatarName;
     public final LinearLayout mWallPostCommentersLayout;
 
     public PostRecyclerViewHolder(View view) {
         super(view);
         mView = view;
+        mLayoutPostItem = (RelativeLayout) view.findViewById(R.id.layout_post_item);
         mAvatarView = (SimpleDraweeView) view.findViewById(R.id.avatar);
         mAvatarName = (TextView) view.findViewById(R.id.avatar_name);
 

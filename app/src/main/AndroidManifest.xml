@@ -12,10 +12,7 @@
         android:minSdkVersion="16"
         android:targetSdkVersion="16" />
 
-    <!-- Requires this permission to download RSS data from Picasa -->
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Requires this permission to check the network state       -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application

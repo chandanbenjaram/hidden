@@ -20,6 +20,7 @@
         card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
+            android:id="@+id/layout_post_item"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/borderframe"

@@ -34,6 +34,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.otto.Subscribe;
+
 import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
@@ -41,6 +43,8 @@ import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.adapters.EndlessRecyclerOnScrollListener;
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
+import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
+import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaPosts;
 
 public class PostListFragment extends Fragment {
@@ -51,6 +55,27 @@ public class PostListFragment extends Fragment {
     private Intent mServiceIntent;
     private LinearLayoutManager mLayoutManager;
     FragmentActivity activity;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
+
+    @Subscribe
+    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
+//        System.out.println("onPostsRefreshedEvent..." + event);
+        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        mViewAdapter.swapCursor(cursor);
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -80,19 +105,12 @@ public class PostListFragment extends Fragment {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
                 System.out.println(this + "..." + current_page);
-
-                String sortOrder = String.format("%s limit " + current_page, BaseColumns._ID);
-
-
-                Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, sortOrder);
-                PostCursorRecyclerViewAdapter mViewAdapter = (PostCursorRecyclerViewAdapter) rv.getAdapter();
-                mViewAdapter.changeCursor(cursor);
+//
+//                Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, sortOrder);
+//                PostCursorRecyclerViewAdapter mViewAdapter = (PostCursorRecyclerViewAdapter) rv.getAdapter();
+//                mViewAdapter.changeCursor(cursor);
             }
         });
-
-
-//        OVERRIDDENRecyclerView rv = (OVERRIDDENRecyclerView) inflater.inflate(
-//                R.layout.posts_recycler_view, container, false);
 
         rv.setLayoutManager(mLayoutManager);
         setupRecyclerView(rv);
@@ -120,11 +138,8 @@ public class PostListFragment extends Fragment {
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setHasFixedSize(true);
-//        recyclerView.setLayoutManager();
-        String sortOrder = String.format("%s limit 5", BaseColumns._ID);
 
-
-        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, sortOrder);
+        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         PostCursorRecyclerViewAdapter mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
 

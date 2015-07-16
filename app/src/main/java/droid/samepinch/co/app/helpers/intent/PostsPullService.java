@@ -23,6 +23,8 @@ import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
 import droid.samepinch.co.app.helpers.module.StorageComponent;
+import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
+import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dao.SchemaTags;
@@ -36,22 +38,13 @@ import droid.samepinch.co.rest.RespPosts;
  */
 public class PostsPullService extends IntentService {
     public static final String LOG_TAG = "PostsPullService";
-    private BroadcastNotifier mBroadcaster;
-
 
     public PostsPullService() {
-        super(PostsPullService.class.getSimpleName());
+        super("PostsPullService");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        mBroadcaster = new BroadcastNotifier(this);
-//        mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_STARTED);
-
-//        if (appToken == null) {
-//            mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_FAILED);
-//            return;
-//        }
 
         StorageComponent component = DaggerStorageComponent.create();
         ReqPosts postsReq = component.provideReqPosts();
@@ -80,7 +73,6 @@ public class PostsPullService extends IntentService {
                 // call remote
                 payloadEntity = new HttpEntity<>(postsReq.build(), headers);
 //                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
-
 //                ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
 //                System.out.println("respStr...\n" + respStr.getBody());
                 resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
@@ -90,9 +82,6 @@ public class PostsPullService extends IntentService {
                     // try resetting token?
                     postsReq.setToken(Utils.getAppToken(true));
                     payloadEntity = new HttpEntity<>(postsReq.build(), headers);
-//                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
-//                    ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
-//                    System.out.println("respStr...\n" + respStr.getBody());
                     resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
                 } else {
                     throw new IllegalStateException("un-known response code.", e);
@@ -102,10 +91,11 @@ public class PostsPullService extends IntentService {
             ArrayList<ContentProviderOperation> ops = parseResponse(resp);
             ContentProviderResult[] result = getContentResolver().
                     applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
-            mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE);
+
+            // publish this event
+            BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent());
         } catch (Exception e) {
             e.printStackTrace();
-//            mBroadcaster.broadcastIntentWithState(AppConstants.APP_INTENT.REFRESH_ACTION_FAILED);
         }
     }
 
@@ -126,7 +116,6 @@ public class PostsPullService extends IntentService {
             User postOwner = post.getOwner();
             // DOTS
             if (post.getAnonymous()) {
-//                    dfltAnonyDot.setPhoto(anonyImg);
                 // TODO
                 ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
                         .withValue(SchemaDots.COLUMN_UID, dfltAnonyDot.getUid())
@@ -167,6 +156,4 @@ public class PostsPullService extends IntentService {
         }
         return ops;
     }
-
-
 }

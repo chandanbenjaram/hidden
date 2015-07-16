@@ -17,9 +17,11 @@
 package droid.samepinch.co.app;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,8 +34,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.squareup.otto.Subscribe;
 
 import java.util.Map;
 
@@ -41,6 +45,9 @@ import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.SmartFragmentStatePagerAdapter;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
+import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
+import droid.samepinch.co.app.helpers.pubsubs.Events;
+import droid.samepinch.co.data.dao.SchemaPosts;
 
 /**
  * TODO
@@ -52,15 +59,31 @@ public class MainActivity extends AppCompatActivity {
     Adapter adapterViewPager;
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
+    @Subscribe
+    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
+        Snackbar.make(this.findViewById(R.id.fab), "refreshed..." + event, Snackbar.LENGTH_LONG).show();
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fresco.initialize(getApplicationContext());
         Utils.PreferencesManager.initializeInstance(getApplicationContext());
 
         setContentView(R.layout.activity_main);
-
-//        StorageComponent component = DaggerStorageComponent.builder().dataModule(new DataModule()).build();
-//        vehicle = component.provideVehicle();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -98,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // call for intent
-                 Intent mServiceIntent =
+                Intent mServiceIntent =
                         new Intent(getApplicationContext(), PostsPullService.class);
                 mServiceIntent.putExtras(iArgs);
                 startService(mServiceIntent);

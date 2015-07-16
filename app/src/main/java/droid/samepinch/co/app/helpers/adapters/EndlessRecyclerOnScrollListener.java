@@ -11,7 +11,7 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
     public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();
 
     int visibilityThreshold;
-    private int loaderIndex = 0;
+    private int loaderIndex = 0, previousTotal;
     boolean loadingMore;
 
     private LinearLayoutManager mLayoutManager;
@@ -25,31 +25,34 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
         this.visibilityThreshold = visibilityThreshold;
     }
 
+
     @Override
     public void onScrolled(RecyclerView rv, int dx, int dy) {
         super.onScrolled(rv, dx, dy);
 
         // scroll-up event
-        if(dy <=0){
+        if (dy <= 0) {
             return;
         }
 
 
-        // scroll-down event
-        int lastVisibleItemPsn = mLayoutManager.findLastVisibleItemPosition();
-        int totalItemsCnt = mLayoutManager.getItemCount();
+        int visibleItemCount = mLayoutManager.getChildCount();
+        int totalItemCount = mLayoutManager.getItemCount();
+        int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
-        // check if more needed
-        if (!loadingMore && (loadingMore=lastVisibleItemPsn + visibilityThreshold > totalItemsCnt)) {
-
-            try{
-                // get more. no need to prevent future loading if no addition from this step
-                onLoadMore(rv, totalItemsCnt + loaderIndex);
-                loaderIndex += 1;
-            }finally{
-                // reset
+        if (loadingMore) {
+            if (totalItemCount > previousTotal) {
                 loadingMore = false;
+                previousTotal = totalItemCount;
             }
+        }
+        if (!loadingMore && (totalItemCount - visibleItemCount)
+                <= (firstVisibleItem + visibilityThreshold)) {
+            // End has been reached
+            onLoadMore(rv, totalItemCount + loaderIndex);
+            // Do something
+
+            loadingMore = true;
         }
     }
 
