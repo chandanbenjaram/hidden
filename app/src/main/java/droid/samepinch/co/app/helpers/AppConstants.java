@@ -5,15 +5,6 @@ package droid.samepinch.co.app.helpers;
  */
 public class AppConstants {
 
-    public enum K {
-        APP_EXTRAS,
-        TARGET_FRAGMENT,
-        FRAGMENT_TAGWALL,
-        FRAGMENT_DOTWALL,
-        KEY_TAG,
-        KEY_DOT
-    }
-
     public enum API {
         SHARED_PREFS_NAME("droid.samepinch.co.app.pref"),
         ACCESS_TOKEN("access_token"),
@@ -97,5 +88,15 @@ public class AppConstants {
         public Integer getIntValue() {
             return Integer.parseInt(getValue());
         }
+    }
+
+    public enum K {
+        APP_EXTRAS,
+        TARGET_FRAGMENT,
+        FRAGMENT_TAGWALL,
+        FRAGMENT_DOTWALL,
+        KEY_TAG,
+        KEY_DOT,
+        Wall
     }
 }

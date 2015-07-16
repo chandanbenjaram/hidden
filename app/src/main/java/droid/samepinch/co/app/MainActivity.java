@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
-        Snackbar.make(this.findViewById(R.id.fab), "refreshed..." + event, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
     }
 
 
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Page " + position;
+            return position == 0? AppConstants.K.Wall.name(): "";
         }
     }
 }
