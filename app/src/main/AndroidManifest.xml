@@ -52,6 +52,10 @@
             android:name=".helpers.intent.PostsPullService"
             android:exported="false"/>
 
+        <service
+            android:name=".helpers.intent.TagsPullService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

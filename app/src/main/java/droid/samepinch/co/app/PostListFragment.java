@@ -17,14 +17,10 @@
 package droid.samepinch.co.app;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -50,11 +46,18 @@ import droid.samepinch.co.data.dao.SchemaPosts;
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = "PostListFragment";
 
-    PostListFragmentUpdater postListFragmentUpdater = new PostListFragmentUpdater();
     PostCursorRecyclerViewAdapter mViewAdapter;
     private Intent mServiceIntent;
     private LinearLayoutManager mLayoutManager;
     FragmentActivity activity;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = (FragmentActivity) activity;
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        pref.remove(AppConstants.API.PREF_POSTS_LIST.getValue());
+    }
 
     @Override
     public void onResume() {
@@ -67,20 +70,6 @@ public class PostListFragment extends Fragment {
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
-    }
-
-
-    @Subscribe
-    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
-//        System.out.println("onPostsRefreshedEvent..." + event);
-        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-        mViewAdapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = (FragmentActivity) activity;
     }
 
     @Nullable
@@ -101,14 +90,10 @@ public class PostListFragment extends Fragment {
             }
         };
 
+
         rv.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
-                System.out.println(this + "..." + current_page);
-//
-//                Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, sortOrder);
-//                PostCursorRecyclerViewAdapter mViewAdapter = (PostCursorRecyclerViewAdapter) rv.getAdapter();
-//                mViewAdapter.changeCursor(cursor);
             }
         });
 
@@ -116,8 +101,17 @@ public class PostListFragment extends Fragment {
         setupRecyclerView(rv);
 
         callForRemotePosts();
-
         return rv;
+    }
+
+    private void setupRecyclerView(RecyclerView recyclerView) {
+        recyclerView.setHasFixedSize(true);
+
+        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+
+        recyclerView.setAdapter(mViewAdapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     private void callForRemotePosts() {
@@ -136,35 +130,21 @@ public class PostListFragment extends Fragment {
         activity.startService(mServiceIntent);
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setHasFixedSize(true);
+    @Subscribe
+    public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+                pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
 
-        Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-        PostCursorRecyclerViewAdapter mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
-
-
-        recyclerView.setAdapter(mViewAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-    }
-
-
-    private class PostListFragmentUpdater extends BroadcastReceiver {
-        private PostListFragmentUpdater() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String intentName = intent.getStringExtra(AppConstants.APP_INTENT.EXTENDED_DATA_STATUS.getValue());
-            AppConstants.APP_INTENT intentNameConst = AppConstants.APP_INTENT.valueOf(intentName);
-            Snackbar.make(activity.findViewById(R.id.fab), intentNameConst.getValue(), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-
-            // swap on success
-            if (AppConstants.APP_INTENT.REFRESH_ACTION_COMPLETE == intentNameConst) {
-//                Cursor newCursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-//                mViewAdapter.swapCursor(newCursor);
-//                mViewAdapter.notifyDataSetChanged();
+                try {
+                    Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                    mViewAdapter.changeCursor(cursor);
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
             }
-        }
+        });
     }
 }

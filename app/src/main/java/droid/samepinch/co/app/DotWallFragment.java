@@ -78,7 +78,7 @@ public class DotWallFragment extends Fragment {
 
         Cursor cursor = activity.getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
         int photoUrlIndex;
-        if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_PHOTO_URL)) != -1) {
+        if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE)) != -1) {
             String photoUrlStr = cursor.getString(photoUrlIndex);
             if(photoUrlStr != null){
                 Uri imgUri = Uri.parse(photoUrlStr);

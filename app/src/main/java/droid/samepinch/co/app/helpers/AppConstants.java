@@ -23,6 +23,8 @@ public class AppConstants {
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         USERS(BASE.getValue().concat("api/users")),
         POSTS(BASE.getValue().concat("api/v2/posts")),
+        GROUPS(BASE.getValue().concat("api/groups")),
+
         CONTENT_AUTHORITY("droid.samepinch.co.app");
 
         private final String value;
@@ -44,7 +46,19 @@ public class AppConstants {
         REFRESH_ACTION_FAILED("failed to refresh"),
         REFRESH_ACTION_COMPLETE("refresh complete"),
         AUTHENTICATING_CLIENT("authenticating client..."),
-        REFRESH_ACTION_LOAD("load refreshed content");
+        REFRESH_ACTION_LOAD("load refreshed content"),
+
+        KEY_POST_COUNT("post_count"),
+        KEY_LAST_MODIFIED("last_modified"),
+        KEY_STEP("step"),
+        KEY_ETAG("etag"),
+        KEY_KEY("key"),
+        KEY_BY("by"),
+        KEY_NEW("new"),
+        KEY_NAME("name"),
+
+
+        ;
         private final String value;
 
         APP_INTENT(String value) {
@@ -61,7 +75,9 @@ public class AppConstants {
         GRANT_TYPE("grant_type", "client_credentials"),
         CLIENT_ID("client_id", "07b71e492ccb9de623cfa8d151157b5452ad52eae7197fe85689a07876960f8f"),
         CLIENT_SECRET("client_secret", "2e716b657cd8d0a85ea632a915d0a3c699bd7bc2be326ecec167d26bba159a9b"),
-        SCOPE("scope", "imsocl");
+        SCOPE("scope", "imsocl"),
+        ;
+
         private final String key, value;
 
         KV(String key, String value) {

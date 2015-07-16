@@ -17,7 +17,6 @@
 package droid.samepinch.co.app;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -34,7 +33,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.squareup.otto.Subscribe;
@@ -47,7 +45,6 @@ import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.intent.PostsPullService;
 import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
 import droid.samepinch.co.app.helpers.pubsubs.Events;
-import droid.samepinch.co.data.dao.SchemaPosts;
 
 /**
  * TODO
@@ -167,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
     static class Adapter extends SmartFragmentStatePagerAdapter {
-        private static int NUM_ITEMS = 2;
+        private static int NUM_ITEMS = 1;
 
         public Adapter(FragmentManager fragmentManager) {
             super(fragmentManager);

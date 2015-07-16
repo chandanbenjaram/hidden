@@ -17,8 +17,8 @@
 package droid.samepinch.co.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -33,19 +33,34 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
+
+import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
+import droid.samepinch.co.app.helpers.intent.TagsPullService;
+import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
+import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dao.SchemaTags;
 
+import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_NAME;
 import static droid.samepinch.co.app.helpers.AppConstants.K;
 
 public class TagWallFragment extends Fragment {
     public static final String LOG_TAG = "TagWallFragment";
 
-    AppCompatActivity activity;
-    PostCursorRecyclerViewAdapter mViewAdapter;
+    private Intent mServiceIntent;
+
+    private AppCompatActivity activity;
+    private PostCursorRecyclerViewAdapter mViewAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private View mView;
+    private String mTag;
+    private SimpleDraweeView mBackdropImg;
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -54,11 +69,24 @@ public class TagWallFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = inflater.inflate(R.layout.tags_wall_view, container, false);
+        mView = inflater.inflate(R.layout.tags_wall_view, container, false);
 
-        final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) mView.findViewById(R.id.toolbar);
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -69,47 +97,46 @@ public class TagWallFragment extends Fragment {
             }
         });
         CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar);
+                (CollapsingToolbarLayout) mView.findViewById(R.id.collapsing_toolbar);
 
         // tag name
-        String tag = getArguments().getString(K.KEY_TAG.name());
-        collapsingToolbar.setTitle(tag);
+        mTag = getArguments().getString(K.KEY_TAG.name());
+        collapsingToolbar.setTitle(mTag);
 
-        Cursor cursor = activity.getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
-        Uri imgUri;
-        int photoUrlIndex;
-        if (cursor.moveToFirst() && (photoUrlIndex = cursor.getColumnIndex(SchemaTags.COLUMN_PHOTO_URL)) != -1) {
-            String photoUrlStr = cursor.getString(photoUrlIndex);
-             imgUri = Uri.parse(photoUrlStr);
-            // tag map
-            SimpleDraweeView backdropImg = (SimpleDraweeView) view.findViewById(R.id.backdrop);
-            backdropImg.setImageURI(imgUri);
-        }else{
-//            imgUri = Uri.parse("https://posts.samepinch.co/assets/anonymous-9970e78c322d666ccc2aba97a42e4689979b00edf724e0a01715f3145579f200.png");
+        mBackdropImg = (SimpleDraweeView) mView.findViewById(R.id.backdrop);
+        Cursor cursor = activity.getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTag}, null);
+        if (cursor.moveToFirst()) {
+            int imgIdx = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE);
+            String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
+            if (StringUtils.isNotBlank(imgStr)) {
+                Utils.setupLoadingImageHolder(mBackdropImg, imgStr);
+            }
         }
-
+        cursor.close();
 
         // recyclers
         // custom recycler
-        RecyclerView rv = new RecyclerView(activity.getApplicationContext()){
+        RecyclerView rv = new RecyclerView(activity.getApplicationContext()) {
             @Override
             public void scrollBy(int x, int y) {
-                try{
+                try {
                     super.scrollBy(x, y);
-                }catch (NullPointerException nlp){
+                } catch (NullPointerException nlp) {
                     // muted
                 }
             }
         };
 
-        LinearLayout rvHolder = (LinearLayout) view.findViewById(R.id.holder_recyclerview);
+        LinearLayout rvHolder = (LinearLayout) mView.findViewById(R.id.holder_recyclerview);
         rvHolder.addView(rv);
         mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
-        setupRecyclerView(new String[]{"%" + tag + "%"}, rv);
+        setupRecyclerView(new String[]{"%" + mTag + "%"}, rv);
 
-        return view;
+        callForRemoteTagData(mTag);
+        return mView;
     }
+
 
     private void setupRecyclerView(String[] tags, RecyclerView recyclerView) {
         recyclerView.setHasFixedSize(true);
@@ -117,5 +144,42 @@ public class TagWallFragment extends Fragment {
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    private void callForRemoteTagData(String tag) {
+        // construct context from preferences if any?
+        Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_NAME.getValue(), tag);
+
+        // call for intent
+        mServiceIntent =
+                new Intent(activity.getApplicationContext(), TagsPullService.class);
+        mServiceIntent.putExtras(iArgs);
+        activity.startService(mServiceIntent);
+    }
+
+    @Subscribe
+    public void onTagRefreshedEvent(Events.TagRefreshedEvent event) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // update preferences metadata
+                Cursor cursor = activity.getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTag}, null);
+                try {
+                    if (cursor.moveToFirst()) {
+                        int imgIdx = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE);
+                        String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
+                        if (StringUtils.isNotBlank(imgStr)) {
+                            Utils.setupLoadingImageHolder(mBackdropImg, imgStr);
+                        }
+                    }
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                }finally{
+                    cursor.close();
+                }
+            }
+        });
+
     }
 }

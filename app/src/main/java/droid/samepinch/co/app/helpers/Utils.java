@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
-import droid.samepinch.co.app.helpers.module.StorageComponent;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
+import droid.samepinch.co.rest.RestClient;
 
 import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_ID;
 import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_SECRET;
@@ -186,8 +185,7 @@ public class Utils {
         payload.put(SCOPE.getKey(), SCOPE.getValue());
         payload.put(GRANT_TYPE.getKey(), GRANT_TYPE.getValue());
 
-        StorageComponent component = DaggerStorageComponent.create();
-        ResponseEntity<Map> response = component.provideRestTemplate().postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
+        ResponseEntity<Map> response = RestClient.INSTANCE.handle().postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
         Map<String, String> responseEntity = response.getBody();
         for (Map.Entry<String, String> entry : responseEntity.entrySet()) {
             pref.setValue(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
@@ -230,6 +228,11 @@ public class Utils {
         }
 
         public void setValue(String key, Map<String, String> val) {
+            // null val deletes preferences enty
+            if(val == null){
+                remove(key);
+                return;
+            }
             JSONObject jsonObject = new JSONObject(val);
             String valStr = jsonObject.toString();
             setValue(key, valStr);

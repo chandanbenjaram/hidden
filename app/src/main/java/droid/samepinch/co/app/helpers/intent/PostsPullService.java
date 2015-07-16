@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,7 +18,9 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.Utils;
@@ -32,6 +35,9 @@ import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
 import droid.samepinch.co.rest.ReqPosts;
 import droid.samepinch.co.rest.RespPosts;
+import droid.samepinch.co.rest.RestClient;
+
+import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.*;
 
 /**
  * Created by imaginationcoder on 6/26/15.
@@ -55,12 +61,12 @@ public class PostsPullService extends IntentService {
         postsReq.setToken(Utils.getAppToken(false));
         postsReq.setCmd("filter");
         // set context args
-        postsReq.setPostCount(iArgs.getString("post_count"));
-        postsReq.setLastModified(iArgs.getString("last_modified"));
-        postsReq.setStep(iArgs.getString("step"));
-        postsReq.setEtag(iArgs.getString("etag"));
-        postsReq.setKey(iArgs.getString("key"));
-        postsReq.setBy(iArgs.getString("by"));
+        postsReq.setPostCount(iArgs.getString(KEY_POST_COUNT.getValue()));
+        postsReq.setLastModified(iArgs.getString(KEY_LAST_MODIFIED.getValue()));
+        postsReq.setStep(StringUtils.defaultString(iArgs.getString(KEY_STEP.getValue())));
+        postsReq.setEtag(iArgs.getString(KEY_ETAG.getValue()));
+        postsReq.setKey(iArgs.getString(KEY_KEY.getValue()));
+        postsReq.setBy(iArgs.getString(KEY_BY.getValue()));
 
         //headers
         HttpHeaders headers = new HttpHeaders();
@@ -75,35 +81,45 @@ public class PostsPullService extends IntentService {
 //                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 //                ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
 //                System.out.println("respStr...\n" + respStr.getBody());
-                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
+                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
             } catch (HttpStatusCodeException e) {
                 if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                     // try resetting token?
                     postsReq.setToken(Utils.getAppToken(true));
                     payloadEntity = new HttpEntity<>(postsReq.build(), headers);
-                    resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
+                    resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
                 } else {
                     throw new IllegalStateException("un-known response code.", e);
                 }
             }
 
-            ArrayList<ContentProviderOperation> ops = parseResponse(resp);
-            ContentProviderResult[] result = getContentResolver().
-                    applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
-
             // publish this event
-            BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent());
+            Map<String, String> metaData = new HashMap<>();
+            RespPosts.Body respBody = resp.getBody().getBody();
+            metaData.put(KEY_LAST_MODIFIED.getValue(), respBody.getLastModifiedStr());
+            metaData.put(KEY_ETAG.getValue(), respBody.getEtag());
+            metaData.put(KEY_POST_COUNT.getValue(), String.valueOf(respBody.getPostCount()));
+
+            ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());
+            if(ops != null){
+                ContentProviderResult[] result = getContentResolver().
+                        applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+                BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @NonNull
-    private ArrayList<ContentProviderOperation> parseResponse(ResponseEntity<RespPosts> resp) {
-        RespPosts respData = resp.getBody();
-
+    private ArrayList<ContentProviderOperation> parseResponse(RespPosts respData) {
         List<Post> postsToInsert = respData.getBody().getPosts();
+        if(postsToInsert == null){
+            return null;
+        }
+
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         // anonymous dot construction
@@ -150,7 +166,6 @@ public class PostsPullService extends IntentService {
             for (String tag : post.getTags()) {
                 ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
                         .withValue(SchemaTags.COLUMN_NAME, tag)
-                        .withValue(SchemaTags.COLUMN_PHOTO_URL, "http://bigtheme.ir/wp-content/uploads/2015/06/sample.jpg")
                         .build());
             }
         }

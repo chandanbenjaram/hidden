@@ -1,7 +1,6 @@
 package droid.samepinch.co.app.helpers.module;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Singleton;
 
@@ -20,10 +19,6 @@ public class DataModule {
 
     @Provides ReqPosts provideReqPosts(){
         return new ReqPosts();
-    }
-
-    @Provides @Singleton RestTemplate provideRestTemplate(){
-        return new RestTemplate();
     }
 
     @Provides @Singleton User provideAnonymousDot(){

@@ -63,7 +63,7 @@ public interface SchemaPosts extends BaseColumns {
             + " AS SELECT"
             + " p." + _ID
             + ", p." + COLUMN_UID
-            + ", SUBSTR(p." + COLUMN_CONTENT + ", 1, 155) " + COLUMN_CONTENT
+            + ", p." + COLUMN_CONTENT
             + ", p." + COLUMN_COMMENT_COUNT
             + ", p." + COLUMN_UPVOTE_COUNT
             + ", p." + COLUMN_VIEWS
