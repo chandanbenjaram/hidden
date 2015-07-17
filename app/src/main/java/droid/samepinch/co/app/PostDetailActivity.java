@@ -16,38 +16,54 @@
 
 package droid.samepinch.co.app;
 
+import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import droid.samepinch.co.data.dao.SchemaPosts;
 
 public class PostDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_NAME = "cheese_name";
+    private CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_postdetail);
+        initActivityTransitions();
+        setContentView(R.layout.activity_postdetail_2);
 
         // get caller data
         Bundle iArgs = getIntent().getExtras();
         String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        supportPostponeEnterTransition();
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(postId);
+        String itemTitle = postId;
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle(itemTitle);
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
-        loadBackdrop();
+        TextView title = (TextView) findViewById(R.id.title);
+        title.setText(itemTitle + "ttl");
+
+        collapsingToolbarLayout.setContentScrimColor(android.R.color.background_dark);
+        collapsingToolbarLayout.setStatusBarScrimColor(android.R.color.background_dark);
+//        updateBackground((FloatingActionButton) findViewById(R.id.fab), palette);
+        supportStartPostponedEnterTransition();
     }
 
     @Override
@@ -69,5 +85,31 @@ public class PostDetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sample_actions, menu);
         return true;
+    }
+
+    private void initActivityTransitions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Slide transition = new Slide();
+            transition.excludeTarget(android.R.id.statusBarBackground, true);
+            getWindow().setEnterTransition(transition);
+            getWindow().setReturnTransition(transition);
+        }
+    }
+
+    private void applyPalette(Palette palette) {
+        int primaryDark = getResources().getColor(R.color.primary_material_dark);
+        int primary = getResources().getColor(R.color.primary_material_light);
+        collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
+        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
+        updateBackground((FloatingActionButton) findViewById(R.id.fab), palette);
+        supportStartPostponedEnterTransition();
+    }
+
+    private void updateBackground(FloatingActionButton fab, Palette palette) {
+        int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
+        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.accent_material_dark));
+
+        fab.setRippleColor(lightVibrantColor);
+        fab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
     }
 }
