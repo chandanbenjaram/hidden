@@ -26,6 +26,7 @@ import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.app.PostDetailActivity;
 import droid.samepinch.co.app.R;
 import droid.samepinch.co.app.helpers.Utils;
+import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Commenter;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
@@ -102,8 +103,12 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         vh.mLayoutPostItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle iArgs = new Bundle();
+                iArgs.putString(SchemaPosts.COLUMN_UID, post.getUid());
+
                 Intent intent = new Intent(context, PostDetailActivity.class);
-                intent.putExtra(PostDetailActivity.EXTRA_NAME, post.getUid());
+                intent.putExtras(iArgs);
+
                 context.startActivity(intent);
             }
         });

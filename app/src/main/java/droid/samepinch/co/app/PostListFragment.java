@@ -90,7 +90,6 @@ public class PostListFragment extends Fragment {
             }
         };
 
-
         rv.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
