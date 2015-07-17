@@ -14,9 +14,13 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TimeZone;
 
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -24,6 +28,7 @@ import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.User;
 import droid.samepinch.co.rest.RestClient;
 
+import static droid.samepinch.co.app.helpers.AppConstants.API.DEFAULT_DATE_FORMAT;
 import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_ID;
 import static droid.samepinch.co.app.helpers.AppConstants.KV.CLIENT_SECRET;
 import static droid.samepinch.co.app.helpers.AppConstants.KV.GRANT_TYPE;
@@ -266,5 +271,23 @@ public class Utils {
                     .clear()
                     .commit();
         }
+    }
+
+    public static Date string2Date(String stringDate){
+        Date date = null;
+        if(stringDate == null){
+            return date;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+            date = sdf.parse(stringDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return date;
     }
 }

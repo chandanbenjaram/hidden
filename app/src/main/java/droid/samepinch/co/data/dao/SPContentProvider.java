@@ -89,6 +89,9 @@ public class SPContentProvider extends ContentProvider {
             case PATH_POSTS:
             case PATH_POSTS_ITEM:
                 qb.setTables(SchemaPosts.VIEW_CREATE_POST_WITH_DOT_NAME);
+                if(sortOrder == null){
+                    sortOrder = SchemaPosts.COLUMN_CREATED_AT + " desc";
+                }
                 break;
             case PATH_DOTS:
             case PATH_DOTS_ITEM:
@@ -186,7 +189,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "droid.samepinch.co.app.db";
-        static final int DATABASE_VERSION = 51;
+        static final int DATABASE_VERSION = 55;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);

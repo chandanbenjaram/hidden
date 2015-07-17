@@ -72,6 +72,7 @@ public interface SchemaPosts extends BaseColumns {
             + ", p." + COLUMN_TAGS
             + ", p." + COLUMN_OWNER
             + ", p." + COLUMN_IMAGES
+            + ", p." + COLUMN_CREATED_AT
             + ", d." + SchemaDots.COLUMN_PINCH_HANDLE
             + ", d." + SchemaDots.COLUMN_FNAME
             + ", d." + SchemaDots.COLUMN_LNAME

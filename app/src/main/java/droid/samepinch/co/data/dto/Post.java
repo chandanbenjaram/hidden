@@ -1,8 +1,5 @@
 package droid.samepinch.co.data.dto;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
@@ -12,10 +9,11 @@ import com.google.gson.reflect.TypeToken;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import droid.samepinch.co.app.helpers.Utils;
 
 /**
  * Created by imaginationcoder on 7/1/15.
@@ -117,9 +115,9 @@ public class Post {
     }
 
     public Date getCreatedAt() {
-        if (createdAt == null && createdAtStr != null) {
+        if (createdAt == null) {
             //TODO
-            setCreatedAt(new Date());
+            setCreatedAt(Utils.string2Date(createdAtStr));
         }
         return createdAt;
     }
@@ -195,4 +193,6 @@ public class Post {
         }
         return StringUtils.arrayToDelimitedString(getImages().toArray(), ",");
     }
+
+
 }
