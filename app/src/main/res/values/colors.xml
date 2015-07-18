@@ -15,6 +15,12 @@
   -->
 
 <resources>
+    <color name="colorPrimary">#E74C3C</color>
+    <color name="colorPrimaryDark">#B83c30</color>
+    <color name="divider">#644d4d4d</color>
+    <color name="titleTextColor">@android:color/white</color>
+    <color name="colorAccent">#23ff9a</color>
+
     <color name="window_background">#FFF5F5F5</color>
 
     <color name="red_50">#ffebee</color>
