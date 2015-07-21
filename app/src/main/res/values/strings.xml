@@ -16,8 +16,6 @@
 -->
 
 <resources>
-    <string name="app_name">Cheesesquare</string>
-
   <string name="cheese_ipsum">Jarlsberg lancashire edam. Dolcelatte hard cheese brie st. agur blue
     cheese caerphilly bavarian bergkase cheese and biscuits mascarpone. Cheeseburger swiss bavarian
     bergkase cream cheese fromage frais cheesy feet port-salut airedale. St. agur blue cheese rubber
@@ -29,4 +27,25 @@
   <string name="content_authority_posts">droid.samepinch.co.app.posts</string>
   <string name="content_authority_users">droid.samepinch.co.app.users</string>
 
+  <string name="app_name">SamePinch</string>
+  <string name="sample_data">"Some data %1$d"</string>
+  <string name="standard_app_bar_menu_title">Standard app bar</string>
+  <string name="tabs_menu_title">Tabs</string>
+  <string name="flexible_space_with_image_menu_title">Flexible space with image</string>
+  <string name="flexible_space_menu_title">Flexible space app bar</string>
+  <string name="navigation_drawer_open" translatable="false"/>
+  <string name="navigation_drawer_close" translatable="false"/>
+  <string name="sample_email">sample.user@email.com</string>
+  <string name="not_implemented_yet">Not implemented yet</string>
+  <string name="contact_desc">contact photo</string>
+  <string name="desc_list_item_left_icon">desc_list_item_icon</string>
+  <string name="image_desc">image_desc</string>
+  <string name="some_folder">Some folder</string>
+  <string name="sample_name">User Name</string>
+  <string name="pop_title">Pop</string>
+  <string name="indie_title">Indie</string>
+  <string name="rock_title">Rock</string>
+  <string name="r8b_title"><![CDATA[R&B]]></string>
+  <string name="not_title_set">No title set</string>
+  <string name="floating_action_button">Floating action button</string>
 </resources>

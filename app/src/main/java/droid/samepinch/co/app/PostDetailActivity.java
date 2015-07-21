@@ -41,6 +41,7 @@
 
 package droid.samepinch.co.app;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -51,13 +52,20 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import droid.samepinch.co.app.helpers.Utils;
+import droid.samepinch.co.app.helpers.intent.PostDetailsService;
+import droid.samepinch.co.app.helpers.widget.TextViewWithImages;
+import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
 
+import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
+
 public class PostDetailActivity extends AppCompatActivity {
+
+    private Intent mServiceIntent;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,21 +91,34 @@ public class PostDetailActivity extends AppCompatActivity {
         String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
         Post post = null;
-        Cursor cursor = getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_UID + "=?", new String[]{postId}, null);
+        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPosts.COLUMN_UID + "=?", new String[]{postId}, null);
         if(cursor != null && cursor.moveToFirst()){
             post = Utils.cursorToPostEntity(cursor);
         }
 
-        TextView textView, recentView;
-        for (int i = 0; i < 5; i++) {
-            //Create a textView, set a random ID and position it below the most recently added view
-            textView = new TextView(PostDetailActivity.this);
-            textView.setId((int) System.currentTimeMillis());
-            textView.setText(post.getContent());
-            contentLayout.addView(textView, lParams);
-            recentView = textView;
+        if(post !=null){
+            TextViewWithImages textView, recentView;
+            for (int i = 0; i < 5; i++) {
+                //Create a textView, set a random ID and position it below the most recently added view
+                textView = new TextViewWithImages(PostDetailActivity.this);
+                textView.setId((int) System.currentTimeMillis());
+                textView.setText(post.getContent());
+                contentLayout.addView(textView, lParams);
+                recentView = textView;
+            }
         }
 
+
+
+        // construct context from preferences if any?
+        Bundle iServiceArgs = new Bundle();
+        iServiceArgs.putString(KEY_UID.getValue(), postId);
+
+        // call for intent
+        mServiceIntent =
+                new Intent(getApplicationContext(), PostDetailsService.class);
+        mServiceIntent.putExtras(iArgs);
+        startService(mServiceIntent);
     }
 
     @Override

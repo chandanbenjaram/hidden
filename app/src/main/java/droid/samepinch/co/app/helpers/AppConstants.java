@@ -15,9 +15,9 @@ public class AppConstants {
         BASE("https://msocl.herokuapp.com/"),
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         USERS(BASE.getValue().concat("api/users")),
-        POSTS(BASE.getValue().concat("api/v2/posts")),
+        POSTS_WITH_FILTER(BASE.getValue().concat("api/v2/posts")),
+        POSTS(BASE.getValue().concat("api/posts")),
         GROUPS(BASE.getValue().concat("api/groups")),
-
         CONTENT_AUTHORITY("droid.samepinch.co.app");
 
         private final String value;
@@ -49,6 +49,8 @@ public class AppConstants {
         KEY_BY("by"),
         KEY_NEW("new"),
         KEY_NAME("name"),
+        KEY_UID("uid"),
+
 
 
         ;

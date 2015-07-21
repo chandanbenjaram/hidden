@@ -81,7 +81,7 @@ public class PostsPullService extends IntentService {
 //                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 //                ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
 //                System.out.println("respStr...\n" + respStr.getBody());
-                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
+                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS_WITH_FILTER.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
             } catch (HttpStatusCodeException e) {
                 if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {

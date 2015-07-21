@@ -29,6 +29,8 @@ public class SPContentProvider extends ContentProvider {
     // posts
     private static final int PATH_POSTS = 108;
     private static final int PATH_POSTS_ITEM = 109;
+    private static final int PATH_POST_DETAILS = 1080;
+    private static final int PATH_POST_DETAILS_ITEM = 1090;
 
     // dots
     private static final int PATH_DOTS = 208;
@@ -47,6 +49,10 @@ public class SPContentProvider extends ContentProvider {
         // posts handler
         sUriMatcher.addURI(authority, SchemaPosts.PATH_POSTS, PATH_POSTS);
         sUriMatcher.addURI(authority, SchemaPosts.PATH_POSTS + "/#", PATH_POSTS_ITEM);
+
+        // post details handler
+        sUriMatcher.addURI(authority, SchemaPostDetails.PATH_POST_DETAILS, PATH_POST_DETAILS);
+        sUriMatcher.addURI(authority, SchemaPostDetails.PATH_POST_DETAILS + "/#", PATH_POST_DETAILS_ITEM);
 
         // dots handler
         sUriMatcher.addURI(authority, SchemaDots.PATH_DOTS, PATH_DOTS);
@@ -93,6 +99,10 @@ public class SPContentProvider extends ContentProvider {
                     sortOrder = SchemaPosts.COLUMN_CREATED_AT + " desc";
                 }
                 break;
+            case PATH_POST_DETAILS:
+            case PATH_POST_DETAILS_ITEM:
+                qb.setTables(SchemaPostDetails.TABLE_NAME);
+                break;
             case PATH_DOTS:
             case PATH_DOTS_ITEM:
                 qb.setTables(SchemaDots.TABLE_NAME);
@@ -116,6 +126,11 @@ public class SPContentProvider extends ContentProvider {
             case PATH_POSTS_ITEM:
                 db = mHelper.getWritableDatabase();
                 rowId = db.replaceOrThrow(SchemaPosts.TABLE_NAME, "", values);
+                break;
+            case PATH_POST_DETAILS:
+            case PATH_POST_DETAILS_ITEM:
+                db = mHelper.getWritableDatabase();
+                rowId = db.replaceOrThrow(SchemaPostDetails.TABLE_NAME, "", values);
                 break;
             case PATH_DOTS:
             case PATH_DOTS_ITEM:
@@ -189,7 +204,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "droid.samepinch.co.app.db";
-        static final int DATABASE_VERSION = 55;
+        static final int DATABASE_VERSION = 60;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -204,9 +219,10 @@ public class SPContentProvider extends ContentProvider {
         @Override
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
             sqLiteDatabase.execSQL(SchemaPosts.TABLE_CREATE);
+            sqLiteDatabase.execSQL(SchemaPostDetails.TABLE_CREATE);
+
             sqLiteDatabase.execSQL(SchemaDots.TABLE_CREATE);
             sqLiteDatabase.execSQL(SchemaTags.TABLE_CREATE);
-
 
             // VIEWS
             sqLiteDatabase.execSQL(SchemaPosts.VIEW_CREATE_POST_WITH_DOT);
@@ -219,6 +235,8 @@ public class SPContentProvider extends ContentProvider {
                     + newVersion + " which destroys all old data");
 
             sqLiteDatabase.execSQL(SchemaPosts.TABLE_DROP);
+            sqLiteDatabase.execSQL(SchemaPostDetails.TABLE_DROP);
+
             sqLiteDatabase.execSQL(SchemaDots.TABLE_DROP);
             sqLiteDatabase.execSQL(SchemaTags.TABLE_DROP);
 

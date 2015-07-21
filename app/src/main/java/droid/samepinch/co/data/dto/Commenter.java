@@ -1,14 +1,37 @@
 package droid.samepinch.co.data.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
  * Created by imaginationcoder on 7/14/15.
  */
-public class Commenter implements Serializable{
+public class Commenter implements Serializable {
+    String uid;
     private String fname;
     private String lname;
     private String photo;
+    @SerializedName("pinch_handle")
+    String pinchHandle;
+
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getPinchHandle() {
+        return pinchHandle;
+    }
+
+    public void setPinchHandle(String pinchHandle) {
+        this.pinchHandle = pinchHandle;
+    }
+
     private Boolean anonymous;
 
     public String getFname() {
