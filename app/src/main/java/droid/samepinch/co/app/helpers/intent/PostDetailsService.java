@@ -63,8 +63,8 @@ public class PostDetailsService extends IntentService {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
             HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
-//            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, String.class);
-//            System.out.println("respStr..." + respStr);
+            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, String.class);
+            System.out.println("respStr..." + respStr);
 
             ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, RespPostDetails.class);
             System.out.println("resp..." + resp);
@@ -125,19 +125,20 @@ public class PostDetailsService extends IntentService {
                     .withValue(SchemaDots.COLUMN_PINCH_HANDLE, postOwner.getPinchHandle())
                     .withValue(SchemaDots.COLUMN_PHOTO_URL, postOwner.getPhoto()).build());
         }
-        // POSTS
+        // POST DETAILS
         ops.add(ContentProviderOperation.newInsert(SchemaPostDetails.CONTENT_URI)
-                .withValue(SchemaPosts.COLUMN_UID, details.getUid())
-                .withValue(SchemaPosts.COLUMN_CONTENT, details.getContent())
-//                .withValue(SchemaPosts.COLUMN_IMAGES, details.getImagesForDB())
-                .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, details.getCommentCount())
-                .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, details.getUpvoteCount())
-                .withValue(SchemaPosts.COLUMN_VIEWS, details.getViews())
-                .withValue(SchemaPosts.COLUMN_ANONYMOUS, details.getAnonymous())
-                .withValue(SchemaPosts.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
+                .withValue(SchemaPostDetails.COLUMN_UID, details.getUid())
+                .withValue(SchemaPostDetails.COLUMN_CONTENT, details.getContent())
+                .withValue(SchemaPostDetails.COLUMN_IMAGES, details.getImagesForDB())
+                .withValue(SchemaPostDetails.COLUMN_LARGE_IMAGES, details.getImagesForDB())
+                .withValue(SchemaPostDetails.COLUMN_COMMENT_COUNT, details.getCommentCount())
+                .withValue(SchemaPostDetails.COLUMN_UPVOTE_COUNT, details.getUpvoteCount())
+                .withValue(SchemaPostDetails.COLUMN_VIEWS, details.getViews())
+                .withValue(SchemaPostDetails.COLUMN_ANONYMOUS, details.getAnonymous())
+                .withValue(SchemaPostDetails.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
 //                .withValue(SchemaPosts.COLUMN_COMMENTERS, details.getCommentersForDB())
-                .withValue(SchemaPosts.COLUMN_OWNER, (details.getAnonymous() ? dfltAnonyDot.getUid() : postOwner.getUid()))
-                .withValue(SchemaPosts.COLUMN_TAGS, details.getTagsForDB()).build());
+                .withValue(SchemaPostDetails.COLUMN_OWNER, (details.getAnonymous() ? dfltAnonyDot.getUid() : postOwner.getUid()))
+                .withValue(SchemaPostDetails.COLUMN_TAGS, details.getTagsForDB()).build());
         // TAGS
         for (String tag : details.getTags()) {
             ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)

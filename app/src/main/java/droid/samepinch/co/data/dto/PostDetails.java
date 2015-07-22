@@ -1,10 +1,13 @@
 package droid.samepinch.co.data.dto;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +31,17 @@ public class PostDetails {
     Integer upvoteCount;
     Integer views;
     List<String> tags;
+    Boolean anonymous;
+    @SerializedName("createdAt")
+    String createdAtStr;
+    @Expose(deserialize = false, serialize = false)
+    @SerializedName("createdAtDB")
+    Date createdAt;
+    User owner;
+    @SerializedName("anonymous_image")
+    String anonymousImage;
+
+    List<CommentDetails> comments;
 
     public List<CommentDetails> getComments() {
         return comments;
@@ -146,32 +160,63 @@ public class PostDetails {
         this.anonymousImage = anonymousImage;
     }
 
-    List<CommentDetails> comments;
-
-    Boolean anonymous;
-    @SerializedName("createdAt")
-    String createdAtStr;
-    @Expose(deserialize = false, serialize = false)
-    @SerializedName("createdAtDB")
-    Date createdAt;
-    User owner;
-
-    @SerializedName("anonymous_image")
-    String anonymousImage;
-
 
     public void setTagsFromDB(String tags) {
         if (tags != null) {
-            setTags(Arrays.asList(tags.split(",")));
-        } else {
             setTags(null);
+        } else {
+            setTags(Arrays.asList(tags.split(",")));
         }
     }
 
     public String getTagsForDB() {
-        if (getTags() == null || getTags().isEmpty()) {
+        if (getTags() == null) {
             return null;
         }
         return StringUtils.arrayToDelimitedString(getTags().toArray(), ",");
+    }
+
+
+    public void setImagesFromDB(String imagesStr) {
+        if (imagesStr == null) {
+            setImages(null);
+
+        } else {
+            Gson g = new Gson();
+            Type token = new TypeToken<Map<String, String>>() {
+            }.getType();
+            Map<String, String> images = g.fromJson(imagesStr, token);
+            setImages(images);
+        }
+    }
+
+    public String getImagesForDB() {
+        if (getImages() == null) {
+            return null;
+        }
+
+        Gson g = new Gson();
+        return g.toJson(getImages());
+    }
+
+    public void setLargeImagesFromDB(String largeImagesStr) {
+        if (largeImagesStr != null) {
+            setLargeImages(null);
+        } else {
+            Gson g = new Gson();
+            Type token = new TypeToken<Map<String, String>>() {
+            }.getType();
+            Map<String, String> largeImages = g.fromJson(largeImagesStr, token);
+            setLargeImages(largeImages);
+        }
+    }
+
+    public String getLargeImagesForDB() {
+        if (getLargeImages() == null) {
+            return null;
+        }
+
+        Gson g = new Gson();
+        return g.toJson(getLargeImages());
     }
 }

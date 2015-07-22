@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import droid.samepinch.co.data.dao.SchemaDots;
+import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
+import droid.samepinch.co.data.dto.PostDetails;
 import droid.samepinch.co.data.dto.User;
 import droid.samepinch.co.rest.RestClient;
 
@@ -156,6 +158,65 @@ public class Utils {
 
         post.setOwner(user);
         return post;
+    }
+
+    public static PostDetails cursorToPostDetailsEntity(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+
+        PostDetails details = new PostDetails();
+        int uidIndex;
+        int contentIndex;
+        int imagesIndex;
+        int largeImagesIndex;
+        int commentCountIndex;
+        int upvoteCountIndex;
+        int viewsIndex;
+        int anonymousIndex;
+        int createdAtIndex;
+        int commentersIndex;
+        int tagsIndex;
+        if ((uidIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_UID)) != -1) {
+            details.setUid(cursor.getString(uidIndex));
+        }
+
+        if ((contentIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_CONTENT)) != -1) {
+            details.setContent(cursor.getString(contentIndex));
+        }
+        if ((imagesIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_IMAGES)) != -1) {
+            details.setImagesFromDB(cursor.getString(imagesIndex));
+        }
+        if ((largeImagesIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_LARGE_IMAGES)) != -1) {
+            details.setLargeImagesFromDB(cursor.getString(largeImagesIndex));
+        }
+
+        if ((commentCountIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_COMMENT_COUNT)) != -1) {
+            details.setCommentCount(cursor.getInt(commentCountIndex));
+        }
+
+        if ((upvoteCountIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_UPVOTE_COUNT)) != -1) {
+            details.setUpvoteCount(cursor.getInt(upvoteCountIndex));
+        }
+
+        if ((viewsIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_VIEWS)) != -1) {
+            details.setViews(cursor.getInt(viewsIndex));
+        }
+
+        if ((anonymousIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_ANONYMOUS)) != -1) {
+            details.setAnonymous(cursor.getInt(anonymousIndex) == 1);
+        }
+
+//        if ((commentersIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_COMMENTERS)) != -1) {
+//            post.setCommentersFromDB(cursor.getString(commentersIndex));
+//        }
+
+        if ((tagsIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_TAGS)) != -1) {
+            details.setTagsFromDB(cursor.getString(tagsIndex));
+        }
+//
+
+        return details;
     }
 
 
@@ -290,4 +351,6 @@ public class Utils {
 
         return date;
     }
+
+
 }

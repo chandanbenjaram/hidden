@@ -1,64 +1,64 @@
-///*
-// * Copyright (C) 2015 The Android Open Source Project
-// *
-// * Licensed under the Apache License, Version 2.0 (the "License");
-// * you may not use this file except in compliance with the License.
-// * You may obtain a copy of the License at
-// *
-// *      http://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS,
-// * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// * See the License for the specific language governing permissions and
-// * limitations under the License.
-// */
-//    private void updateBackground(FloatingActionButton fab, Palette palette) {
-//        int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
-//        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.accent_material_dark));
-//
-//        fab.setRippleColor(lightVibrantColor);
-//        fab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
-//    }
-//}
-//
-
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package droid.samepinch.co.app;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.ViewUtils;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.BasePostprocessor;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.facebook.imagepipeline.request.Postprocessor;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
+import droid.samepinch.co.app.helpers.widget.IImageKV;
 import droid.samepinch.co.app.helpers.widget.TextViewWithImages;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.Post;
+import droid.samepinch.co.data.dto.PostDetails;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
@@ -83,31 +83,72 @@ public class PostDetailActivity extends AppCompatActivity {
         ab.setDisplayShowCustomEnabled(true); // enable overriding the default toolbar layout
         ab.setDisplayShowTitleEnabled(false);
 
-        LinearLayout contentLayout = (LinearLayout) findViewById(R.id.postdetail_content);
+        LinearLayout contentLayout = (LinearLayout) findViewById(R.id.postdetail_content_layout);
         ViewGroup.LayoutParams lParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         // get caller data
         Bundle iArgs = getIntent().getExtras();
         String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
-        Post post = null;
-        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPosts.COLUMN_UID + "=?", new String[]{postId}, null);
-        if(cursor != null && cursor.moveToFirst()){
-            post = Utils.cursorToPostEntity(cursor);
+        PostDetails details = null;
+        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId}, null);
+        if (cursor.moveToFirst()) {
+            details = Utils.cursorToPostDetailsEntity(cursor);
         }
 
-        if(post !=null){
-            TextViewWithImages textView, recentView;
-            for (int i = 0; i < 5; i++) {
-                //Create a textView, set a random ID and position it below the most recently added view
-                textView = new TextViewWithImages(PostDetailActivity.this);
-                textView.setId((int) System.currentTimeMillis());
-                textView.setText(post.getContent());
-                contentLayout.addView(textView, lParams);
-                recentView = textView;
+        if (details != null) {
+            TextView content = (TextView) findViewById(R.id.postdetail_content);
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+            SpannableStringBuilder contentBldr = new SpannableStringBuilder();
+
+            List<String> imageKArr = getImageValues(details.getContent());
+
+            String fullContent = details.getContent();
+            Map<String, String> imageKV = details.getImages();
+            String strToAdd;
+            String nl = System.getProperty ("line.separator");
+            for(String imgK : imageKArr){
+
+                strToAdd = StringUtils.substringBefore(fullContent, imgK).replaceAll("::", "");
+                //strToAdd +=nl;
+                int start = StringUtils.indexOf(fullContent, strToAdd);
+                int end = start + strToAdd.length();
+                if(StringUtils.isNotBlank(strToAdd)){
+                    contentBldr.append(strToAdd);
+                }
+
+                fullContent = StringUtils.substringAfter(fullContent, imgK);
+
+                String imgV = imageKV.get(imgK);
+                ImageRequest imageRequest =
+                        ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgV)).setResizeOptions(
+                                new ResizeOptions(150, 150))
+                                .build();
+//                DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                        .setImageRequest(imageRequest)
+//                        .setAutoPlayAnimations(true)
+//                        .build();
+//                SimpleDraweeView sdView = new SimpleDraweeView(this);
+//                sdView.setController(controller);
+
+
+                ImageSpan imgSpan = new ImageSpan(getApplicationContext(), image);
+
+                //                Drawable d = sdView.getDrawable();
+//                d.setBounds(0, 0, 150, 150);
+//                BitmapDrawable drawable = (BitmapDrawable) sdView.getDrawable();
+//
+//                ImageSpan imgSpan = new ImageSpan(getApplicationContext(), drawable.getBitmap());
+//
+////                contentBldr.append(System.getProperty("line.separator"));
+//                //contentBldr.setSpan(imgSpan, end, end+1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+//                contentBldr.setSpan(imgSpan, contentBldr.length()-1, contentBldr.length(), 0);
             }
-        }
 
+            content.setText(contentBldr);
+            content.setMovementMethod(LinkMovementMethod.getInstance());
+        }
 
 
         // construct context from preferences if any?
@@ -140,5 +181,16 @@ public class PostDetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sample_actions, menu);
         return true;
+    }
+
+    private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
+
+    private static List<String> getImageValues(final String str) {
+        final List<String> imgVals = new ArrayList<>();
+        final Matcher matcher = IMG_PATTERN.matcher(str);
+        while (matcher.find()) {
+            imgVals.add(matcher.group(1));
+        }
+        return imgVals;
     }
 }

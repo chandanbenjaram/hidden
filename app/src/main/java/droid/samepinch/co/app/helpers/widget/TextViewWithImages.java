@@ -6,6 +6,8 @@ import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,22 +17,23 @@ import java.util.regex.Pattern;
 public class TextViewWithImages extends TextView {
     private static final Spannable.Factory spannableFactory = Spannable.Factory.getInstance();
 
-    public TextViewWithImages(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-    public TextViewWithImages(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
     public TextViewWithImages(Context context) {
         super(context);
     }
-    @Override
-    public void setText(CharSequence text, BufferType type) {
-        Spannable s = getTextWithImages(getContext(), text);
+
+//    @Override
+//    public void setText(CharSequence text, BufferType type) {
+//        Spannable s = getTextWithImages(getContext(), text);
+//        super.setText(s, BufferType.SPANNABLE);
+//    }
+
+    public void setText(CharSequence text, Map<String, String> imageKV) {
+        Spannable s = getTextWithImages(getContext(), text, imageKV);
         super.setText(s, BufferType.SPANNABLE);
+
     }
 
-    private static boolean addImages(Context context, Spannable spannable) {
+    private static boolean addImages(Context context, Spannable spannable, Map<String, String> imageKV) {
         Pattern refImg = Pattern.compile("::(.*?)(::)");
         boolean hasChanges = false;
 
@@ -48,6 +51,9 @@ public class TextViewWithImages extends TextView {
                 }
             }
             String resname = spannable.subSequence(matcher.start(1), matcher.end(1)).toString().trim();
+            if(imageKV !=null && imageKV.containsKey(resname)){
+                resname = imageKV.get(resname);
+            }
             int id = context.getResources().getIdentifier(resname, "drawable", context.getPackageName());
             if (set) {
                 hasChanges = true;
@@ -61,9 +67,9 @@ public class TextViewWithImages extends TextView {
 
         return hasChanges;
     }
-    private static Spannable getTextWithImages(Context context, CharSequence text) {
+    private static Spannable getTextWithImages(Context context, CharSequence text, Map<String, String> imageKV) {
         Spannable spannable = spannableFactory.newSpannable(text);
-        addImages(context, spannable);
+        addImages(context, spannable, imageKV);
         return spannable;
     }
 }
