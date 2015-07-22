@@ -2,46 +2,17 @@ package droid.samepinch.co.app;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.internal.widget.ViewUtils;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ImageSpan;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
-import com.facebook.drawee.drawable.ScalingUtils;
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
-import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
-import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.common.ResizeOptions;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.BasePostprocessor;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.facebook.imagepipeline.request.Postprocessor;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,11 +24,9 @@ import java.util.regex.Pattern;
 
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
-import droid.samepinch.co.app.helpers.widget.IImageKV;
-import droid.samepinch.co.app.helpers.widget.TextViewWithImages;
+import droid.samepinch.co.app.helpers.widget.SIMView;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
-import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.PostDetails;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
@@ -84,7 +53,6 @@ public class PostDetailActivity extends AppCompatActivity {
         ab.setDisplayShowTitleEnabled(false);
 
         LinearLayout contentLayout = (LinearLayout) findViewById(R.id.postdetail_content_layout);
-        ViewGroup.LayoutParams lParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         // get caller data
         Bundle iArgs = getIntent().getExtras();
@@ -95,59 +63,69 @@ public class PostDetailActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
-
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         if (details != null) {
-            TextView content = (TextView) findViewById(R.id.postdetail_content);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-            SpannableStringBuilder contentBldr = new SpannableStringBuilder();
-
             List<String> imageKArr = getImageValues(details.getContent());
+            String rightContent = details.getContent();
 
-            String fullContent = details.getContent();
             Map<String, String> imageKV = details.getImages();
-            String strToAdd;
-            String nl = System.getProperty ("line.separator");
-            for(String imgK : imageKArr){
+            String leftContent;
+            LayoutInflater inflater = LayoutInflater.from(this);
+            for (String imgK : imageKArr) {
+                // get left of image
+                leftContent = StringUtils.substringBefore(rightContent, imgK).replaceAll("::", "");
 
-                strToAdd = StringUtils.substringBefore(fullContent, imgK).replaceAll("::", "");
-                //strToAdd +=nl;
-                int start = StringUtils.indexOf(fullContent, strToAdd);
-                int end = start + strToAdd.length();
-                if(StringUtils.isNotBlank(strToAdd)){
-                    contentBldr.append(strToAdd);
+                // grab right remaining chunk
+                rightContent = StringUtils.substringAfter(rightContent, imgK).replaceAll("::", "");
+
+                if (StringUtils.isNotBlank(leftContent)) {
+                    TextView tView = new TextView(getApplicationContext());
+                    tView.setText(leftContent);
+                    tView.setLayoutParams(layoutParams);
+
+                    contentLayout.addView(tView);
                 }
 
-                fullContent = StringUtils.substringAfter(fullContent, imgK);
-
+                // grab image url
                 String imgV = imageKV.get(imgK);
-                ImageRequest imageRequest =
-                        ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgV)).setResizeOptions(
-                                new ResizeOptions(150, 150))
-                                .build();
-//                DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                        .setImageRequest(imageRequest)
+
+//                inflater.inflate(R.layout.widget_sim, contentLayout);
+
+                SIMView fImageView = new SIMView(PostDetailActivity.this);
+                fImageView.setLayoutParams(layoutParams);
+
+
+//                GenericDraweeHierarchyBuilder builder =
+//                        new GenericDraweeHierarchyBuilder(getResources());
+//                GenericDraweeHierarchy hierarchy = builder
+//                        .setFadeDuration(300)
+//                        .build();
+//
+//                // fresco stuff STARTS
+//                ImageRequest fImageReq =
+//                        ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgV)).build();
+//                DraweeController fController = Fresco.newDraweeControllerBuilder()
+//                        .setImageRequest(fImageReq)
 //                        .setAutoPlayAnimations(true)
 //                        .build();
-//                SimpleDraweeView sdView = new SimpleDraweeView(this);
-//                sdView.setController(controller);
+//                SimpleDraweeView fImageView = new SimpleDraweeView(PostDetailActivity.this);
+//                fImageView.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
+//                fImageView.setImageURI(Uri.parse(imgV));
+////                fImageView.setController(fController);
+//                fImageView.setHierarchy(hierarchy);
+                // END
 
-
-                ImageSpan imgSpan = new ImageSpan(getApplicationContext(), image);
-
-                //                Drawable d = sdView.getDrawable();
-//                d.setBounds(0, 0, 150, 150);
-//                BitmapDrawable drawable = (BitmapDrawable) sdView.getDrawable();
-//
-//                ImageSpan imgSpan = new ImageSpan(getApplicationContext(), drawable.getBitmap());
-//
-////                contentBldr.append(System.getProperty("line.separator"));
-//                //contentBldr.setSpan(imgSpan, end, end+1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-//                contentBldr.setSpan(imgSpan, contentBldr.length()-1, contentBldr.length(), 0);
+                contentLayout.addView(fImageView);
             }
 
-            content.setText(contentBldr);
-            content.setMovementMethod(LinkMovementMethod.getInstance());
+
+            if (StringUtils.isNotBlank(rightContent)) {
+                TextView tView = new TextView(getApplicationContext());
+                tView.setText(rightContent);
+                tView.setLayoutParams(layoutParams);
+
+                contentLayout.addView(tView);
+            }
         }
 
 
