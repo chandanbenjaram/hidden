@@ -63,7 +63,7 @@ public class PostDetailActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         if (details != null) {
             List<String> imageKArr = getImageValues(details.getContent());
             String rightContent = details.getContent();
@@ -77,53 +77,25 @@ public class PostDetailActivity extends AppCompatActivity {
 
                 // grab right remaining chunk
                 rightContent = StringUtils.substringAfter(rightContent, imgK).replaceAll("::", "");
-
                 if (StringUtils.isNotBlank(leftContent)) {
-                    TextView tView = new TextView(getApplicationContext());
+                    TextView tView = new TextView(PostDetailActivity.this);
                     tView.setText(leftContent);
                     tView.setLayoutParams(layoutParams);
-
                     contentLayout.addView(tView);
                 }
 
-                // grab image url
-                String imgV = imageKV.get(imgK);
-
-//                inflater.inflate(R.layout.widget_sim, contentLayout);
 
                 SIMView fImageView = new SIMView(PostDetailActivity.this);
-                fImageView.setLayoutParams(layoutParams);
-
-
-//                GenericDraweeHierarchyBuilder builder =
-//                        new GenericDraweeHierarchyBuilder(getResources());
-//                GenericDraweeHierarchy hierarchy = builder
-//                        .setFadeDuration(300)
-//                        .build();
-//
-//                // fresco stuff STARTS
-//                ImageRequest fImageReq =
-//                        ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgV)).build();
-//                DraweeController fController = Fresco.newDraweeControllerBuilder()
-//                        .setImageRequest(fImageReq)
-//                        .setAutoPlayAnimations(true)
-//                        .build();
-//                SimpleDraweeView fImageView = new SimpleDraweeView(PostDetailActivity.this);
-//                fImageView.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
-//                fImageView.setImageURI(Uri.parse(imgV));
-////                fImageView.setController(fController);
-//                fImageView.setHierarchy(hierarchy);
-                // END
-
+//                fImageView.setSIMView(imageKV.get(imgK));
+                fImageView.populateImageView("https://i.imgflip.com/ohr0t.gif");
                 contentLayout.addView(fImageView);
             }
 
 
             if (StringUtils.isNotBlank(rightContent)) {
-                TextView tView = new TextView(getApplicationContext());
+                TextView tView = new TextView(PostDetailActivity.this);
                 tView.setText(rightContent);
                 tView.setLayoutParams(layoutParams);
-
                 contentLayout.addView(tView);
             }
         }

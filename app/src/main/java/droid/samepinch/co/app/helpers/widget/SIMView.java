@@ -4,9 +4,17 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+
+import org.apache.commons.lang3.StringUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,15 +32,14 @@ public class SIMView extends RelativeLayout {
 
     public SIMView(Context context) {
         super(context);
-
-        init();
-        onFinishInflate();
+        initView(context);
+//        onFinishInflate();
     }
 
     public SIMView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        init();
+        initView(context);
         getAttributes(context, attrs);
     }
 
@@ -52,20 +59,15 @@ public class SIMView extends RelativeLayout {
         }
     }
 
-    private void init() {
-        inflate(getContext(), R.layout.widget_sim, this);
+    private void initView(Context context) {
+        this.inflate(context, R.layout.widget_sim, this);
+        ButterKnife.bind(this);
     }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        ButterKnife.bind(this);
-        mImagePath = "http://www.maisasolutions.com/img/logo.png";
-        setSIMView(mImagePath);
-    }
-
-    public void setSIMView(String aImagePath) {
-        Uri uri = Uri.parse(aImagePath);
-        mSIMView.setImageURI(uri);
+        populateImageView(mImagePath);
     }
 
     public String getmImagePath() {
@@ -74,5 +76,21 @@ public class SIMView extends RelativeLayout {
 
     public void setmImagePath(String mImagePath) {
         this.mImagePath = mImagePath;
+    }
+
+    public void populateImageView(String imgUri) {
+        if (StringUtils.isBlank(imgUri)) {
+            return;
+        }
+//
+        ImageRequest fImageReq =
+                ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri)).build();
+        DraweeController contrlr = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(fImageReq)
+                .setAutoPlayAnimations(true)
+                .build();
+        mSIMView.setController(contrlr);
+//        Uri uri = Uri.parse(imgUri);
+//        mSIMView.setImageURI(uri);
     }
 }
