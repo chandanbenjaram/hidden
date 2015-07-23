@@ -63,7 +63,6 @@ public class PostDetailActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         if (details != null) {
             List<String> imageKArr = getImageValues(details.getContent());
             String rightContent = details.getContent();
@@ -80,14 +79,14 @@ public class PostDetailActivity extends AppCompatActivity {
                 if (StringUtils.isNotBlank(leftContent)) {
                     TextView tView = new TextView(PostDetailActivity.this);
                     tView.setText(leftContent);
-                    tView.setLayoutParams(layoutParams);
                     contentLayout.addView(tView);
                 }
 
 
                 SIMView fImageView = new SIMView(PostDetailActivity.this);
-//                fImageView.setSIMView(imageKV.get(imgK));
-                fImageView.populateImageView("https://i.imgflip.com/ohr0t.gif");
+                fImageView.populateImageView(imageKV.get(imgK));
+                //fImageView.populateImageView("https://i.imgflip.com/ohr0t.gif");
+//                fImageView.populateImageView("http://www.targeticse.co.in/wp-content/uploads/2010/03/biology.gif");
                 contentLayout.addView(fImageView);
             }
 
@@ -95,7 +94,6 @@ public class PostDetailActivity extends AppCompatActivity {
             if (StringUtils.isNotBlank(rightContent)) {
                 TextView tView = new TextView(PostDetailActivity.this);
                 tView.setText(rightContent);
-                tView.setLayoutParams(layoutParams);
                 contentLayout.addView(tView);
             }
         }

@@ -82,15 +82,13 @@ public class SIMView extends RelativeLayout {
         if (StringUtils.isBlank(imgUri)) {
             return;
         }
-//
         ImageRequest fImageReq =
                 ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri)).build();
         DraweeController contrlr = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(fImageReq)
+                .setOldController(mSIMView.getController())
                 .setAutoPlayAnimations(true)
                 .build();
         mSIMView.setController(contrlr);
-//        Uri uri = Uri.parse(imgUri);
-//        mSIMView.setImageURI(uri);
     }
 }
