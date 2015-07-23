@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -63,8 +62,9 @@ public class PostDetailActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
+        cursor.close();
         if (details != null) {
-            ViewGroup.LayoutParams lParams=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
             List<String> imageKArr = getImageValues(details.getContent());
             String rightContent = details.getContent();
 
@@ -91,15 +91,19 @@ public class PostDetailActivity extends AppCompatActivity {
                 contentLayout.addView(fImageView);
             }
 
-
             if (StringUtils.isNotBlank(rightContent)) {
                 TextView tView = new TextView(PostDetailActivity.this);
                 tView.setText(rightContent);
-                tView.setLayoutParams(lParams);
                 contentLayout.addView(tView);
             }
+
         }
 
+//
+//        TextView tView = new TextView(PostDetailActivity.this);
+//        tView.setText("C");
+////        tView.setLayoutParams(lParams);
+//        contentLayout.addView(tView);
 
         // construct context from preferences if any?
         Bundle iServiceArgs = new Bundle();

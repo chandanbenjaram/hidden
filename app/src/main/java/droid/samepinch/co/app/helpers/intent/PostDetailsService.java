@@ -21,10 +21,11 @@ import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
 import droid.samepinch.co.app.helpers.module.StorageComponent;
+import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
-import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dao.SchemaTags;
+import droid.samepinch.co.data.dto.CommentDetails;
 import droid.samepinch.co.data.dto.PostDetails;
 import droid.samepinch.co.data.dto.User;
 import droid.samepinch.co.rest.ReqNoBody;
@@ -63,17 +64,11 @@ public class PostDetailsService extends IntentService {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
             HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
-            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, String.class);
-            System.out.println("respStr..." + respStr);
+//            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, String.class);
+//            System.out.println("respStr..." + respStr);
 
             ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, RespPostDetails.class);
             System.out.println("resp..." + resp);
-
-//            ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());
-//            if (ops != null) {
-//                ContentProviderResult[] result = getContentResolver().
-//                        applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
-//                BusProvider.INSTANCE.getBus().post(new Events.TagRefreshedEvent(null));
 
             ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());
             if(ops != null){
@@ -84,9 +79,6 @@ public class PostDetailsService extends IntentService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("e..." + e);
-
-
         }
 
     }
@@ -136,9 +128,27 @@ public class PostDetailsService extends IntentService {
                 .withValue(SchemaPostDetails.COLUMN_VIEWS, details.getViews())
                 .withValue(SchemaPostDetails.COLUMN_ANONYMOUS, details.getAnonymous())
                 .withValue(SchemaPostDetails.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
-//                .withValue(SchemaPosts.COLUMN_COMMENTERS, details.getCommentersForDB())
                 .withValue(SchemaPostDetails.COLUMN_OWNER, (details.getAnonymous() ? dfltAnonyDot.getUid() : postOwner.getUid()))
                 .withValue(SchemaPostDetails.COLUMN_TAGS, details.getTagsForDB()).build());
+
+        // comments
+        if( details.getComments() !=null){
+            for(CommentDetails cd : details.getComments()){
+                ops.add(ContentProviderOperation.newInsert(SchemaComments.CONTENT_URI)
+                        .withValue(SchemaComments.COLUMN_UID, cd.getUid())
+                        .withValue(SchemaComments.COLUMN_CREATED_AT, cd.getCreatedAt().getTime())
+                        .withValue(SchemaComments.COLUMN_ANONYMOUS, cd.getAnonymous())
+                        .withValue(SchemaComments.COLUMN_TEXT, cd.getText())
+                        .withValue(SchemaComments.COLUMN_UPVOTE_COUNT, cd.getUpvoteCount())
+                        .withValue(SchemaComments.COLUMN_DOT_UID, cd.getCommenter().getUid())
+                        .withValue(SchemaComments.COLUMN_DOT_FNAME, cd.getCommenter().getFname())
+                        .withValue(SchemaComments.COLUMN_DOT_LNAME, cd.getCommenter().getLname())
+                        .withValue(SchemaComments.COLUMN_DOT_PINCH_HANDLE, cd.getCommenter().getPinchHandle())
+                        .withValue(SchemaComments.COLUMN_DOT_PHOTO_URL, cd.getCommenter().getPhoto())
+                        .withValue(SchemaComments.COLUMN_POST_DETAILS, details.getUid()).build());
+            }
+        }
+
         // TAGS
         for (String tag : details.getTags()) {
             ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)

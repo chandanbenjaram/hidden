@@ -40,6 +40,9 @@ public class SPContentProvider extends ContentProvider {
     private static final int PATH_TAGS = 308;
     private static final int PATH_TAGS_ITEM = 309;
 
+    private static final int PATH_COMMENTS = 408;
+    private static final int PATH_COMMENTS_ITEM = 409;
+
     // uri patterns matcher
     private static final UriMatcher sUriMatcher;
 
@@ -61,6 +64,10 @@ public class SPContentProvider extends ContentProvider {
         // tags handler
         sUriMatcher.addURI(authority, SchemaTags.PATH_TAGS, PATH_TAGS);
         sUriMatcher.addURI(authority, SchemaTags.PATH_TAGS + "/#", PATH_TAGS_ITEM);
+
+        // comments handler
+        sUriMatcher.addURI(authority, SchemaComments.PATH_COMMENTS, PATH_COMMENTS);
+        sUriMatcher.addURI(authority, SchemaComments.PATH_COMMENTS + "/#", PATH_COMMENTS_ITEM);
     }
 
     DBHelper mHelper;
@@ -71,12 +78,18 @@ public class SPContentProvider extends ContentProvider {
             case PATH_POSTS:
             case PATH_POSTS_ITEM:
                 return SchemaPosts.PATH_POSTS;
+            case PATH_POST_DETAILS:
+            case PATH_POST_DETAILS_ITEM:
+                return SchemaPostDetails.PATH_POST_DETAILS;
             case PATH_DOTS:
             case PATH_DOTS_ITEM:
                 return SchemaDots.PATH_DOTS;
             case PATH_TAGS:
             case PATH_TAGS_ITEM:
                 return SchemaTags.PATH_TAGS;
+            case PATH_COMMENTS:
+            case PATH_COMMENTS_ITEM:
+                return SchemaComments.PATH_COMMENTS;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
@@ -111,6 +124,10 @@ public class SPContentProvider extends ContentProvider {
             case PATH_TAGS_ITEM:
                 qb.setTables(SchemaTags.TABLE_NAME);
                 break;
+            case PATH_COMMENTS:
+            case PATH_COMMENTS_ITEM:
+                qb.setTables(SchemaComments.TABLE_NAME);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown uri: " + uri);
         }
@@ -141,6 +158,11 @@ public class SPContentProvider extends ContentProvider {
             case PATH_TAGS_ITEM:
                 db = mHelper.getWritableDatabase();
                 rowId = db.replaceOrThrow(SchemaTags.TABLE_NAME, "", values);
+                break;
+            case PATH_COMMENTS:
+            case PATH_COMMENTS_ITEM:
+                db = mHelper.getWritableDatabase();
+                rowId = db.replaceOrThrow(SchemaComments.TABLE_NAME, "", values);
                 break;
 
             default:
@@ -204,7 +226,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "droid.samepinch.co.app.db";
-        static final int DATABASE_VERSION = 61;
+        static final int DATABASE_VERSION = 67;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -223,6 +245,7 @@ public class SPContentProvider extends ContentProvider {
 
             sqLiteDatabase.execSQL(SchemaDots.TABLE_CREATE);
             sqLiteDatabase.execSQL(SchemaTags.TABLE_CREATE);
+            sqLiteDatabase.execSQL(SchemaComments.TABLE_CREATE);
 
             // VIEWS
             sqLiteDatabase.execSQL(SchemaPosts.VIEW_CREATE_POST_WITH_DOT);
@@ -239,6 +262,8 @@ public class SPContentProvider extends ContentProvider {
 
             sqLiteDatabase.execSQL(SchemaDots.TABLE_DROP);
             sqLiteDatabase.execSQL(SchemaTags.TABLE_DROP);
+
+            sqLiteDatabase.execSQL(SchemaComments.TABLE_DROP);
 
             // VIEWS
             sqLiteDatabase.execSQL(SchemaPosts.VIEW_DROP_POST_WITH_DOT);

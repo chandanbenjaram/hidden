@@ -2,6 +2,10 @@ package droid.samepinch.co.data.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
+import droid.samepinch.co.app.helpers.Utils;
+
 /**
  * Created by imaginationcoder on 7/21/15.
  */
@@ -14,6 +18,13 @@ public class CommentDetails {
     @SerializedName("upvote_count")
     Integer upvoteCount;
     Commenter commenter;
+
+    @SerializedName("createdAtDB")
+    Date createdAt;
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public Commenter getCommenter() {
         return commenter;
@@ -41,6 +52,14 @@ public class CommentDetails {
 
     public String getCreatedAtStr() {
         return createdAtStr;
+    }
+
+    public Date getCreatedAt() {
+        if (createdAt == null) {
+            //TODO
+            setCreatedAt(Utils.string2Date(createdAtStr));
+        }
+        return createdAt;
     }
 
     public void setCreatedAtStr(String createdAtStr) {
