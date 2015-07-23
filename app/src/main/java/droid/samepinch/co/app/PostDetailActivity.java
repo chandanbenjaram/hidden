@@ -64,6 +64,7 @@ public class PostDetailActivity extends AppCompatActivity {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
         if (details != null) {
+            ViewGroup.LayoutParams lParams=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             List<String> imageKArr = getImageValues(details.getContent());
             String rightContent = details.getContent();
 
@@ -94,6 +95,7 @@ public class PostDetailActivity extends AppCompatActivity {
             if (StringUtils.isNotBlank(rightContent)) {
                 TextView tView = new TextView(PostDetailActivity.this);
                 tView.setText(rightContent);
+                tView.setLayoutParams(lParams);
                 contentLayout.addView(tView);
             }
         }
