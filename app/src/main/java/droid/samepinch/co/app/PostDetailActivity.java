@@ -3,9 +3,11 @@ package droid.samepinch.co.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import droid.samepinch.co.app.helpers.CommentsFragment;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
 import droid.samepinch.co.app.helpers.widget.SIMView;
@@ -30,8 +33,9 @@ import droid.samepinch.co.data.dto.PostDetails;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
-public class PostDetailActivity extends AppCompatActivity {
+public class PostDetailActivity extends AppCompatActivity implements CommentsFragment.CommentsFragmentCallbackListener {
     private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
+    public static final String LOG_TAG = "PostDetailActivity";
 
     private Intent mServiceIntent;
 
@@ -40,6 +44,9 @@ public class PostDetailActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postdetail);
+
+        Utils.PreferencesManager.initializeInstance(getApplicationContext());
+
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -109,6 +116,23 @@ public class PostDetailActivity extends AppCompatActivity {
                 new Intent(getApplicationContext(), PostDetailsService.class);
         mServiceIntent.putExtras(iArgs);
         startService(mServiceIntent);
+
+
+        if (StringUtils.isNotBlank(postId) && findViewById(R.id.comments_container) != null) {
+            if (savedInstanceState != null) {
+                return;
+            }
+            CommentsFragment commentsFragment = new CommentsFragment();
+            Bundle args = new Bundle();
+            args.putString(SchemaPosts.COLUMN_UID, postId);
+            commentsFragment.setArguments(args);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.comments_container, commentsFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
+
     }
 
     @Override
@@ -140,5 +164,10 @@ public class PostDetailActivity extends AppCompatActivity {
             imgVals.add(matcher.group(1));
         }
         return imgVals;
+    }
+
+    @Override
+    public void onCommentClick(int position) {
+        Log.i(LOG_TAG, "position=" + position);
     }
 }

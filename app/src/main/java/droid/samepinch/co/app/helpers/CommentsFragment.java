@@ -13,29 +13,40 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
+
 import droid.samepinch.co.app.R;
 import droid.samepinch.co.data.dao.SchemaComments;
-import droid.samepinch.co.data.dao.SchemaPostDetails;
+import droid.samepinch.co.data.dao.SchemaPosts;
 
 /**
  * Created by cbenjaram on 7/23/15.
  */
 public class CommentsFragment extends ListFragment {
-    Activity mActivity;
+    CommentsFragmentCallbackListener mCallback;
     private ListView mListView;
     private CursorAdapter mAdapter;
-
+    private String mPostId;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
+        // callback check
+        try {
+            mCallback = (CommentsFragmentCallbackListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.comments_fragment,
-                container, true);
+                container, false);
         mListView = (ListView) rootView.findViewById(android.R.id.list);
+        Bundle iArgs = getArguments();
+        mPostId = iArgs == null? null : iArgs.getString(SchemaPosts.COLUMN_UID);
+
         return rootView;
 
     }
@@ -45,11 +56,13 @@ public class CommentsFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
 //        int num = getArguments().getInt(ARG_SECTION_NUMBER);
         ContentResolver resolver = getActivity().getContentResolver();
-        Cursor c = resolver.query(SchemaComments.CONTENT_URI, null, null, null, null);
-        if (c.moveToFirst()) {
-            mAdapter = new CommentsCursorAdapter(getActivity(), c, CursorAdapter.NO_SELECTION);
-            mListView.setAdapter(mAdapter);
+        Cursor c = null;
+        if(StringUtils.isNotBlank(mPostId)){
+            c = getActivity().getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         }
+
+        mAdapter = new CommentsCursorAdapter(getActivity(), c, CursorAdapter.NO_SELECTION);
+        mListView.setAdapter(mAdapter);
     }
 
     public static class CommentsCursorAdapter extends android.widget.CursorAdapter {
@@ -58,22 +71,18 @@ public class CommentsFragment extends ListFragment {
             super(context, c, flags);
         }
 
-        // The bindView method is used to bind all data to a given view
-        // such as setting the text on a TextView.
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            // Find fields to populate in inflated template
-            TextView tvBody = (TextView) view.findViewById(R.id.tvBody);
-            TextView tvPriority = (TextView) view.findViewById(R.id.tvPriority);
-            // Extract properties from cursor
-            int dotFnameIdx = cursor.getColumnIndexOrThrow(SchemaComments.COLUMN_DOT_FNAME);
-            String body = cursor.getString(dotFnameIdx);
+            TextView avatarNameView = (TextView) view.findViewById(R.id.avatar_name);
+            TextView commentView = (TextView) view.findViewById(R.id.comment);
 
-            int createdAtIdx = cursor.getColumnIndexOrThrow(SchemaComments.COLUMN_CREATED_AT);
-            int priority = cursor.getInt(createdAtIdx);
-            // Populate fields with extracted properties
-            tvBody.setText(body);
-            tvPriority.setText(String.valueOf(priority));
+            int dotFnameIdx = cursor.getColumnIndexOrThrow(SchemaComments.COLUMN_DOT_FNAME);
+            String name = cursor.getString(dotFnameIdx);
+            avatarNameView.setText(name);
+
+            int commentIdx = cursor.getColumnIndexOrThrow(SchemaComments.COLUMN_TEXT);
+            String comment = cursor.getString(commentIdx);
+            commentView.setText(comment);
         }
 
         @Override
@@ -96,4 +105,10 @@ public class CommentsFragment extends ListFragment {
         TextView name;
         TextView time;
     }
+
+    // Container Activity must implement this interface
+    public static interface CommentsFragmentCallbackListener {
+        void onCommentClick(int position);
+    }
+
 }
