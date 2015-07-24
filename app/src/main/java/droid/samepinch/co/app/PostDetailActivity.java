@@ -31,6 +31,7 @@ import droid.samepinch.co.data.dto.PostDetails;
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class PostDetailActivity extends AppCompatActivity {
+    private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
 
     private Intent mServiceIntent;
 
@@ -96,18 +97,12 @@ public class PostDetailActivity extends AppCompatActivity {
                 tView.setText(rightContent);
                 contentLayout.addView(tView);
             }
-
         }
-
-//
-//        TextView tView = new TextView(PostDetailActivity.this);
-//        tView.setText("C");
-////        tView.setLayoutParams(lParams);
-//        contentLayout.addView(tView);
 
         // construct context from preferences if any?
         Bundle iServiceArgs = new Bundle();
         iServiceArgs.putString(KEY_UID.getValue(), postId);
+
 
         // call for intent
         mServiceIntent =
@@ -137,7 +132,6 @@ public class PostDetailActivity extends AppCompatActivity {
         return true;
     }
 
-    private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
 
     private static List<String> getImageValues(final String str) {
         final List<String> imgVals = new ArrayList<>();
