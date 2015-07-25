@@ -3,6 +3,7 @@ package droid.samepinch.co.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,6 +47,13 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postdetail);
 
+        // get caller data
+        Bundle iArgs = getIntent    ().getExtras();
+        String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
+
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        toolbarLayout.setTitle(postId);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -59,7 +66,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
         // Get the ActionBar here to configure the way it behaves.
         final ActionBar ab = getSupportActionBar();
-        //ab.setHomeAsUpIndicator(R.drawable.ic_menu); // set a custom icon for the default home button
+//        ab.setHomeAsUpIndicator(R.drawable.ic_menu); // set a custom icon for the default home button
         ab.setDisplayShowHomeEnabled(true); // show or hide the default home button
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowCustomEnabled(false); // enable overriding the default toolbar layout
@@ -67,9 +74,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
 //        LinearLayout contentLayout = (LinearLayout) findViewById(R.id.postdetail_content_layout);
 
-        // get caller data
-        Bundle iArgs = getIntent    ().getExtras();
-        String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
+
 
         PostDetails details = null;
         Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId}, null);
@@ -78,7 +83,6 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         }
         cursor.close();
         if (details != null) {
-
             List<String> imageKArr = getImageValues(details.getContent());
             String rightContent = details.getContent();
 
@@ -125,7 +129,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         startService(mServiceIntent);
 
 
-        if (false && StringUtils.isNotBlank(postId) && findViewById(R.id.comments_container) != null) {
+        if (StringUtils.isNotBlank(postId) && findViewById(R.id.comments_container) != null) {
             if (savedInstanceState != null) {
                 return;
             }
