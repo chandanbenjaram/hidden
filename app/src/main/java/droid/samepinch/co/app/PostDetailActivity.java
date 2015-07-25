@@ -47,16 +47,13 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postdetail);
 
-        Utils.PreferencesManager.initializeInstance(getApplicationContext());
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         TextView dummyView = (TextView) findViewById(R.id.dummy_txt);
         StringBuilder dummyTxt = new StringBuilder();
         for(int i=0; i< 200; i++){
-            dummyTxt.append(System.lineSeparator() + "DUMMY TEXT..." + i);
+            dummyTxt.append( "\r\n" + "DUMMY TEXT..." + i);
         }
         dummyView.setText(dummyTxt);
 
@@ -128,7 +125,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         startService(mServiceIntent);
 
 
-        if (StringUtils.isNotBlank(postId) && findViewById(R.id.comments_container) != null) {
+        if (false && StringUtils.isNotBlank(postId) && findViewById(R.id.comments_container) != null) {
             if (savedInstanceState != null) {
                 return;
             }
