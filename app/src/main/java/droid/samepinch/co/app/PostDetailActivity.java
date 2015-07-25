@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     public static final String LOG_TAG = "PostDetailActivity";
 
     private Intent mServiceIntent;
+    LinearLayout mContentLayout;
 
 
     @Override
@@ -48,21 +50,28 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         Utils.PreferencesManager.initializeInstance(getApplicationContext());
 
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        TextView dummyView = (TextView) findViewById(R.id.dummy_txt);
+        StringBuilder dummyTxt = new StringBuilder();
+        for(int i=0; i< 200; i++){
+            dummyTxt.append(System.lineSeparator() + "DUMMY TEXT..." + i);
+        }
+        dummyView.setText(dummyTxt);
 
         // Get the ActionBar here to configure the way it behaves.
         final ActionBar ab = getSupportActionBar();
         //ab.setHomeAsUpIndicator(R.drawable.ic_menu); // set a custom icon for the default home button
         ab.setDisplayShowHomeEnabled(true); // show or hide the default home button
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowCustomEnabled(true); // enable overriding the default toolbar layout
+        ab.setDisplayShowCustomEnabled(false); // enable overriding the default toolbar layout
         ab.setDisplayShowTitleEnabled(false);
 
-        LinearLayout contentLayout = (LinearLayout) findViewById(R.id.postdetail_content_layout);
+//        LinearLayout contentLayout = (LinearLayout) findViewById(R.id.postdetail_content_layout);
 
         // get caller data
-        Bundle iArgs = getIntent().getExtras();
+        Bundle iArgs = getIntent    ().getExtras();
         String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
         PostDetails details = null;
@@ -78,7 +87,8 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
             Map<String, String> imageKV = details.getImages();
             String leftContent;
-            LayoutInflater inflater = LayoutInflater.from(this);
+            LayoutInflater inflater = LayoutInflater.from(PostDetailActivity.this);
+             mContentLayout = (LinearLayout) inflater.inflate(R.layout.layout_postdetails_content, null);
             for (String imgK : imageKArr) {
                 // get left of image
                 leftContent = StringUtils.substringBefore(rightContent, imgK).replaceAll("::", "");
@@ -88,7 +98,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 if (StringUtils.isNotBlank(leftContent)) {
                     TextView tView = new TextView(PostDetailActivity.this);
                     tView.setText(leftContent);
-                    contentLayout.addView(tView);
+                    mContentLayout.addView(tView);
                 }
 
 
@@ -96,13 +106,13 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 fImageView.populateImageView(imageKV.get(imgK));
                 //fImageView.populateImageView("https://i.imgflip.com/ohr0t.gif");
 //                fImageView.populateImageView("http://www.targeticse.co.in/wp-content/uploads/2010/03/biology.gif");
-                contentLayout.addView(fImageView);
+                mContentLayout.addView(fImageView);
             }
 
             if (StringUtils.isNotBlank(rightContent)) {
                 TextView tView = new TextView(PostDetailActivity.this);
                 tView.setText(rightContent);
-                contentLayout.addView(tView);
+                mContentLayout.addView(tView);
             }
         }
 
@@ -123,6 +133,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 return;
             }
             CommentsFragment commentsFragment = new CommentsFragment();
+            commentsFragment.setMHeaderView(mContentLayout);
             Bundle args = new Bundle();
             args.putString(SchemaPosts.COLUMN_UID, postId);
             commentsFragment.setArguments(args);
@@ -169,5 +180,11 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     @Override
     public void onCommentClick(int position) {
         Log.i(LOG_TAG, "position=" + position);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

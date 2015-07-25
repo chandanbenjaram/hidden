@@ -27,6 +27,9 @@ public class CommentsFragment extends ListFragment {
     private ListView mListView;
     private CursorAdapter mAdapter;
     private String mPostId;
+
+    private View mHeaderView;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -44,8 +47,13 @@ public class CommentsFragment extends ListFragment {
         View rootView = inflater.inflate(R.layout.comments_fragment,
                 container, false);
         mListView = (ListView) rootView.findViewById(android.R.id.list);
+//        TextView tView = new TextView(getActivity());
+//        mListView.addHeaderView(tView);
+        if (getMHeaderView() != null) {
+            mListView.addHeaderView(getMHeaderView());
+        }
         Bundle iArgs = getArguments();
-        mPostId = iArgs == null? null : iArgs.getString(SchemaPosts.COLUMN_UID);
+        mPostId = iArgs == null ? null : iArgs.getString(SchemaPosts.COLUMN_UID);
 
         return rootView;
 
@@ -57,7 +65,7 @@ public class CommentsFragment extends ListFragment {
 //        int num = getArguments().getInt(ARG_SECTION_NUMBER);
         ContentResolver resolver = getActivity().getContentResolver();
         Cursor c = null;
-        if(StringUtils.isNotBlank(mPostId)){
+        if (StringUtils.isNotBlank(mPostId)) {
             c = getActivity().getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         }
 
@@ -111,4 +119,11 @@ public class CommentsFragment extends ListFragment {
         void onCommentClick(int position);
     }
 
+    public View getMHeaderView() {
+        return mHeaderView;
+    }
+
+    public void setMHeaderView(View mHeaderView) {
+        this.mHeaderView = mHeaderView;
+    }
 }
