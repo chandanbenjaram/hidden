@@ -11,7 +11,7 @@ import droid.samepinch.co.app.helpers.AppConstants;
  */
 public interface SchemaPostDetails extends BaseColumns {
     // DB related stuff
-    String TABLE_NAME = "postdetails";
+    String TABLE_NAME = "post_content";
     String COLUMN_UID = "uid";
     String COLUMN_CONTENT = "content";
     String COLUMN_IMAGES = "images";
@@ -57,7 +57,7 @@ public interface SchemaPostDetails extends BaseColumns {
 
 
     // provider related stuff
-    String PATH_POST_DETAILS = "postdetails";
+    String PATH_POST_DETAILS = "post_content";
     String CONTENT_AUTHORITY = AppConstants.API.CONTENT_AUTHORITY.getValue();
     String CONTENT_TYPE =
             ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POST_DETAILS;
