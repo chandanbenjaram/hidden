@@ -1,5 +1,6 @@
 package droid.samepinch.co.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -7,11 +8,17 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,8 +33,11 @@ import java.util.regex.Pattern;
 
 import droid.samepinch.co.app.helpers.CommentsFragment;
 import droid.samepinch.co.app.helpers.Utils;
+import droid.samepinch.co.app.helpers.adapters.PostCursorRecyclerViewAdapter;
+import droid.samepinch.co.app.helpers.adapters.PostDetailsRVAdapter;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
 import droid.samepinch.co.app.helpers.widget.SIMView;
+import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.PostDetails;
@@ -41,26 +51,33 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     private Intent mServiceIntent;
     LinearLayout mContentLayout;
 
+    PostDetailsRVAdapter mViewAdapter;
+
+    String mPostId;
+
+    private LinearLayoutManager mLayoutManager;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postdetail);
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
         // get caller data
         Bundle iArgs = getIntent    ().getExtras();
-        String postId = iArgs.getString(SchemaPosts.COLUMN_UID);
+        mPostId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        toolbarLayout.setTitle(postId);
+        toolbarLayout.setTitle(mPostId);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         TextView dummyView = (TextView) findViewById(R.id.dummy_txt);
         StringBuilder dummyTxt = new StringBuilder();
-        for(int i=0; i< 200; i++){
-            dummyTxt.append( "\r\n" + "DUMMY TEXT..." + i);
+        for(int i=0; i< 5; i++){
+            dummyTxt.append( "\r\n" + "DETAILS..." + i);
         }
         dummyView.setText(dummyTxt);
 
@@ -77,49 +94,34 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
 
         PostDetails details = null;
-        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId}, null);
+        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
         if (cursor.moveToFirst()) {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
         cursor.close();
         if (details != null) {
-            List<String> imageKArr = getImageValues(details.getContent());
-            String rightContent = details.getContent();
 
-            Map<String, String> imageKV = details.getImages();
-            String leftContent;
-            LayoutInflater inflater = LayoutInflater.from(PostDetailActivity.this);
-             mContentLayout = (LinearLayout) inflater.inflate(R.layout.layout_postdetails_content, null);
-            for (String imgK : imageKArr) {
-                // get left of image
-                leftContent = StringUtils.substringBefore(rightContent, imgK).replaceAll("::", "");
+//            // custom recycler
+//            RecyclerView rv = new RecyclerView(getApplicationContext()) {
+//                @Override
+//                public void scrollBy(int x, int y) {
+//                    try {
+//                        super.scrollBy(x, y);
+//                    } catch (NullPointerException nlp) {
+//                        // muted
+//                    }
+//                }
+//            };
 
-                // grab right remaining chunk
-                rightContent = StringUtils.substringAfter(rightContent, imgK).replaceAll("::", "");
-                if (StringUtils.isNotBlank(leftContent)) {
-                    TextView tView = new TextView(PostDetailActivity.this);
-                    tView.setText(leftContent);
-                    mContentLayout.addView(tView);
-                }
+            RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
+            rv.setLayoutManager(mLayoutManager);
+            setupRecyclerView(rv);
 
-
-                SIMView fImageView = new SIMView(PostDetailActivity.this);
-                fImageView.populateImageView(imageKV.get(imgK));
-                //fImageView.populateImageView("https://i.imgflip.com/ohr0t.gif");
-//                fImageView.populateImageView("http://www.targeticse.co.in/wp-content/uploads/2010/03/biology.gif");
-                mContentLayout.addView(fImageView);
-            }
-
-            if (StringUtils.isNotBlank(rightContent)) {
-                TextView tView = new TextView(PostDetailActivity.this);
-                tView.setText(rightContent);
-                mContentLayout.addView(tView);
-            }
         }
 
         // construct context from preferences if any?
         Bundle iServiceArgs = new Bundle();
-        iServiceArgs.putString(KEY_UID.getValue(), postId);
+        iServiceArgs.putString(KEY_UID.getValue(), mPostId);
 
 
         // call for intent
@@ -127,24 +129,18 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 new Intent(getApplicationContext(), PostDetailsService.class);
         mServiceIntent.putExtras(iArgs);
         startService(mServiceIntent);
+    }
 
-
-        if (StringUtils.isNotBlank(postId) && findViewById(R.id.comments_container) != null) {
-            if (savedInstanceState != null) {
-                return;
-            }
-            CommentsFragment commentsFragment = new CommentsFragment();
-            commentsFragment.setMHeaderView(mContentLayout);
-            Bundle args = new Bundle();
-            args.putString(SchemaPosts.COLUMN_UID, postId);
-            commentsFragment.setArguments(args);
-
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.comments_container, commentsFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
+    private void setupRecyclerView(RecyclerView recyclerView) {
+        recyclerView.setHasFixedSize(true);
+        Cursor c = null;
+        if (StringUtils.isNotBlank(mPostId)) {
+            c = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         }
 
+        mViewAdapter = new PostDetailsRVAdapter(this, c);
+        recyclerView.setAdapter(mViewAdapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override
