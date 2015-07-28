@@ -3,6 +3,7 @@ package droid.samepinch.co.app;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentTransaction;
@@ -93,13 +94,33 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
 
 
-        PostDetails details = null;
+//        PostDetails details = null;
         Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
-        if (cursor.moveToFirst()) {
-            details = Utils.cursorToPostDetailsEntity(cursor);
+        Cursor c = null;
+        if (StringUtils.isNotBlank(mPostId)) {
+            c = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         }
-        cursor.close();
-        if (details != null) {
+
+        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+
+
+        Cursor mergeCursorr = new MergeCursor(new Cursor[]{cursor, c});
+
+
+        RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
+        rv.setHasFixedSize(true);
+
+        rv.setLayoutManager(mLayoutManager);
+
+        mViewAdapter = new PostDetailsRVAdapter(this, mergeCursorr);
+        rv.setAdapter(mViewAdapter);
+        rv.setItemAnimator(new DefaultItemAnimator());
+
+//        if (cursor.moveToFirst()) {
+//            details = Utils.cursorToPostDetailsEntity(cursor);
+//        }
+//        cursor.close();
+//        if (details != null) {
 
 //            // custom recycler
 //            RecyclerView rv = new RecyclerView(getApplicationContext()) {
@@ -113,11 +134,9 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 //                }
 //            };
 
-            RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
-            rv.setLayoutManager(mLayoutManager);
-            setupRecyclerView(rv);
 
-        }
+
+//        }
 
         // construct context from preferences if any?
         Bundle iServiceArgs = new Bundle();
@@ -138,7 +157,12 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
             c = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         }
 
-        mViewAdapter = new PostDetailsRVAdapter(this, c);
+        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+
+
+        Cursor finalC = new MergeCursor(new Cursor[]{cursor, c});
+
+        mViewAdapter = new PostDetailsRVAdapter(this, finalC);
         recyclerView.setAdapter(mViewAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }

@@ -11,10 +11,9 @@ import droid.samepinch.co.app.R;
  */
 public class PostDetailsRVHolder extends RecyclerView.ViewHolder {
     View mView;
-    TextView mCommentText;
-    public PostDetailsRVHolder (View itemView) {
-        super (itemView);
+
+    public PostDetailsRVHolder(View itemView) {
+        super(itemView);
         mView = itemView;
-        mCommentText = (TextView) mView.findViewById(R.id.post_comment);
     }
 }

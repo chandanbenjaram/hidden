@@ -15,27 +15,70 @@ import droid.samepinch.co.app.R;
 public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsRVHolder> {
     private final Context context;
 
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
+
     public PostDetailsRVAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         this.context = context;
     }
 
     @Override
-    public PostDetailsRVHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context)
-                .inflate(R.layout.post_comments, parent, false);
+    public int getItemViewType(int position) {
+        if (isPositionHeader(position)) {
+            return TYPE_HEADER;
+        }
+        return 1;
+    }
 
-        return new PostDetailsRVHolder(v);
+    @Override
+    public PostDetailsRVHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v;
+        PostDetailsRVHolder viewHolder = null;
+        switch (viewType) {
+            case TYPE_HEADER:
+                v = LayoutInflater.from(context)
+                        .inflate(R.layout.post_content, parent, false);
+                viewHolder = new PostContentRVHolder(v);
+                break;
+
+            case TYPE_ITEM:
+                v = LayoutInflater.from(context)
+                        .inflate(R.layout.post_comments, parent, false);
+                viewHolder = new PostCommentsRVHolder(v);
+                break;
+
+            default:
+                throw new IllegalStateException("unknown viewType=" + viewType);
+        }
+
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(PostDetailsRVHolder viewHolder, Cursor cursor) {
-                StringBuilder dummyTxt = new StringBuilder();
+//        StringBuilder dummyTxt = new StringBuilder();
+//        for (int i = 0; i < 25; i++) {
+//            dummyTxt.append("\r\n" + "DUMMY TEXT..." + i);
+//        }
 
-                for(int i=0; i< 25; i++){
-            dummyTxt.append( "\r\n" + "DUMMY TEXT..." + i);
+        if (viewHolder instanceof PostContentRVHolder) {
+            PostContentRVHolder _header = (PostContentRVHolder) viewHolder;
+            _header.mContentText.setText("I am header");
+        } else if (viewHolder instanceof PostCommentsRVHolder) {
+            PostCommentsRVHolder _item = (PostCommentsRVHolder) viewHolder;
+            _item.mCommentText.setText("I am comment...");
         }
-//        dummyView.setText(dummyTxt);
-        viewHolder.mCommentText.setText("a comment..." + dummyTxt);
     }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount();
+    }
+
+    private boolean isPositionHeader(int position) {
+        return position == 0;
+    }
+
+
 }
