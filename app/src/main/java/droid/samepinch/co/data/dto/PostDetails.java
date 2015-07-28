@@ -162,7 +162,7 @@ public class PostDetails {
 
 
     public void setTagsFromDB(String tags) {
-        if (tags != null) {
+        if (tags == null) {
             setTags(null);
         } else {
             setTags(Arrays.asList(tags.split(",")));

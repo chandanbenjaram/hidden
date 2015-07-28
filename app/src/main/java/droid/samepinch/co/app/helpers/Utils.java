@@ -1,9 +1,18 @@
 package droid.samepinch.co.app.helpers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.view.View;
+import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -26,6 +35,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import droid.samepinch.co.app.ActivityFragment;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -368,4 +378,38 @@ public class Utils {
         return imgVals;
     }
 
+    public static void markTags(final Context context, TextView view, String[] tags) {
+        SpannableStringBuilder spanTxt = new SpannableStringBuilder();
+
+        for (final String tag : tags) {
+            spanTxt.append(tag);
+            spanTxt.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    // TARGET
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_TAGWALL.name());
+                    // data
+                    args.putString(AppConstants.K.KEY_TAG.name(), tag);
+
+                    // intent
+                    Intent intent = new Intent(context, ActivityFragment.class);
+                    intent.putExtras(args);
+
+                    context.startActivity(intent);
+                }
+
+                @Override
+                public void updateDrawState(TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setUnderlineText(false);
+                    ds.setColor(Color.BLUE);
+                }
+            }, spanTxt.length() - tag.length(), spanTxt.length(), 0);
+            spanTxt.append(" ");
+        }
+
+        view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setText(spanTxt, TextView.BufferType.SPANNABLE);
+    }
 }

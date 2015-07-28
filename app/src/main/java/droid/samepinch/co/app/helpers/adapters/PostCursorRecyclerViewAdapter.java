@@ -3,17 +3,11 @@ package droid.samepinch.co.app.helpers.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -149,41 +143,8 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
             vh.mWallPostImages.setVisibility(View.VISIBLE);
         }
 
-        customTextView(vh.mWallTags, post.getTagsForDB().split(","));
+        Utils.markTags(getContext(), vh.mWallTags, post.getTagsForDB().split(","));
     }
 
-    private void customTextView(TextView view, String[] tags) {
-        SpannableStringBuilder spanTxt = new SpannableStringBuilder();
 
-        for (final String tag : tags) {
-            spanTxt.append(tag);
-            spanTxt.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(View widget) {
-                    // TARGET
-                    Bundle args = new Bundle();
-                    args.putString(K.TARGET_FRAGMENT.name(), K.FRAGMENT_TAGWALL.name());
-                    // data
-                    args.putString(K.KEY_TAG.name(), tag);
-
-                    // intent
-                    Intent intent = new Intent(context, ActivityFragment.class);
-                    intent.putExtras(args);
-
-                    context.startActivity(intent);
-                }
-
-                @Override
-                public void updateDrawState(TextPaint ds) {
-                    super.updateDrawState(ds);
-                    ds.setUnderlineText(false);
-                    ds.setColor(Color.BLUE);
-                }
-            }, spanTxt.length() - tag.length(), spanTxt.length(), 0);
-            spanTxt.append(" ");
-        }
-
-        view.setMovementMethod(LinkMovementMethod.getInstance());
-        view.setText(spanTxt, TextView.BufferType.SPANNABLE);
-    }
 }
