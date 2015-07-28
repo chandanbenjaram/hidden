@@ -36,9 +36,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droid.samepinch.co.app.ActivityFragment;
+import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
+import droid.samepinch.co.data.dto.CommentDetails;
+import droid.samepinch.co.data.dto.Commenter;
 import droid.samepinch.co.data.dto.Post;
 import droid.samepinch.co.data.dto.PostDetails;
 import droid.samepinch.co.data.dto.User;
@@ -234,6 +237,70 @@ public class Utils {
 
         return details;
     }
+
+    public static CommentDetails cursorToCommentDetails(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+
+        CommentDetails dto = new CommentDetails();
+        int uidIndex;
+        if ((uidIndex = cursor.getColumnIndex(SchemaComments.COLUMN_UID)) != -1) {
+            dto.setUid(cursor.getString(uidIndex));
+        }
+
+        int createdAtIndex;
+        if ((createdAtIndex = cursor.getColumnIndex(SchemaComments.COLUMN_CREATED_AT)) != -1) {
+            dto.setCreatedAt(new Date(cursor.getLong(createdAtIndex)));
+        }
+
+        int anonymousIndex;
+        if ((anonymousIndex = cursor.getColumnIndex(SchemaComments.COLUMN_ANONYMOUS)) != -1) {
+            dto.setAnonymous(cursor.getInt(anonymousIndex) == 1);
+        }
+
+        int textIndex;
+        if ((textIndex = cursor.getColumnIndex(SchemaComments.COLUMN_TEXT)) != -1) {
+            dto.setText(cursor.getString(textIndex));
+        }
+
+        int upvoteCountIndex;
+        if ((upvoteCountIndex = cursor.getColumnIndex(SchemaComments.COLUMN_UPVOTE_COUNT)) != -1) {
+            dto.setUpvoteCount(cursor.getInt(upvoteCountIndex));
+        }
+
+        // commenter related
+        Commenter commenterDto = new Commenter();
+        dto.setCommenter(commenterDto);
+
+        int commenterUidIndex;
+        if ((commenterUidIndex = cursor.getColumnIndex(SchemaComments.COLUMN_DOT_UID)) != -1) {
+            commenterDto.setUid(cursor.getString(commenterUidIndex));
+        }
+
+        int commenterFnameIndex;
+        if ((commenterFnameIndex = cursor.getColumnIndex(SchemaComments.COLUMN_DOT_FNAME)) != -1) {
+            commenterDto.setFname(cursor.getString(commenterFnameIndex));
+        }
+
+        int commenterLnameIndex;
+        if ((commenterLnameIndex = cursor.getColumnIndex(SchemaComments.COLUMN_DOT_LNAME)) != -1) {
+            commenterDto.setLname(cursor.getString(commenterLnameIndex));
+        }
+
+        int commenterHandleIndex;
+        if ((commenterHandleIndex = cursor.getColumnIndex(SchemaComments.COLUMN_DOT_PINCH_HANDLE)) != -1) {
+            commenterDto.setPinchHandle(cursor.getString(commenterHandleIndex));
+        }
+
+        int commenterPhotoIndex;
+        if ((commenterPhotoIndex = cursor.getColumnIndex(SchemaComments.COLUMN_DOT_PHOTO_URL)) != -1) {
+            commenterDto.setPhoto(cursor.getString(commenterPhotoIndex));
+        }
+
+        return dto;
+    }
+
 
 
     public static void setupLoadingImageHolder(SimpleDraweeView iView, String imageUrl) {

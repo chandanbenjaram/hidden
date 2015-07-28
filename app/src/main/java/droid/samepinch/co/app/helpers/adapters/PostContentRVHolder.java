@@ -74,6 +74,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
             String tags = details.getTagsForDB();
             if(StringUtils.isNotBlank(tags)){
                 TextView tView = new TextView(mView.getContext());
+                tView.setGravity(View.TEXT_ALIGNMENT_CENTER);
                 Utils.markTags(mView.getContext(), tView, tags.split(","));
                 addToView(tView);
             }

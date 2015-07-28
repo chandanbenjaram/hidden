@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 
 import com.squareup.otto.Subscribe;
 
@@ -36,7 +35,6 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     public static final String LOG_TAG = "PostDetailActivity";
 
     private Intent mServiceIntent;
-    LinearLayout mContentLayout;
 
     PostDetailsRVAdapter mViewAdapter;
 
