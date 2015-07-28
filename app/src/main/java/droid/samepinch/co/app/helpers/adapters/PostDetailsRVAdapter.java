@@ -2,7 +2,6 @@ package droid.samepinch.co.app.helpers.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,13 +37,13 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
         switch (viewType) {
             case TYPE_HEADER:
                 v = LayoutInflater.from(context)
-                        .inflate(R.layout.post_content, parent, false);
+                        .inflate(R.layout.post_details_content, parent, false);
                 viewHolder = new PostContentRVHolder(v);
                 break;
 
             case TYPE_ITEM:
                 v = LayoutInflater.from(context)
-                        .inflate(R.layout.post_comments, parent, false);
+                        .inflate(R.layout.post_comment_item, parent, false);
                 viewHolder = new PostCommentsRVHolder(v);
                 break;
 
@@ -62,13 +61,14 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
 //            dummyTxt.append("\r\n" + "DUMMY TEXT..." + i);
 //        }
 
-        if (viewHolder instanceof PostContentRVHolder) {
-            PostContentRVHolder _header = (PostContentRVHolder) viewHolder;
-            _header.mContentText.setText("I am header");
-        } else if (viewHolder instanceof PostCommentsRVHolder) {
-            PostCommentsRVHolder _item = (PostCommentsRVHolder) viewHolder;
-            _item.mCommentText.setText("I am comment...");
-        }
+        viewHolder.onBindViewHolderImpl(cursor);
+//        if (viewHolder instanceof PostContentRVHolder) {
+//            PostContentRVHolder _header = (PostContentRVHolder) viewHolder;
+//            _header.mContentText.setText("I am header");
+//        } else if (viewHolder instanceof PostCommentsRVHolder) {
+//            PostCommentsRVHolder _item = (PostCommentsRVHolder) viewHolder;
+//            _item.mCommentText.setText("I am comment...");
+//        }
     }
 
     @Override

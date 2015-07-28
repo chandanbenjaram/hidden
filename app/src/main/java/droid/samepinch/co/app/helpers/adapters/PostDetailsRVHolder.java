@@ -1,10 +1,8 @@
 package droid.samepinch.co.app.helpers.adapters;
 
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.TextView;
-
-import droid.samepinch.co.app.R;
 
 /**
  * Created by imaginationcoder on 7/27/15.
@@ -15,5 +13,10 @@ public class PostDetailsRVHolder extends RecyclerView.ViewHolder {
     public PostDetailsRVHolder(View itemView) {
         super(itemView);
         mView = itemView;
+    }
+
+    void onBindViewHolderImpl(Cursor cursor){
+        // do nothing in base
+        return;
     }
 }

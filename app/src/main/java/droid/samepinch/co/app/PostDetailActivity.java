@@ -14,19 +14,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import org.apache.commons.lang3.StringUtils;
+import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import droid.samepinch.co.app.helpers.CommentsFragment;
 import droid.samepinch.co.app.helpers.adapters.PostDetailsRVAdapter;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
+import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
+import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
@@ -46,6 +44,18 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
     private LinearLayoutManager mLayoutManager;
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,7 +64,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
         // get caller data
-        Bundle iArgs = getIntent    ().getExtras();
+        Bundle iArgs = getIntent().getExtras();
         mPostId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -74,7 +84,7 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         // query for post details
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
         // query for post comments
-        Cursor currComments= getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+        Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
 
         // recycler view setup
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
@@ -96,23 +106,6 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         startService(mServiceIntent);
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setHasFixedSize(true);
-        Cursor c = null;
-        if (StringUtils.isNotBlank(mPostId)) {
-            c = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
-        }
-
-        Cursor cursor = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
-
-
-        Cursor finalC = new MergeCursor(new Cursor[]{cursor, c});
-
-        mViewAdapter = new PostDetailsRVAdapter(this, finalC);
-        recyclerView.setAdapter(mViewAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -123,25 +116,10 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadBackdrop() {
-        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-        //Glide.with(this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sample_actions, menu);
         return true;
-    }
-
-
-    private static List<String> getImageValues(final String str) {
-        final List<String> imgVals = new ArrayList<>();
-        final Matcher matcher = IMG_PATTERN.matcher(str);
-        while (matcher.find()) {
-            imgVals.add(matcher.group(1));
-        }
-        return imgVals;
     }
 
     @Override
@@ -153,5 +131,23 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    @Subscribe
+    public void onPostDetailsRefreshEvent(Events.PostDetailsRefreshEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // query for post details
+                    Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+                    // query for post comments
+                    Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+                    mViewAdapter.changeCursor(new MergeCursor(new Cursor[]{currPost, currComments}));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

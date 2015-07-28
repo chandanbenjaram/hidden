@@ -16,11 +16,15 @@ import org.springframework.http.ResponseEntity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
@@ -40,6 +44,8 @@ import static droid.samepinch.co.app.helpers.AppConstants.KV.SCOPE;
  * Created by imaginationcoder on 7/4/15.
  */
 public class Utils {
+    private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
+
     public static User cursorToUserEntity(Cursor cursor) {
         if (cursor == null) {
             return null;
@@ -295,7 +301,7 @@ public class Utils {
 
         public void setValue(String key, Map<String, String> val) {
             // null val deletes preferences enty
-            if(val == null){
+            if (val == null) {
                 remove(key);
                 return;
             }
@@ -334,9 +340,9 @@ public class Utils {
         }
     }
 
-    public static Date string2Date(String stringDate){
+    public static Date string2Date(String stringDate) {
         Date date = null;
-        if(stringDate == null){
+        if (stringDate == null) {
             return date;
         }
 
@@ -352,5 +358,14 @@ public class Utils {
         return date;
     }
 
+
+    public static List<String> getImageValues(final String str) {
+        final List<String> imgVals = new ArrayList<>();
+        final Matcher matcher = IMG_PATTERN.matcher(str);
+        while (matcher.find()) {
+            imgVals.add(matcher.group(1));
+        }
+        return imgVals;
+    }
 
 }

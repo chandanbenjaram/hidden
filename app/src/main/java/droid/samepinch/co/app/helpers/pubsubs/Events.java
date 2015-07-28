@@ -31,4 +31,10 @@ public class Events {
         }
     }
 
+
+    public static class PostDetailsRefreshEvent extends EventBase {
+        public PostDetailsRefreshEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }

@@ -21,6 +21,8 @@ import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.module.DaggerStorageComponent;
 import droid.samepinch.co.app.helpers.module.StorageComponent;
+import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
+import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
@@ -64,9 +66,6 @@ public class PostDetailsService extends IntentService {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
             HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
-//            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, String.class);
-//            System.out.println("respStr..." + respStr);
-
             ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, RespPostDetails.class);
             System.out.println("resp..." + resp);
 
@@ -74,9 +73,8 @@ public class PostDetailsService extends IntentService {
             if(ops != null){
                 ContentProviderResult[] result = getContentResolver().
                         applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
-//                BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
+                BusProvider.INSTANCE.getBus().post(new Events.PostDetailsRefreshEvent(null));
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

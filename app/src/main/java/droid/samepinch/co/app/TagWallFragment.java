@@ -180,6 +180,5 @@ public class TagWallFragment extends Fragment {
                 }
             }
         });
-
     }
 }
