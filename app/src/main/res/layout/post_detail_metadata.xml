@@ -20,6 +20,8 @@
         android:layout_alignBottom="@+id/post_dot_with_handle"
         android:layout_toLeftOf="@+id/post_views_count"
         android:layout_toStartOf="@+id/post_views_count"
+        android:drawableLeft="@drawable/icon_like_postview_2x"
+
         android:text="likes count"
         android:textColor="@color/grey_500"
         android:textSize="10dp" />
