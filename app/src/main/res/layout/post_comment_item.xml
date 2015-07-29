@@ -5,7 +5,7 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:paddingLeft="@dimen/list_item_horizontal_margin"
     android:paddingRight="@dimen/list_item_horizontal_margin"
-    android:paddingTop="@dimen/list_item_vertical_margin"
+    android:paddingTop="0dp"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_item_height">
 

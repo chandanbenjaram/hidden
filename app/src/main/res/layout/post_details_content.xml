@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/post_dot_with_handle"
-        android:paddingTop="5dp"
         android:orientation="vertical" />
     <!--<RelativeLayout-->
         <!--android:id="@+id/layout_post_item"-->

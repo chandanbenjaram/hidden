@@ -6,13 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <droid.samepinch.co.app.helpers.widget.NullSafeRecylerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"
-        app:behavior_overlapTop="64dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -46,13 +40,7 @@
                 <!--android:paddingTop="64dp"-->
                 <!--layout="@layout/post_detail_metadata"-->
                 <!--></include>-->
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <include layout="@layout/post_detail_metadata"></include>
-                </LinearLayout>
+                <include layout="@layout/post_detail_metadata"></include>
             </FrameLayout>
 
             <!--<FrameLayout-->
@@ -97,6 +85,13 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
+    <droid.samepinch.co.app.helpers.widget.NullSafeRecylerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        app:behavior_overlapTop="64dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floating_action_button"

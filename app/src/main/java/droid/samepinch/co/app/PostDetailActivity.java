@@ -14,9 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -30,9 +33,11 @@ import droid.samepinch.co.app.helpers.intent.PostDetailsService;
 import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
 import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaComments;
+import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.PostDetails;
+import droid.samepinch.co.data.dto.User;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
@@ -47,8 +52,11 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     private String mPostId;
 
 
-    @Bind(R.id.post_dot_with_handle)
-    TextView mPostDotWithHandle;
+    @Bind(R.id.post_dot_name)
+    TextView mPostDotName;
+
+    @Bind(R.id.post_dot_handle)
+    TextView mPostDotHandle;
 
     @Bind(R.id.post_vote_count)
     TextView mPostVoteCount;
@@ -91,7 +99,17 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
         if (currPost.moveToFirst()) {
             PostDetails details = Utils.cursorToPostDetailsEntity(currPost);
-            mPostDotWithHandle.setText(details.getOwner().getUid());
+            // get user info
+            Cursor currDot = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{details.getOwner().getUid()}, null);
+            if (currDot.moveToFirst()) {
+                User user = Utils.cursorToUserEntity(currDot);
+                mPostDotName.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
+                mPostDotHandle.setText("@" + user.getPinchHandle());
+            }else{
+                mPostDotName.setVisibility(View.GONE);
+                mPostDotHandle.setVisibility(View.GONE);
+            }
+
             mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null ? 0 : details.getUpvoteCount()));
             mPostViewsCount.setText(String.valueOf(details.getViews() == null ? 0 : details.getViews()));
         }

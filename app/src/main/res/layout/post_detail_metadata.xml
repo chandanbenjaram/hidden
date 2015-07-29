@@ -1,50 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="vertical">-->
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+    <!--<merge xmlns:android="http://schemas.android.com/apk/res/android">-->
 
-    <TextView
-        android:id="@+id/post_dot_with_handle"
-        android:layout_width="wrap_content"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="handle"
-        android:gravity="center"
-        android:textColor="@color/grey_500"
-        />
+        android:layout_alignParentBottom="true"
+        android:divider="?android:listDivider"
+        android:dividerPadding="2.5dp"
+        android:orientation="horizontal"
+        android:showDividers="middle"
+        android:weightSum="2"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/post_dot_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="name"
+            android:textColor="@color/blue_500" />
+
+        <TextView
+            android:id="@+id/post_dot_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/post_dot_name"
+            android:layout_toRightOf="@+id/post_dot_name"
+            android:gravity="center"
+            android:text="handle"
+            android:textColor="@color/grey_500" />
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/post_vote_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/post_dot_with_handle"
-        android:layout_toLeftOf="@+id/post_views_count"
-        android:layout_toStartOf="@+id/post_views_count"
         android:drawableLeft="@drawable/icon_like_postview_1x"
+        android:drawableStart="@drawable/icon_like_postview_1x"
         android:gravity="center"
         android:text="likes count"
         android:textColor="@color/grey_500"
-        android:textSize="10dp" />
+        android:textSize="10sp" />
 
     <TextView
         android:id="@+id/post_views_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/post_vote_count"
         android:drawableLeft="@drawable/icon_view_count_1x"
-        android:text="#of views"
         android:gravity="center"
+        android:text="#of views"
         android:textColor="@color/grey_500"
-        android:textSize="10dp" />
+        android:textSize="10sp" />
+
 
     <TextView
         android:id="@+id/post_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="date"
+        android:layout_below="@+id/post_views_count"
         android:gravity="center"
+        android:text="date"
         android:textColor="@color/grey_500"
-        android:textSize="10dp" />
+        android:textSize="10sp" />
 
-</merge>
-    <!--</LinearLayout>-->
+    <!--</merge>-->
+</LinearLayout>
