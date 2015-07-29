@@ -6,11 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bluejamesbond.text.DocumentView;
-import com.bluejamesbond.text.style.TextAlignment;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +49,24 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
         }
 
         if (details != null) {
+
+//            View.OnClickListener dotClick = new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    // TARGET
+//                    Bundle args = new Bundle();
+//                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
+//                    // data
+//                    args.putString(AppConstants.K.KEY_DOT.name(), user.getUid());
+//
+//                    // intent
+//                    Intent intent = new Intent(context, ActivityFragment.class);
+//                    intent.putExtras(args);
+//
+//                    context.startActivity(intent);
+//                }
+//            };
+
             mPostDotWithHandle.setText("N/A");
             mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null? 0 : details.getUpvoteCount()));
             mPostViewsCount.setText(String.valueOf(details.getViews() == null? 0: details.getViews()));
@@ -77,14 +91,12 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
 //                    documentView.getDocumentLayoutParams().setTextAlignment(TextAlignment.JUSTIFIED);
 //                    documentView.setText(leftContent);
 //                    addToView(documentView);
-
-
                 }
 
                 SIMView imgView = new SIMView(mView.getContext());
-                imgView.populateImageView(imageKV.get(imgK));
 //                imgView.populateImageView("https://i.imgflip.com/ohr0t.gif");
 //                imgView.populateImageView("http://www.targeticse.co.in/wp-content/uploads/2010/03/biology.gif");
+                imgView.populateImageView(imageKV.get(imgK));
                 addToView(imgView);
             }
 

@@ -3,6 +3,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     ap="false"
+    android:paddingTop="64dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"

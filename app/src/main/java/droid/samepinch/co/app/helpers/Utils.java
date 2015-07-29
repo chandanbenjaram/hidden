@@ -234,6 +234,13 @@ public class Utils {
             details.setTagsFromDB(cursor.getString(tagsIndex));
         }
 //
+        // dot related
+        User owner = new User();
+        details.setOwner(owner);
+        int dotUIDIndex;
+        if ((dotUIDIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_OWNER)) != -1) {
+            owner.setUid(cursor.getString(dotUIDIndex));
+        }
 
         return details;
     }

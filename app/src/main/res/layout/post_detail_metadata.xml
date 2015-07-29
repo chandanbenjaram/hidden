@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="@color/blue_500"
     android:orientation="vertical"
-    app:layout_collapseParallaxMultiplier="0.1"
-    app:layout_collapseMode="parallax">
+    android:gravity="center">
 
     <TextView
-        android:id="@+id/text"
-        android:layout_width="match_parent"
+        android:id="@+id/post_dot_with_handle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:text="primary text"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:layout_marginLeft="5dp"
+        android:text="BY XYZ"
+        android:textColor="@color/blue_500" />
 
     <TextView
-        android:id="@+id/sub_text"
-        android:layout_width="match_parent"
+        android:id="@+id/post_vote_count"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text"
-        android:textColor="@color/white"
-        android:text="sub text"
-        android:textSize="16sp" />
-</RelativeLayout>
+        android:layout_alignBottom="@+id/post_dot_with_handle"
+        android:layout_toLeftOf="@+id/post_views_count"
+        android:layout_toStartOf="@+id/post_views_count"
+        android:text="likes count"
+        android:textColor="@color/grey_500"
+        android:textSize="10dp" />
+
+    <TextView
+        android:id="@+id/post_views_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="#of views"
+        android:textColor="@color/grey_500"
+        android:textSize="10dp" />
+    <TextView
+        android:id="@+id/post_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="date"
+        android:textColor="@color/grey_500"
+        android:textSize="10dp" />
+</LinearLayout>
