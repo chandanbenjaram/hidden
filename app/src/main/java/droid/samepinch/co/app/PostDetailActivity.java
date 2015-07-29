@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
@@ -51,6 +52,9 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
     private String mPostId;
 
+
+    @Bind(R.id.post_dot)
+    ViewGroup mPostDot;
 
     @Bind(R.id.post_dot_name)
     TextView mPostDotName;
@@ -97,22 +101,8 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
 
         // query for post details
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
-        if (currPost.moveToFirst()) {
-            PostDetails details = Utils.cursorToPostDetailsEntity(currPost);
-            // get user info
-            Cursor currDot = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{details.getOwner().getUid()}, null);
-            if (currDot.moveToFirst()) {
-                User user = Utils.cursorToUserEntity(currDot);
-                mPostDotName.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
-                mPostDotHandle.setText("@" + user.getPinchHandle());
-            }else{
-                mPostDotName.setVisibility(View.GONE);
-                mPostDotHandle.setVisibility(View.GONE);
-            }
+        setUpMetadata(currPost);
 
-            mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null ? 0 : details.getUpvoteCount()));
-            mPostViewsCount.setText(String.valueOf(details.getViews() == null ? 0 : details.getViews()));
-        }
         // query for post comments
         Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
 
@@ -135,6 +125,67 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 new Intent(getApplicationContext(), PostDetailsService.class);
         mServiceIntent.putExtras(iArgs);
         startService(mServiceIntent);
+    }
+
+    private void setUpMetadata(Cursor currPost) {
+        if (!currPost.moveToFirst()) {
+            return;
+        }
+
+
+        int viewsIndex;
+        if ((viewsIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_VIEWS)) != -1) {
+            mPostViewsCount.setText(Integer.toString(currPost.getInt(viewsIndex)));
+        }
+
+        int upvoteCountIndex;
+        if ((upvoteCountIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_UPVOTE_COUNT)) != -1) {
+            mPostVoteCount.setText(Integer.toString(currPost.getInt(upvoteCountIndex)));
+        }
+
+        int createdAtIndex;
+        if ((createdAtIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_CREATED_AT)) != -1) {
+            mPostDate.setText(Utils.dateToString(currPost.getLong(createdAtIndex)));
+        }
+
+        String ownerUid = null;
+        int ownerUidIndex;
+        if ((ownerUidIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_OWNER)) != -1) {
+            ownerUid = currPost.getString(ownerUidIndex);
+        }
+        // get user info
+        Cursor currDot = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{ownerUid}, null);
+        if (currDot.moveToFirst()) {
+            final User user = Utils.cursorToUserEntity(currDot);
+
+            String dotName = null;
+            if (StringUtils.isBlank(user.getPrefName())) {
+                String fName = StringUtils.defaultString(user.getFname(), "");
+                String lName = StringUtils.defaultString(user.getLname(), "");
+                dotName = fName + " " + lName;
+            } else {
+                dotName = user.getPrefName();
+            }
+            mPostDotName.setText(dotName);
+            mPostDotHandle.setText("@" + user.getPinchHandle());
+
+            // onclick take to dot view
+            mPostDot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TARGET
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
+                    // data
+                    args.putString(AppConstants.K.KEY_DOT.name(), user.getUid());
+
+                    // intent
+                    Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override

@@ -96,4 +96,11 @@
     <style name="TransparentText" parent="@android:style/TextAppearance">
         <item name="android:textColor">#00666666</item>
     </style>
+    <style name="SP_TagTextStyle" parent="@android:style/TextAppearance.Small">
+        <item name="android:textStyle">italic</item>
+        <item name="android:color"> @color/blue_700</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+    </style>
 </resources>

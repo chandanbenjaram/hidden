@@ -6,16 +6,17 @@
     android:orientation="vertical">
     <!--<merge xmlns:android="http://schemas.android.com/apk/res/android">-->
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
+        android:id="@+id/post_dot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:divider="?android:listDivider"
         android:dividerPadding="2.5dp"
+        android:gravity="center"
         android:orientation="horizontal"
         android:showDividers="middle"
-        android:weightSum="2"
-        android:gravity="center">
+        android:weightSum="2">
 
         <TextView
             android:id="@+id/post_dot_name"
@@ -29,8 +30,6 @@
             android:id="@+id/post_dot_handle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/post_dot_name"
-            android:layout_toRightOf="@+id/post_dot_name"
             android:gravity="center"
             android:text="handle"
             android:textColor="@color/grey_500" />
@@ -52,8 +51,8 @@
         android:id="@+id/post_views_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/post_vote_count"
         android:drawableLeft="@drawable/icon_view_count_1x"
+        android:drawableStart="@drawable/icon_view_count_1x"
         android:gravity="center"
         android:text="#of views"
         android:textColor="@color/grey_500"

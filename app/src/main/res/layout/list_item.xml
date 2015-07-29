@@ -129,14 +129,11 @@
 
             <TextView
                 android:id="@+id/wall_tags"
+                android:layout_below="@id/wall_post_images"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/wall_post_images"
                 android:layout_centerHorizontal="true"
-                android:padding="5dp"
-                android:text="#tags"
-                android:textColor="@color/blue_900"
-                android:textSize="10dp" />
+                style="@style/SP_TagTextStyle"/>
 
             <LinearLayout
                 android:id="@+id/wall_post_commenters"

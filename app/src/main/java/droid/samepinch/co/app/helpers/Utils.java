@@ -20,6 +20,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 
@@ -83,7 +84,7 @@ public class Utils {
             user.setPrefName(cursor.getString(prefNameIndex));
         }
         if ((pinchHandleIndex = cursor.getColumnIndex(SchemaDots.COLUMN_PINCH_HANDLE)) != -1) {
-            user.setPrefName(cursor.getString(pinchHandleIndex));
+            user.setPinchHandle(cursor.getString(pinchHandleIndex));
         }
 
         return user;
@@ -441,6 +442,12 @@ public class Utils {
 
         return date;
     }
+
+    public static String dateToString(long ts){
+        long localTS = ts - TimeZone.getDefault().getRawOffset();
+        return DateFormatUtils.format(localTS, DEFAULT_DATE_FORMAT.getValue());
+    }
+
 
 
     public static List<String> getImageValues(final String str) {

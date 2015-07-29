@@ -1,6 +1,7 @@
 package droid.samepinch.co.app.helpers.adapters;
 
 
+import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,19 +22,13 @@ import droid.samepinch.co.data.dto.PostDetails;
 /**
  * Created by imaginationcoder on 7/27/15.
  */
-public class PostContentRVHolder extends PostDetailsRVHolder{
+public class PostContentRVHolder extends PostDetailsRVHolder {
 
     @Bind(R.id.post_details_content)
     ViewGroup mViewGroup;
 
-//    @Bind(R.id.post_dot_with_handle)
-//    TextView mPostDotWithHandle;
-//
-//    @Bind(R.id.post_vote_count)
-//    TextView mPostVoteCount;
-//
-//    @Bind(R.id.post_views_count)
-//    TextView mPostViewsCount;
+    @Bind(R.id.post_details_tags)
+    TextView mTagsView;
 
     public PostContentRVHolder(View itemView) {
         super(itemView);
@@ -41,7 +36,13 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
         setIsRecyclable(false);
     }
 
-    void onBindViewHolderImpl(Cursor cursor){
+    public PostContentRVHolder(View itemView, Context context) {
+        super(itemView);
+        ButterKnife.bind(this, itemView);
+        setIsRecyclable(false);
+    }
+
+    void onBindViewHolderImpl(Cursor cursor) {
         // do nothing in base
         PostDetails details = null;
         if (cursor.moveToFirst()) {
@@ -49,28 +50,6 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
         }
 
         if (details != null) {
-
-//            View.OnClickListener dotClick = new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    // TARGET
-//                    Bundle args = new Bundle();
-//                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
-//                    // data
-//                    args.putString(AppConstants.K.KEY_DOT.name(), user.getUid());
-//
-//                    // intent
-//                    Intent intent = new Intent(context, ActivityFragment.class);
-//                    intent.putExtras(args);
-//
-//                    context.startActivity(intent);
-//                }
-//            };
-
-//            mPostDotWithHandle.setText("N/A");
-//            mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null? 0 : details.getUpvoteCount()));
-//            mPostViewsCount.setText(String.valueOf(details.getViews() == null? 0: details.getViews()));
-
             List<String> imageKArr = Utils.getImageValues(details.getContent());
             String rightContent = details.getContent();
 
@@ -110,16 +89,16 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
 
             // add tags at the end
             String tags = details.getTagsForDB();
-            if(StringUtils.isNotBlank(tags)){
-                TextView tView = new TextView(mView.getContext());
-                tView.setGravity(View.TEXT_ALIGNMENT_CENTER);
-                Utils.markTags(mView.getContext(), tView, tags.split(","));
-                addToView(tView);
+            if (StringUtils.isNotBlank(tags)) {
+                Utils.markTags(mView.getContext(), mTagsView, tags.split(","));
+            }else{
+                // still hold space
+                mView.setVisibility(View.INVISIBLE);
             }
         }
     }
 
-    void addToView(View v){
+    void addToView(View v) {
         mViewGroup.addView(v);
     }
 }

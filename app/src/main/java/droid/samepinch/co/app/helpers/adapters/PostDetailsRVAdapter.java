@@ -48,7 +48,8 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
                 break;
 
             default:
-                throw new IllegalStateException("unknown viewType=" + viewType);
+                Thread.dumpStack();
+                throw new IllegalStateException("un-known viewType=" + viewType);
         }
 
         return viewHolder;
@@ -56,19 +57,7 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
 
     @Override
     public void onBindViewHolder(PostDetailsRVHolder viewHolder, Cursor cursor) {
-//        StringBuilder dummyTxt = new StringBuilder();
-//        for (int i = 0; i < 25; i++) {
-//            dummyTxt.append("\r\n" + "DUMMY TEXT..." + i);
-//        }
-
         viewHolder.onBindViewHolderImpl(cursor);
-//        if (viewHolder instanceof PostContentRVHolder) {
-//            PostContentRVHolder _header = (PostContentRVHolder) viewHolder;
-//            _header.mContentText.setText("I am header");
-//        } else if (viewHolder instanceof PostCommentsRVHolder) {
-//            PostCommentsRVHolder _item = (PostCommentsRVHolder) viewHolder;
-//            _item.mCommentText.setText("I am comment...");
-//        }
     }
 
     @Override
