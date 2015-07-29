@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <droid.samepinch.co.app.helpers.widget.NullSafeRecylerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        app:behavior_overlapTop="64dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -44,40 +51,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/post_dot_with_handle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="BY XYZ"
-                        android:textColor="@color/blue_500" />
-
-                    <TextView
-                        android:id="@+id/post_vote_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@+id/post_dot_with_handle"
-                        android:layout_toLeftOf="@+id/post_views_count"
-                        android:layout_toStartOf="@+id/post_views_count"
-                        android:text="likes count"
-                        android:textColor="@color/grey_500"
-                        android:textSize="10dp" />
-
-                    <TextView
-                        android:id="@+id/post_views_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="#of views"
-                        android:textColor="@color/grey_500"
-                        android:textSize="10dp" />
-                    <TextView
-                        android:id="@+id/post_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:text="date"
-                        android:textColor="@color/grey_500"
-                        android:textSize="10dp" />
+                    <include layout="@layout/post_detail_metadata"></include>
                 </LinearLayout>
             </FrameLayout>
 
@@ -123,19 +97,7 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <droid.samepinch.co.app.helpers.widget.NullSafeRecylerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:behavior_overlapTop="64dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <!--<droid.samepinch.co.app.helpers.widget.NullSafeRecylerView-->
-    <!--android:id="@+id/recyclerView"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-    <!--app:behavior_overlapTop="64dp"/>-->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"

@@ -14,13 +14,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
 import java.util.regex.Pattern;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.CommentsFragment;
+import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.adapters.PostDetailsRVAdapter;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
 import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
@@ -28,6 +32,7 @@ import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
+import droid.samepinch.co.data.dto.PostDetails;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
@@ -36,32 +41,31 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     public static final String LOG_TAG = "PostDetailActivity";
 
     private Intent mServiceIntent;
-
-    PostDetailsRVAdapter mViewAdapter;
-
-    String mPostId;
-
+    private PostDetailsRVAdapter mViewAdapter;
     private LinearLayoutManager mLayoutManager;
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // register to event bus
-        BusProvider.INSTANCE.getBus().register(this);
-    }
+    private String mPostId;
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.INSTANCE.getBus().unregister(this);
-    }
+
+    @Bind(R.id.post_dot_with_handle)
+    TextView mPostDotWithHandle;
+
+    @Bind(R.id.post_vote_count)
+    TextView mPostVoteCount;
+
+    @Bind(R.id.post_views_count)
+    TextView mPostViewsCount;
+
+    @Bind(R.id.post_date)
+    TextView mPostDate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postdetail);
-        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        ButterKnife.bind(this);
 
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
         // get caller data
         Bundle iArgs = getIntent().getExtras();
         mPostId = iArgs.getString(SchemaPosts.COLUMN_UID);
@@ -83,12 +87,17 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         ab.setDisplayShowTitleEnabled(false);
 
 
-
-
         // query for post details
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+        if (currPost.moveToFirst()) {
+            PostDetails details = Utils.cursorToPostDetailsEntity(currPost);
+            mPostDotWithHandle.setText(details.getOwner().getUid());
+            mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null ? 0 : details.getUpvoteCount()));
+            mPostViewsCount.setText(String.valueOf(details.getViews() == null ? 0 : details.getViews()));
+        }
         // query for post comments
         Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+
 
         // recycler view setup
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
@@ -153,5 +162,18 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 }

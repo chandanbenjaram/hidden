@@ -26,14 +26,14 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
     @Bind(R.id.post_details_content)
     ViewGroup mViewGroup;
 
-    @Bind(R.id.post_dot_with_handle)
-    TextView mPostDotWithHandle;
-
-    @Bind(R.id.post_vote_count)
-    TextView mPostVoteCount;
-
-    @Bind(R.id.post_views_count)
-    TextView mPostViewsCount;
+//    @Bind(R.id.post_dot_with_handle)
+//    TextView mPostDotWithHandle;
+//
+//    @Bind(R.id.post_vote_count)
+//    TextView mPostVoteCount;
+//
+//    @Bind(R.id.post_views_count)
+//    TextView mPostViewsCount;
 
     public PostContentRVHolder(View itemView) {
         super(itemView);
@@ -67,9 +67,9 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
 //                }
 //            };
 
-            mPostDotWithHandle.setText("N/A");
-            mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null? 0 : details.getUpvoteCount()));
-            mPostViewsCount.setText(String.valueOf(details.getViews() == null? 0: details.getViews()));
+//            mPostDotWithHandle.setText("N/A");
+//            mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null? 0 : details.getUpvoteCount()));
+//            mPostViewsCount.setText(String.valueOf(details.getViews() == null? 0: details.getViews()));
 
             List<String> imageKArr = Utils.getImageValues(details.getContent());
             String rightContent = details.getContent();
