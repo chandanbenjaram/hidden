@@ -101,6 +101,7 @@ public class AppConstants {
         FRAGMENT_DOTWALL,
         KEY_TAG,
         KEY_DOT,
-        Wall
+        Wall,
+        POST
     }
 }

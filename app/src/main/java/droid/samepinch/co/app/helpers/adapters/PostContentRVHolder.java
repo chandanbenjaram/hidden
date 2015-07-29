@@ -6,7 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bluejamesbond.text.DocumentView;
+import com.bluejamesbond.text.style.TextAlignment;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,15 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
     @Bind(R.id.post_details_content)
     ViewGroup mViewGroup;
 
+    @Bind(R.id.post_dot_with_handle)
+    TextView mPostDotWithHandle;
+
+    @Bind(R.id.post_vote_count)
+    TextView mPostVoteCount;
+
+    @Bind(R.id.post_views_count)
+    TextView mPostViewsCount;
+
     public PostContentRVHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
@@ -34,12 +47,16 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
 
     void onBindViewHolderImpl(Cursor cursor){
         // do nothing in base
-
         PostDetails details = null;
         if (cursor.moveToFirst()) {
             details = Utils.cursorToPostDetailsEntity(cursor);
         }
+
         if (details != null) {
+            mPostDotWithHandle.setText("N/A");
+            mPostVoteCount.setText(String.valueOf(details.getUpvoteCount() == null? 0 : details.getUpvoteCount()));
+            mPostViewsCount.setText(String.valueOf(details.getViews() == null? 0: details.getViews()));
+
             List<String> imageKArr = Utils.getImageValues(details.getContent());
             String rightContent = details.getContent();
 
@@ -52,8 +69,16 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
                 rightContent = StringUtils.substringAfter(rightContent, imgK).replaceAll("::", "");
                 if (StringUtils.isNotBlank(leftContent)) {
                     TextView tView = new TextView(mView.getContext());
+                    tView.setPadding(5, 0, 5, 0);
                     tView.setText(leftContent);
                     addToView(tView);
+
+//                    DocumentView documentView = new DocumentView(mView.getContext(), DocumentView.PLAIN_TEXT);
+//                    documentView.getDocumentLayoutParams().setTextAlignment(TextAlignment.JUSTIFIED);
+//                    documentView.setText(leftContent);
+//                    addToView(documentView);
+
+
                 }
 
                 SIMView imgView = new SIMView(mView.getContext());
@@ -66,6 +91,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder{
 
             if (StringUtils.isNotBlank(rightContent)) {
                 TextView tView = new TextView(mView.getContext());
+                tView.setPadding(5, 0, 5, 0);
                 tView.setText(rightContent);
                 addToView(tView);
             }

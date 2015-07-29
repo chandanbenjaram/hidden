@@ -67,7 +67,6 @@ public class PostDetailsService extends IntentService {
 
             HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
             ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, RespPostDetails.class);
-            System.out.println("resp..." + resp);
 
             ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());
             if(ops != null){

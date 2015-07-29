@@ -19,6 +19,7 @@ import com.squareup.otto.Subscribe;
 
 import java.util.regex.Pattern;
 
+import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.CommentsFragment;
 import droid.samepinch.co.app.helpers.adapters.PostDetailsRVAdapter;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
@@ -65,19 +66,24 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         Bundle iArgs = getIntent().getExtras();
         mPostId = iArgs.getString(SchemaPosts.COLUMN_UID);
 
+        // set title
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        toolbarLayout.setTitle(mPostId);
+        toolbarLayout.setTitle(AppConstants.K.POST.name());
 
+        // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Get the ActionBar here to configure the way it behaves.
         final ActionBar ab = getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.ic_menu); // set a custom icon for the default home button
+        //  ab.setHomeAsUpIndicator(R.drawable.ic_menu); // set a custom icon for the default home button
         ab.setDisplayShowHomeEnabled(true); // show or hide the default home button
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowCustomEnabled(false); // enable overriding the default toolbar layout
         ab.setDisplayShowTitleEnabled(false);
+
+
+
 
         // query for post details
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
