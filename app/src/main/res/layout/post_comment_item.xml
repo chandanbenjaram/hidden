@@ -39,15 +39,55 @@
             android:gravity="center"
             android:textColor="@color/blue_500" />
 
+        <TextView
+            android:id="@+id/avatar_handle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBaseline="@id/avatar"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/avatar"
+            android:textColor="@color/grey_500"
+            android:textSize="10dp"
+            android:text="handle" />
+
+        <TextView
+            android:id="@+id/comment_vote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/avatar"
+            android:layout_toLeftOf="@+id/comment_date"
+            android:gravity="center_vertical"
+            android:paddingRight="5dp"
+            android:text="vote"
+            android:drawableLeft="@drawable/icon_upvote_gray_1x"
+            android:textColor="@color/grey_500"
+            android:textSize="10dp"
+            android:layout_marginRight="5dp" />
+
+
+        <TextView
+            android:id="@+id/comment_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/avatar"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:paddingRight="5dp"
+            android:text="date"
+            android:drawableLeft="@drawable/time_1x"
+            android:textColor="@color/grey_500"
+            android:textSize="10dp"
+            android:layout_marginRight="5dp" />
+
 
         <TextView
             android:id="@+id/comment"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="@+id/avatar"
-            android:layout_marginLeft="5dp"
+            android:layout_below="@+id/avatar_handle"
             android:layout_toRightOf="@+id/avatar"
-            android:gravity="top"
+            android:layout_toEndOf="@+id/avatar"
+            android:text="a comment"
             android:textColor="@color/grey_900" />
     </RelativeLayout>
 </LinearLayout><!--</android.support.v7.widget.CardView>-->
