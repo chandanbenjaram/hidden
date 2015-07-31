@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    >
+    <item
+        android:id="@+id/menuitem_post_flag_id"
+        android:icon="@drawable/icon_flag_24x24"
+        android:orderInCategory="99"
+        android:title="Flag"
+        app:icon="@drawable/icon_flag_24x24"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menuitem_post_edit_id"
+        android:icon="@drawable/icon_edit_2x"
+        android:orderInCategory="299"
+        android:title="Edit"
+        app:icon="@drawable/icon_edit_2x"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menuitem_post_share_id"
+        android:icon="@drawable/icon_share_2x"
+        android:orderInCategory="399"
+        android:title="Share"
+        app:icon="@drawable/icon_share_2x"
+        app:showAsAction="ifRoom" />
+    <!--<item-->
+    <!--android:id="@+id/menuitem_post_share_id"-->
+    <!--android:icon="@drawable/icon_share_2x"-->
+    <!--android:title="Share"-->
+    <!--app:actionProviderClass="android.support.v7.widget.ShareActionProvider"-->
+    <!--app:icon="@drawable/icon_share_2x"-->
+    <!--app:showAsAction="never" />-->
+</menu>

@@ -5,11 +5,13 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,9 +50,12 @@ public class PostDetailActivity extends AppCompatActivity {
     private Intent mServiceIntent;
     private PostDetailsRVAdapter mViewAdapter;
     private LinearLayoutManager mLayoutManager;
-
     private String mPostId;
 
+    private ShareActionProvider mShareActionProvider;
+
+    @Bind(R.id.bottomsheet)
+    BottomSheetLayout mBottomsheet;
 
     @Bind(R.id.post_dot)
     ViewGroup mPostDot;
@@ -192,14 +199,82 @@ public class PostDetailActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
+
+            case R.id.menuitem_post_edit_id:
+                doEditIt(item);
+                return true;
+
+            case R.id.menuitem_post_flag_id:
+                doFlagIt(item);
+                return true;
+
+            case R.id.menuitem_post_share_id:
+                doShareIt(item);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sample_actions, menu);
+        getMenuInflater().inflate(R.menu.post_detail_menu, menu);
+//        MenuItem menuItemShare = menu.findItem(R.id.menuitem_post_share_id);
+//        // Set history different from the default before getting the action
+//        // view since a call to MenuItemCompat.getActionView() calls
+//        // ActionProvider.onCreateActionView() which uses the backing file name. Omit this
+//        // line if using the default share history file is desired.
+//        mShareActionProvider.setShareHistoryFileName("custom_share_history.xml");
+//        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItemShare);
+//        doShareIt();
         return true;
+    }
+
+//    public void doShareIt() {
+//        Intent sendIntent = new Intent();
+//        sendIntent.setAction(Intent.ACTION_SEND);
+//        sendIntent.putExtra(Intent.EXTRA_TEXT, mPostId);
+//        sendIntent.setType("text/plain");
+//
+//        // When you want to share set the share intent.
+//        mShareActionProvider.setShareIntent(sendIntent);
+//    }
+
+    public void doShareIt(MenuItem item) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mPostId);
+        shareIntent.setType("text/plain");
+
+        IntentPickerSheetView intentPickerSheet = new IntentPickerSheetView(PostDetailActivity.this, shareIntent, "Share with...", new IntentPickerSheetView.OnIntentPickedListener() {
+            @Override
+            public void onIntentPicked(Intent intent) {
+                mBottomsheet.dismissSheet();
+                startActivity(intent);
+            }
+        });
+//        intentPickerSheet.setFilter(new IntentPickerSheetView.Filter() {
+//            @Override
+//            public boolean include(IntentPickerSheetView.ActivityInfo info) {
+//                return !info.componentName.getPackageName().startsWith("com.android");
+//            }
+//        });
+//// Sort activities in reverse order for no good reason
+//        intentPickerSheet.setSortMethod(new Comparator<IntentPickerSheetView.ActivityInfo>() {
+//            @Override
+//            public int compare(IntentPickerSheetView.ActivityInfo lhs, IntentPickerSheetView.ActivityInfo rhs) {
+//                return rhs.label.compareTo(lhs.label);
+//            }
+//        });
+        mBottomsheet.showWithSheetView(intentPickerSheet);
+    }
+
+    public void doFlagIt(MenuItem item) {
+        System.out.println("doFlagIt..." + item);
+
+    }
+
+    public void doEditIt(MenuItem item) {
+        System.out.println("doEditIt..." + item);
     }
 
     @Override

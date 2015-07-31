@@ -29,3 +29,12 @@
     @butterknife.* <methods>;
 }
 # ButterKnife - End
+
+# SP specific
+-keep public class droid.samepinch.co.app.PostDetailActivity {
+  public *;
+}
+
+-keep public class android.widget.ShareActionProvider {
+  public *;
+}
