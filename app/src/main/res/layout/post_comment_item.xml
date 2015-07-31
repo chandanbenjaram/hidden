@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--<RelativeLayout--><!--xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:tools="http://schemas.android.com/tools"--><!--xmlns:fresco="http://schemas.android.com/apk/res-auto"--><!--android:paddingLeft="@dimen/list_item_horizontal_margin"--><!--android:paddingRight="@dimen/list_item_horizontal_margin"--><!--android:paddingTop="0dp"--><!--android:layout_width="match_parent"--><!--android:layout_height="@dimen/list_item_height">-->
-
-<!--<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:card_view="http://schemas.android.com/apk/res-auto"--><!--xmlns:fresco="http://schemas.android.com/apk/res-auto"--><!--android:id="@+id/card_view"--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"--><!--android:clipChildren="false"--><!--android:clipToPadding="false"--><!--android:minHeight="@dimen/list_item_height"--><!--card_view:cardElevation="0dp"--><!--card_view:cardPreventCornerOverlap="false">-->
-
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -37,7 +34,8 @@
             android:background="@drawable/rounded_corners"
             android:clickable="true"
             android:gravity="center"
-            android:textColor="@color/blue_500" />
+            android:textColor="@color/blue_500"
+            android:textAllCaps="true"/>
 
         <TextView
             android:id="@+id/avatar_handle"
@@ -100,6 +98,4 @@
             android:text="a comment"
             android:textColor="@color/grey_900" />
     </RelativeLayout>
-</LinearLayout><!--</android.support.v7.widget.CardView>-->
-
-    <!--</RelativeLayout>-->
+</LinearLayout>
