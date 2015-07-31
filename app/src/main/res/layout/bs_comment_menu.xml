@@ -1,26 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/cardview_light_background"
+    android:duplicateParentState="true"
+    android:fitsSystemWindows="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/icon_upvote_gray_1x"
-        android:drawablePadding="32dp"
-        android:gravity="center_vertical"
-        android:text="like/undo like"
-        android:textColor="@color/grey_500" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:duplicateParentState="true"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/icon_upvote_gray_1x"
-        android:drawablePadding="32dp"
-        android:gravity="center_vertical"
-        android:text="flag"
-        android:textColor="@color/grey_500" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:duplicateParentState="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:singleLine="true"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/icon_upvote_gray_24x24"
+            android:drawablePadding="32dp"
+            android:textAppearance="?attr/textAppearanceLargePopupMenu"
+            android:text="like"
+            android:textColor="@color/grey_500"
+            android:textSize="24sp"
+            />
+
+        <View style="@style/Divider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:duplicateParentState="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:singleLine="true"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/icon_flag_24x24"
+            android:drawablePadding="32dp"
+            android:textAppearance="?attr/textAppearanceLargePopupMenu"
+            android:text="flag"
+            android:textColor="@color/grey_500"
+            android:textSize="24sp" />
+    </LinearLayout>
+
 </LinearLayout>
+
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:id="@+id/list_item"--><!--android:layout_width="match_parent"--><!--android:layout_height="?attr/dropdownListPreferredItemHeight"--><!--android:paddingLeft="16dip"--><!--android:paddingRight="16dip"--><!--android:minWidth="196dip"--><!--android:orientation="vertical">-->
+
+    <!--<LinearLayoutandroid:layout_width--><!--="wrap_content"android:layout_height="match_parent"android:duplicateParentState="true" >-->
+
+    <!--<ImageViewandroid:id--><!--="@+id/icon"android:layout_width="32dip"android:layout_height="32dip"android:layout_gravity="center_vertical"android:layout_marginRight="8dip"android:duplicateParentState="true"/>-->
+
+    <!--<TextViewandroid:id--><!--="@+id/title"android:layout_width="wrap_content"android:layout_height="wrap_content"android:layout_gravity="center_vertical"android:textAppearance="?attr/textAppearanceLargePopupMenu"android:duplicateParentState="true"android:singleLine="true"android:ellipsize="marquee"android:fadingEdge="horizontal"/>-->
+
+    <!--</LinearLayout>-->
+
+    <!--</LinearLayout>-->
