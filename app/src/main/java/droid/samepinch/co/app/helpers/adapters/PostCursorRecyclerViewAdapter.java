@@ -89,7 +89,8 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         vh.mWallPostDotView.setOnClickListener(dotClick);
 
         vh.mWallPostDotView.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
-        vh.mWallPinchHandleView.setText("@" + user.getPinchHandle());
+        String pinchHandle = String.format(context.getString(R.string.pinch_handle), user.getPinchHandle());
+        vh.mWallPinchHandleView.setText(pinchHandle);
 
         vh.mWallPostContentView.setText(post.getContent());
         vh.mWallPostViewsView.setText(String.valueOf(post.getViews() == null ? 0 : post.getViews()));

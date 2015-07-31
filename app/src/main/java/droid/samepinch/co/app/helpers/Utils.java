@@ -448,7 +448,12 @@ public class Utils {
         return DateFormatUtils.format(localTS, DEFAULT_DATE_FORMAT.getValue());
     }
 
-
+    public static String dateToString(Date date){
+        if(date == null){
+            return "";
+        }
+        return DateFormatUtils.format(date, DEFAULT_DATE_FORMAT.getValue());
+    }
 
     public static List<String> getImageValues(final String str) {
         final List<String> imgVals = new ArrayList<>();

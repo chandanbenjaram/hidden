@@ -41,7 +41,7 @@
 
         <TextView
             android:id="@+id/avatar_handle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignBaseline="@id/avatar"
             android:layout_marginLeft="5dp"
@@ -51,7 +51,7 @@
             android:text="handle" />
 
         <TextView
-            android:id="@+id/comment_vote"
+            android:id="@+id/comment_upvote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/avatar"
@@ -70,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/avatar"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/comment_menu"
             android:gravity="center_vertical"
             android:paddingRight="5dp"
             android:text="date"
@@ -79,11 +79,21 @@
             android:textSize="10dp"
             android:layout_marginRight="5dp" />
 
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/comment_menu"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_alignParentRight="true"
+            android:adjustViewBounds="true"
+            android:paddingRight="7dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/icon_more_2x"
+            fresco:placeholderImageScaleType="fitCenter" />
 
         <TextView
             android:id="@+id/comment"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/avatar_handle"
             android:layout_toRightOf="@+id/avatar"
             android:layout_toEndOf="@+id/avatar"

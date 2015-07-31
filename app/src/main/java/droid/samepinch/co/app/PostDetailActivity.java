@@ -12,12 +12,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -167,7 +169,8 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 dotName = user.getPrefName();
             }
             mPostDotName.setText(dotName);
-            mPostDotHandle.setText("@" + user.getPinchHandle());
+            String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
+            mPostDotHandle.setText(pinchHandle);
 
             // onclick take to dot view
             mPostDot.setOnClickListener(new View.OnClickListener() {
@@ -209,10 +212,22 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
         Log.i(LOG_TAG, "position=" + position);
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 
     @Subscribe
@@ -231,18 +246,5 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
                 }
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // register to event bus
-        BusProvider.INSTANCE.getBus().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.INSTANCE.getBus().unregister(this);
     }
 }
