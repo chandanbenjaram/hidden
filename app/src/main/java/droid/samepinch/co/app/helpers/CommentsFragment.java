@@ -1,6 +1,5 @@
 package droid.samepinch.co.app.helpers;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,24 +22,11 @@ import droid.samepinch.co.data.dao.SchemaPosts;
  * Created by cbenjaram on 7/23/15.
  */
 public class CommentsFragment extends ListFragment {
-    CommentsFragmentCallbackListener mCallback;
     private ListView mListView;
     private CursorAdapter mAdapter;
     private String mPostId;
 
     private View mHeaderView;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // callback check
-        try {
-            mCallback = (CommentsFragmentCallbackListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,10 +100,6 @@ public class CommentsFragment extends ListFragment {
         TextView time;
     }
 
-    // Container Activity must implement this interface
-    public static interface CommentsFragmentCallbackListener {
-        void onCommentClick(int position);
-    }
 
     public View getMHeaderView() {
         return mHeaderView;

@@ -11,15 +11,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +26,6 @@ import java.util.regex.Pattern;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import droid.samepinch.co.app.helpers.AppConstants;
-import droid.samepinch.co.app.helpers.CommentsFragment;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.adapters.PostDetailsRVAdapter;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
@@ -39,12 +35,11 @@ import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
 import droid.samepinch.co.data.dao.SchemaPosts;
-import droid.samepinch.co.data.dto.PostDetails;
 import droid.samepinch.co.data.dto.User;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
-public class PostDetailActivity extends AppCompatActivity implements CommentsFragment.CommentsFragmentCallbackListener {
+public class PostDetailActivity extends AppCompatActivity {
     private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
     public static final String LOG_TAG = "PostDetailActivity";
 
@@ -205,16 +200,6 @@ public class PostDetailActivity extends AppCompatActivity implements CommentsFra
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sample_actions, menu);
         return true;
-    }
-
-    @Override
-    public void onCommentClick(int position) {
-        Log.i(LOG_TAG, "position=" + position);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     @Override
