@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import droid.samepinch.co.app.CommentFragment;
 import droid.samepinch.co.app.DotWallFragment;
 import droid.samepinch.co.app.R;
 import droid.samepinch.co.app.TagWallFragment;
@@ -39,6 +40,9 @@ public class RootFragment extends Fragment {
                 break;
             case FRAGMENT_DOTWALL:
                 fragment = new DotWallFragment();
+                break;
+            case FRAGMENT_COMMENT:
+                fragment = new CommentFragment();
                 break;
             default:
                 throw new IllegalArgumentException("invalid URI");

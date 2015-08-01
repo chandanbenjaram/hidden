@@ -99,6 +99,7 @@ public class AppConstants {
         TARGET_FRAGMENT,
         FRAGMENT_TAGWALL,
         FRAGMENT_DOTWALL,
+        FRAGMENT_COMMENT,
         KEY_TAG,
         KEY_DOT,
         Wall,

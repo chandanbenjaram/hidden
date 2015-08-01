@@ -16,7 +16,6 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
-    private static final int TYPE_FOOTER = 2;
 
 
     public PostDetailsRVAdapter(Context context, Cursor cursor) {
@@ -28,8 +27,6 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
     public int getItemViewType(int position) {
         if (isPositionHeader(position)) {
             return TYPE_HEADER;
-        }else if(isPositionFooter(position)){
-            return TYPE_FOOTER;
         }
         return 1;
     }
@@ -49,12 +46,6 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
                 v = LayoutInflater.from(context)
                         .inflate(R.layout.post_comment_item, parent, false);
                 viewHolder = new PostCommentsRVHolder(v);
-                break;
-
-            case TYPE_FOOTER:
-                v = LayoutInflater.from(context)
-                        .inflate(R.layout.post_details_comment_add, parent, false);
-                viewHolder = new PostCommentAddRVHolder(v);
                 break;
 
             default:
@@ -77,10 +68,6 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
 
     private boolean isPositionHeader(int position) {
         return position == 0;
-    }
-
-    private boolean isPositionFooter(int position) {
-        return position == (getCursor().getCount()-1);
     }
 
 }
