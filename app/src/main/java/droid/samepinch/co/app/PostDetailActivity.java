@@ -2,9 +2,11 @@ package droid.samepinch.co.app;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -33,6 +36,7 @@ import droid.samepinch.co.app.helpers.AppConstants;
 import droid.samepinch.co.app.helpers.Utils;
 import droid.samepinch.co.app.helpers.adapters.PostDetailsRVAdapter;
 import droid.samepinch.co.app.helpers.intent.PostDetailsService;
+import droid.samepinch.co.app.helpers.intent.PostsPullService;
 import droid.samepinch.co.app.helpers.pubsubs.BusProvider;
 import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaComments;
@@ -75,6 +79,12 @@ public class PostDetailActivity extends AppCompatActivity {
     @Bind(R.id.post_date)
     TextView mPostDate;
 
+    @Bind(R.id.floating_action_button)
+    FloatingActionButton mFAB;
+
+    @Bind(R.id.recyclerView)
+    RecyclerView mRV;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,17 +118,19 @@ public class PostDetailActivity extends AppCompatActivity {
         setUpMetadata(currPost);
 
         // query for post comments
-        Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+        final Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
 
+        // ADD COMMENT footer
+        MatrixCursor currFooter=new MatrixCursor(new String[]{"_id", "comment"});
+        currFooter.newRow().add(Integer.MIN_VALUE).add("comment from matrix...");
 
         // recycler view setup
-        RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
-        rv.setHasFixedSize(true);
-        rv.setLayoutManager(mLayoutManager);
+        mRV.setHasFixedSize(true);
+        mRV.setLayoutManager(mLayoutManager);
 
-        mViewAdapter = new PostDetailsRVAdapter(this, new MergeCursor(new Cursor[]{currPost, currComments}));
-        rv.setAdapter(mViewAdapter);
-        rv.setItemAnimator(new DefaultItemAnimator());
+        mViewAdapter = new PostDetailsRVAdapter(this, new MergeCursor(new Cursor[]{currPost, currComments, currFooter}));
+        mRV.setAdapter(mViewAdapter);
+        mRV.setItemAnimator(new DefaultItemAnimator());
 
         // prepare to refresh post details
         Bundle iServiceArgs = new Bundle();
@@ -129,6 +141,13 @@ public class PostDetailActivity extends AppCompatActivity {
                 new Intent(getApplicationContext(), PostDetailsService.class);
         mServiceIntent.putExtras(iArgs);
         startService(mServiceIntent);
+
+        mFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mLayoutManager.scrollToPositionWithOffset(currComments.getCount() + 1, 0);
+            }
+        });
     }
 
     private void setUpMetadata(Cursor currPost) {
