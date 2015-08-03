@@ -79,11 +79,11 @@
                 android:gravity="center_vertical"
                 android:text="PINCH HANDLE"
                 android:textColor="@color/grey_700"
-                android:layout_below="@+id/wall_post_dot"
-                android:layout_toRightOf="@+id/avatar"
-                android:layout_toEndOf="@+id/avatar"
-                android:layout_marginTop="-3dp"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginTop="-15dp"
+                android:layout_toRightOf="@+id/wall_post_dot"
+                android:layout_marginLeft="5dp"
+                android:textSize="9sp"
+                />
 
             <TextView
                 android:id="@+id/wall_post_views"
@@ -135,7 +135,7 @@
                 android:layout_below="@+id/wall_pinch_handle"
                 android:layout_toRightOf="@+id/avatar"
                 android:layout_toEndOf="@+id/avatar"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="25dp"
                 android:layout_marginLeft="5dp"
                 android:maxLines="3"
                 android:ellipsize="end"/>
