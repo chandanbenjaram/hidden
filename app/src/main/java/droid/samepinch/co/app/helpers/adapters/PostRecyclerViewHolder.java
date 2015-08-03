@@ -25,10 +25,15 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     public final SimpleDraweeView mWallPostImages;
     public final TextView mWallPostContentView;
-    public final TextView mWallPostViewsView;
-    public final TextView mCommentersCount;
     public final TextView mWallTags;
     public final LinearLayout mWallPostCommentersLayout;
+
+    public final TextView mCommentersCount;
+    public final TextView mWallPostViewsView;
+    public final TextView mWallPostUpvoteView;
+    public final TextView mWallPostDateView;
+
+
 
     public PostRecyclerViewHolder(View view) {
         super(view);
@@ -42,9 +47,13 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         mWallPostContentView = (TextView) view.findViewById(R.id.wall_post_content);
         mWallPostImages = (SimpleDraweeView) view.findViewById(R.id.wall_post_images);
-        mWallPostViewsView = (TextView) view.findViewById(R.id.wall_post_views);
         mWallPostCommentersLayout = (LinearLayout) view.findViewById(R.id.wall_post_commenters);
         mCommentersCount = (TextView) view.findViewById(R.id.wall_commenters_count);
         mWallTags = (TextView) view.findViewById(R.id.wall_tags);
+
+        // stats
+        mWallPostViewsView = (TextView) view.findViewById(R.id.wall_post_views);
+        mWallPostUpvoteView = (TextView) view.findViewById(R.id.wall_post_upvote);
+        mWallPostDateView = (TextView) view.findViewById(R.id.wall_post_date);
     }
 }

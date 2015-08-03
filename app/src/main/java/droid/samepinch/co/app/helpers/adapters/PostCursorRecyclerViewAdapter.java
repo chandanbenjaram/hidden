@@ -91,10 +91,12 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         String pinchHandle = String.format(context.getString(R.string.pinch_handle), user.getPinchHandle());
         vh.mWallPinchHandleView.setText(pinchHandle);
 
-        vh.mWallPostContentView.setText(post.getContent());
-        vh.mWallPostViewsView.setText(String.valueOf(post.getViews() == null ? 0 : post.getViews()));
+        vh.mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(post.getViews()), "0"));
+        vh.mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString( post.getUpvoteCount()), "0"));
+        vh.mWallPostDateView.setText(Utils.dateToString(post.getCreatedAt()));
 
-        vh.mLayoutPostItem.setOnClickListener(new View.OnClickListener() {
+        vh.mWallPostContentView.setText(post.getContent());
+        vh.mWallPostContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle iArgs = new Bundle();

@@ -96,6 +96,7 @@ public class Utils {
         }
 
         Post post = new Post();
+        int createdAtIndex;
         int uidIndex;
         int contentIndex;
         int imagesIndex;
@@ -103,9 +104,11 @@ public class Utils {
         int upvoteCountIndex;
         int viewsIndex;
         int anonymousIndex;
-        int createdAtIndex;
         int commentersIndex;
         int tagsIndex;
+        if ((createdAtIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_CREATED_AT)) != -1) {
+            post.setCreatedAt(new Date(cursor.getLong(createdAtIndex)));
+        }
         if ((uidIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_UID)) != -1) {
             post.setUid(cursor.getString(uidIndex));
         }

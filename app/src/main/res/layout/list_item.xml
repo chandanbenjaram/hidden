@@ -89,11 +89,38 @@
                 android:id="@+id/wall_post_views"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/wall_pinch_handle"
-                android:layout_alignParentRight="true"
+                android:layout_toLeftOf="@+id/wall_post_upvote"
                 android:gravity="center_vertical"
-                android:paddingRight="5dp"
-                android:text="views"
+                android:paddingRight="2dp"
+                android:text="VIEWS"
+                android:drawableLeft="@drawable/icon_view_count_1x"
+                android:textColor="@color/grey_500"
+                android:textSize="10dp"
+                android:layout_marginRight="5dp" />
+
+            <TextView
+                android:id="@+id/wall_post_upvote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/wall_post_date"
+                android:gravity="center_vertical"
+                android:paddingRight="2dp"
+                android:text="VOTES"
+                android:drawableLeft="@drawable/icon_upvote_gray_1x"
+                android:textColor="@color/grey_500"
+                android:textSize="10dp"
+                android:layout_marginRight="5dp" />
+
+
+            <TextView
+                android:id="@+id/wall_post_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingRight="2dp"
+                android:text="DATE"
+                android:drawableLeft="@drawable/time_1x"
+                android:layout_alignParentRight="true"
                 android:textColor="@color/grey_500"
                 android:textSize="10dp"
                 android:layout_marginRight="5dp" />
@@ -126,7 +153,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/wall_post_content"
                 />
-
 
             <TextView
                 android:id="@+id/wall_tags"
