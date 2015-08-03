@@ -81,6 +81,7 @@ public class TagWallFragment extends Fragment {
         BusProvider.INSTANCE.getBus().unregister(this);
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

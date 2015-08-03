@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menuitem_comment_as_anonymous"
+        android:orderInCategory="199"
+        android:title="as anonymous"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menuitem_comment_as_user"
+        android:orderInCategory="399"
+        android:title="as XYZ"
+        app:showAsAction="always" />
+</menu>

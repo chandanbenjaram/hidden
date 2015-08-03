@@ -21,28 +21,49 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnEditorAction;
+import droid.samepinch.co.app.helpers.AppConstants;
 
-public class CommentFragment extends Fragment {
+public class CommentFragment extends Fragment implements android.support.v7.widget.PopupMenu.OnMenuItemClickListener {
     public static final String LOG_TAG = "CommentFragment";
 
     private Intent mServiceIntent;
-    FragmentActivity activity;
+    AppCompatActivity activity;
+
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 
     @Bind(R.id.comment_text_id)
     TextView commentTxt;
 
+    private String mPostId;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (FragmentActivity) activity;
+        this.activity = (AppCompatActivity) activity;
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -52,7 +73,107 @@ public class CommentFragment extends Fragment {
         View view = inflater.inflate(R.layout.comment_add_fragment, container, false);
         ButterKnife.bind(this, view);
 
+        // retrieve post from args
+        this.mPostId = getArguments().getString(AppConstants.K.POST.name());
+
+        activity.setSupportActionBar(toolbar);
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // hack to get click working
+                activity.onBackPressed();
+            }
+        });
+        toolbar.setTitle(StringUtils.EMPTY);
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
+    @OnEditorAction(R.id.comment_text_id)
+    public boolean dummy() {
+        return true;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.add_comment_menu, menu);
+
+
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                activity.onBackPressed();
+                return true;
+
+            case R.id.menuitem_login:
+                doLogin(item);
+                return true;
+
+            case R.id.menuitem_comment:
+                doComment(item);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void doLogin(MenuItem item) {
+        //TODO login implementation
+    }
+
+    private void doComment(MenuItem item) {
+        View menuitemCommentView = getView().findViewById(R.id.menuitem_comment);
+        PopupMenu popup = new PopupMenu(activity, menuitemCommentView);
+
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.add_comment_selection_menu, popup.getMenu());
+        MenuItem commentUser = popup.getMenu().findItem(R.id.menuitem_comment_as_user);
+        commentUser.setTitle("as " + System.currentTimeMillis());
+        commentUser.setIcon(R.drawable.icon_more_1x);
+        popup.setOnMenuItemClickListener(this);
+        popup.show();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuitem_comment_as_anonymous:
+                doCommentAsAnonym(item);
+//                activity.getSupportFragmentManager().beginTransaction().remove(this).commit();
+//                activity.onBackPressed();
+                return true;
+
+            case R.id.menuitem_comment_as_user:
+                doCommentAsUser(item);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void doCommentAsAnonym(MenuItem item) {
+        Bundle iArgs = new Bundle();
+        iArgs.putString(AppConstants.K.POST.name(), mPostId);
+        Intent intent = new Intent(activity.getApplicationContext(), PostDetailActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtras(iArgs);
+
+        activity.getApplicationContext().startActivity(intent);
+    }
+
+    private void doCommentAsUser(MenuItem item) {
+    }
 }

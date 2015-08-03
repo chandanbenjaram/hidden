@@ -38,7 +38,6 @@ import droid.samepinch.co.app.helpers.pubsubs.Events;
 import droid.samepinch.co.data.dao.SchemaComments;
 import droid.samepinch.co.data.dao.SchemaDots;
 import droid.samepinch.co.data.dao.SchemaPostDetails;
-import droid.samepinch.co.data.dao.SchemaPosts;
 import droid.samepinch.co.data.dto.User;
 
 import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
@@ -90,7 +89,7 @@ public class PostDetailActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         // get caller data
         Bundle iArgs = getIntent().getExtras();
-        mPostId = iArgs.getString(SchemaPosts.COLUMN_UID);
+        mPostId = iArgs.getString(AppConstants.K.POST.name());
 
         // set title
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);

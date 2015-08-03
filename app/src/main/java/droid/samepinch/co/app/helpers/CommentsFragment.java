@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import droid.samepinch.co.app.R;
 import droid.samepinch.co.data.dao.SchemaComments;
-import droid.samepinch.co.data.dao.SchemaPosts;
 
 /**
  * Created by cbenjaram on 7/23/15.
@@ -39,7 +38,7 @@ public class CommentsFragment extends ListFragment {
             mListView.addHeaderView(getMHeaderView());
         }
         Bundle iArgs = getArguments();
-        mPostId = iArgs == null ? null : iArgs.getString(SchemaPosts.COLUMN_UID);
+        mPostId = iArgs.getString(AppConstants.K.POST.name());
 
         return rootView;
 
