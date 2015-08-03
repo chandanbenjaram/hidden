@@ -35,7 +35,6 @@ import droid.samepinch.co.rest.RespPostDetails;
 import droid.samepinch.co.rest.RestClient;
 
 import static droid.samepinch.co.app.helpers.AppConstants.API.POSTS;
-import static droid.samepinch.co.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 
 /**
@@ -53,10 +52,11 @@ public class PostDetailsService extends IntentService {
 
         // get caller data
         Bundle iArgs = intent.getExtras();
+        String postUri = StringUtils.join(new String[]{POSTS.getValue(), iArgs.getString(AppConstants.K.POST.name())}, "/");
+
         ReqNoBody req = new ReqNoBody();
         req.setToken(Utils.getAppToken(false));
         req.setCmd("show");
-        String postUri = StringUtils.join(new String[]{POSTS.getValue(), iArgs.getString(KEY_UID.getValue())}, "/");
 
         try {
 
