@@ -26,9 +26,17 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Un-comment the following data tag and replace placeholder. -->
+                <data
+                    android:host="gitkit"
+                    android:scheme="com.googleusercontent.apps.916891626646-bpmfvbm3q16eppden1o7cd8pdc79jfgi" />
             </intent-filter>
         </activity>
 
@@ -60,6 +68,25 @@
             android:name=".helpers.intent.PostDetailsService"
             android:exported="false"/>
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="identitytoolkit.show_providers"
+            android:value="Google" />
+        <meta-data
+            android:name="identitytoolkit.use_google_plus"
+            android:value="false" />
+        <!-- GIT KIT SPECIFICS -->
+        <meta-data
+            android:name="identitytoolkit.api_key"
+            android:value="AIzaSyATpn09B9Ggo21qsfVJ29JNJR-b2SqAdrk" />
+        <meta-data
+            android:name="identitytoolkit.server_client_id"
+            android:value="916891626646-bpmfvbm3q16eppden1o7cd8pdc79jfgi.apps.googleusercontent.com" />
+        <meta-data
+            android:name="identitytoolkit.server_widget_url"
+            android:value="https://localhost/callback" />
     </application>
 
 </manifest>

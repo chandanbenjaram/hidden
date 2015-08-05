@@ -13,3 +13,12 @@ http://databasefaq.com/index.php/answer/79292/android-performance-view-gif-anima
 
 ###COMMANDS
 adb shell ps|grep "droid.app.co.app"|awk '{print $2}'|xargs adb shell kill 
+
+
+ARM Translator - https://goo.gl/lC6GWt
+
+
+Gapps(v2-4) - http://goo.gl/0aPPhx
+
+
+Gapps for v5(Lollipop) - http://goo.gl/0zOqQq
