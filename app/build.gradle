@@ -33,6 +33,9 @@ android {
 
 repositories {
     jcenter()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 configurations.all {
@@ -71,10 +74,9 @@ dependencies {
     // misc.
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'org.springframework.android:spring-android-rest-template:2.0.0.M1'
-    compile 'com.facebook.fresco:fresco:0.5.3+'
-    compile 'com.google.android.gms:play-services-plus:7.5.0'
-//    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.facebook.fresco:fresco:0.5.3'
+    compile 'com.google.android.gms:play-services-identity:7.5.0'
+    compile (name:'identitytoolkit-api11', ext:'aar')
 
-    // CHECKOUT
-    // compile 'com.android.support:percent:22.2.0'
+
 }

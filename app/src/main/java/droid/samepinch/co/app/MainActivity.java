@@ -53,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
+
     Adapter adapterViewPager;
+
 
     @Override
     public void onResume() {
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fresco.initialize(getApplicationContext());
-        Utils.PreferencesManager.initializeInstance(getApplicationContext());
+        Utils.PreferencesManager.initializeInstance(this);
 
         setContentView(R.layout.activity_main);
 
