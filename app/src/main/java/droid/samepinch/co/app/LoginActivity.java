@@ -2,17 +2,14 @@ package droid.samepinch.co.app;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.credentials.IdToken;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitUser;
 
@@ -24,8 +21,7 @@ import com.google.identitytoolkit.GitkitUser;
  * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
  * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
  */
-public class LoginActivity extends AppCompatActivity {
-
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private GitkitClient client;
 
     @Override
@@ -66,25 +62,24 @@ public class LoginActivity extends AppCompatActivity {
     // GitkitClient.handleActivityResult to check the result. If the result is for GitkitClient,
     // the method returns true to indicate the result has been consumed.
     //
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    if (!client.handleActivityResult(requestCode, resultCode, intent)) {
-      super.onActivityResult(requestCode, resultCode, intent);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (!client.handleActivityResult(requestCode, resultCode, intent)) {
+            super.onActivityResult(requestCode, resultCode, intent);
+        }
     }
-}
 
 
     // Step 4: Override the onNewIntent method.
     // When the app is invoked with an intent, it is possible that the intent is for GitkitClient.
     // Call GitkitClient.handleIntent to check it. If the intent is for GitkitClient, the method
     // returns true to indicate the intent has been consumed.
-  @Override
-  protected void onNewIntent(Intent intent) {
-    if (!client.handleIntent(intent)) {
-      super.onNewIntent(intent);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (!client.handleIntent(intent)) {
+            super.onNewIntent(intent);
+        }
     }
-  }
-
 
 
     private void showSignInPage() {
@@ -94,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void showProfilePage(IdToken idToken, GitkitUser user) {
+    private void showProfilePage(com.google.identitytoolkit.IdToken idToken, GitkitUser user) {
         setContentView(R.layout.profile);
         showAccount(user);
         findViewById(R.id.sign_out).setOnClickListener(this);
@@ -103,16 +98,15 @@ public class LoginActivity extends AppCompatActivity {
 
     // Step 5: Respond to user actions.
     // If the user clicks sign in, call GitkitClient.startSignIn() to trigger the sign in flow.
-/*
-  @Override
-  public void onClick(View v) {
-    if (v.getId() == R.id.sign_in) {
-      client.startSignIn();
-    } else if (v.getId() == R.id.sign_out) {
-      showSignInPage();
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.sign_in) {
+            client.startSignIn();
+        } else if (v.getId() == R.id.sign_out) {
+            showSignInPage();
+        }
     }
-  }
-*/
 
 
     private void showAccount(GitkitUser user) {
@@ -124,25 +118,25 @@ public class LoginActivity extends AppCompatActivity {
 
         if (user.getPhotoUrl() != null) {
             final ImageView pictureView = (ImageView) findViewById(R.id.account_picture);
-            new AsyncTask<String, Void, Bitmap>() {
-
-                @Override
-                protected Bitmap doInBackground(String... arg) {
-                    try {
-                        byte[] result = HttpUtils.get(arg[0]);
-                        return BitmapFactory.decodeByteArray(result, 0, result.length);
-                    } catch (IOException e) {
-                        return null;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(Bitmap bitmap) {
-                    if (bitmap != null) {
-                        pictureView.setImageBitmap(bitmap);
-                    }
-                }
-            }.execute(user.getPhotoUrl());
+//            new AsyncTask<String, Void, Bitmap>() {
+//
+//                @Override
+//                protected Bitmap doInBackground(String... arg) {
+//                    try {
+//                        byte[] result = HttpUtils.get(arg[0]);
+//                        return BitmapFactory.decodeByteArray(result, 0, result.length);
+//                    } catch (IOException e) {
+//                        return null;
+//                    }
+//                }
+//
+//                @Override
+//                protected void onPostExecute(Bitmap bitmap) {
+//                    if (bitmap != null) {
+//                        pictureView.setImageBitmap(bitmap);
+//                    }
+//                }
+//            }.execute(user.getPhotoUrl());
         }
     }
 }

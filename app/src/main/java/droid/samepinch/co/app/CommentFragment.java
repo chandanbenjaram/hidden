@@ -133,6 +133,9 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
     private void doLogin(MenuItem item) {
         //TODO login implementation
+        Intent intent = new Intent(activity.getApplicationContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.getApplicationContext().startActivity(intent);
     }
 
     private void doComment(MenuItem item) {
