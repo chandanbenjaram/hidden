@@ -10,6 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitUser;
 
@@ -23,6 +29,7 @@ import com.google.identitytoolkit.GitkitUser;
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private GitkitClient client;
+    CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,32 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.welcome);
         Button button = (Button) findViewById(R.id.sign_in);
         button.setOnClickListener(this);
+
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginButton loginButton = (LoginButton) findViewById(R.id.fb_login_button);
+        loginButton.setReadPermissions("user_friends");
+        // If using in a fragment
+//        loginButton.setFragment(this);
+        // Other app specific specialization
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                System.out.println("onSuccess...");
+            }
+
+            @Override
+            public void onCancel() {
+                System.out.println("onCancel...");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                System.out.println("onError...");
+            }
+        });
 
 //        client.startSignIn();
     }

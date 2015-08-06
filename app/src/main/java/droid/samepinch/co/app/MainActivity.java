@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.facebook.FacebookSdk;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.squareup.otto.Subscribe;
 
@@ -79,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fresco.initialize(getApplicationContext());
-        Utils.PreferencesManager.initializeInstance(this);
+//        Fresco.initialize(getApplicationContext());
+//        Utils.PreferencesManager.initializeInstance(this);
+//        FacebookSdk.sdkInitialize(getApplicationContext());
 
         setContentView(R.layout.activity_main);
 
