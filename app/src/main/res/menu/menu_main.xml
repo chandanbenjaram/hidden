@@ -1,6 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    >
+    <item
+        android:id="@+id/menuitem_sign_in_id"
+        android:orderInCategory="99"
+        android:title="@string/sign_in_label"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menuitem_sign_out_id"
+        android:orderInCategory="199"
+        android:title="@string/sign_out_label"
+        app:showAsAction="never" />
+    <!--<item-->
+    <!--android:id="@+id/menuitem_post_share_id"-->
+    <!--android:icon="@drawable/icon_share_2x"-->
+    <!--android:title="Share"-->
+    <!--app:actionProviderClass="android.support.v7.widget.ShareActionProvider"-->
+    <!--app:icon="@drawable/icon_share_2x"-->
+    <!--app:showAsAction="never" />-->
 </menu>

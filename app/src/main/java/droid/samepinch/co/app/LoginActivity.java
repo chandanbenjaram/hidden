@@ -86,6 +86,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.welcome);
         Button button = (Button) findViewById(R.id.sign_in);
         button.setOnClickListener(this);
+
+//        client.startSignIn();
     }
 
 

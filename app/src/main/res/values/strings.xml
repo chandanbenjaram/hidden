@@ -35,8 +35,12 @@
     <string name="enter_comment">enter your comment here...</string>
     <string name="enter_comment_actionLabel">Submit</string>
     <string name="profile_picture_desc">Profile picture</string>
-    <string name="welcome">Welcome to Gitkit Demo</string>
+    <string name="welcome_title">Welcome to SamePinch!</string>
+    <string name="welcome_sub_title">SamePinch is created by idealists who believe in new era of social networking where people engage with others on a wide variety of topics. Imagine a virtual wall where you can post anything you like (even as anonymous) and community is watching, learning and commenting.</string>
     <string name="sign_in_label">Sign in</string>
+    <string name="contd_sign_in_label">continue</string>
     <string name="manage_account_label">Manage account</string>
     <string name="sign_out_label">Sign out</string>
+
+    <string name="fb_app_id">1646195582278585</string>
 </resources>

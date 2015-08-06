@@ -2,16 +2,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:padding="16dp" >
+    android:padding="16dp"
+    android:gravity="center">
 
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:text="@string/welcome_title"-->
+        <!--style="@style/ViewText" />-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:text="@string/welcome_sub_title"
+        style="@style/SP_TagTextStyle"
+        android:autoText="false"
+        android:gravity="start" />
     <Button
         android:id="@+id/sign_in"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/menu_button_2x"
-        android:text="@string/sign_in_label"
-        android:textColor="@android:color/white" />
-
+        android:text="@string/contd_sign_in_label"
+        style="@style/ViewText"
+        android:textColor="@color/white_text"
+        android:background="@color/blue_700"/>
 </LinearLayout>
