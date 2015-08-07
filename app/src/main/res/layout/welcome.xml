@@ -72,7 +72,7 @@
 
     <fragment
         android:id="@+id/fb_fragment"
-        android:name="droid.samepinch.co.app.helpers.LoginFBFragment"
+        android:name="co.samepinch.android.app.helpers.LoginFBFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

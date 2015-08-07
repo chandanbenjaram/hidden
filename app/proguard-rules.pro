@@ -31,7 +31,7 @@
 # ButterKnife - End
 
 # SP specific
--keep public class droid.samepinch.co.app.PostDetailActivity {
+-keep public class co.samepinch.android.app.PostDetailActivity {
   public *;
 }
 

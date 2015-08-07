@@ -48,7 +48,7 @@
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
-        <droid.samepinch.co.app.helpers.widget.NullSafeRecylerView
+        <co.samepinch.android.app.helpers.widget.NullSafeRecylerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
