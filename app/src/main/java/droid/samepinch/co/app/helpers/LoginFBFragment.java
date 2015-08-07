@@ -1,15 +1,9 @@
 package droid.samepinch.co.app.helpers;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -55,13 +49,14 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
                         // App code
                     }
                 });
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login_fb, container, false);
-        ButterKnife.bind(this, view);
+        ButterKnife.bind(LoginFBFragment.this, view);
 
         loginButton.setReadPermissions("user_friends");
         // If using in a fragment
@@ -93,11 +88,4 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
 }

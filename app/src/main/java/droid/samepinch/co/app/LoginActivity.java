@@ -1,184 +1,251 @@
 package droid.samepinch.co.app;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.content.IntentSender;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.google.identitytoolkit.GitkitClient;
-import com.google.identitytoolkit.GitkitUser;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 
-import java.security.MessageDigest;
-import java.security.Signature;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class LoginActivity extends AppCompatActivity {
-    private GitkitClient client;
+public class LoginActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private static final int SIGN_IN_REQUEST_CODE = 10;
+    private static final int ERROR_DIALOG_REQUEST_CODE = 11;
+
+    @Bind(R.id.sign_in_button)
+    SignInButton signInButton;
+
+    @Bind(R.id.sign_out_button)
+    Button signOutButton;
+
+    // For communicating with Google APIs
+    private GoogleApiClient mGoogleApiClient;
+    private boolean mSignInClicked;
+    private boolean mIntentInProgress;
+    // contains all possible error codes for when a client fails to connect to
+    // Google Play services
+    private ConnectionResult mConnectionResult;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.welcome);
-//        Button button = (Button) findViewById(R.id.sign_in);
-//        button.setOnClickListener(this);
+        ButterKnife.bind(this);
+
+        // Initializing google plus api client
+        mGoogleApiClient = buildGoogleAPIClient();
     }
 
-    //    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//
-//        // Step 1: Create a GitkitClient.
-//        // The configurations are set in the AndroidManifest.xml. You can also set or overwrite them
-//        // by calling the corresponding setters on the GitkitClient builder.
-//        //
-//        client = GitkitClient.newBuilder(this, new GitkitClient.SignInCallbacks() {
-//            // Implement the onSignIn method of GitkitClient.SignInCallbacks interface.
-//            // This method is called when the sign-in process succeeds. A Gitkit IdToken and the signed
-//            // in account information are passed to the callback.
-//            @Override
-//            public void onSignIn(com.google.identitytoolkit.IdToken idToken, GitkitUser user) {
-//                showProfilePage(idToken, user);
-//                // Now use the idToken to create a session for your user.
-//                // To do so, you should exchange the idToken for either a Session Token or Cookie
-//                // from your server.
-//                // Finally, save the Session Token or Cookie to maintain your user's session.
-//            }
-//
-//            // Implement the onSignInFailed method of GitkitClient.SignInCallbacks interface.
-//            // This method is called when the sign-in process fails.
-//            @Override
-//            public void onSignInFailed() {
-//                Toast.makeText(LoginActivity.this, "Sign in failed", Toast.LENGTH_LONG).show();
-//            }
-//        }).build();
-//        showSignInPage();
-//    }
-//
-//
-//    // Step 3: Override the onActivityResult method.
-//    // When a result is returned to this activity, it is maybe intended for GitkitClient. Call
-//    // GitkitClient.handleActivityResult to check the result. If the result is for GitkitClient,
-//    // the method returns true to indicate the result has been consumed.
-//    //
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-//        if (!client.handleActivityResult(requestCode, resultCode, intent)) {
-//            super.onActivityResult(requestCode, resultCode, intent);
-//        }
-//    }
-//
-//
-//    // Step 4: Override the onNewIntent method.
-//    // When the app is invoked with an intent, it is possible that the intent is for GitkitClient.
-//    // Call GitkitClient.handleIntent to check it. If the intent is for GitkitClient, the method
-//    // returns true to indicate the intent has been consumed.
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        if (!client.handleIntent(intent)) {
-//            super.onNewIntent(intent);
-//        }
-//    }
-//
-//
-//    private void showSignInPage() {
-//        setContentView(R.layout.welcome);
-//        Button button = (Button) findViewById(R.id.sign_in);
-//        button.setOnClickListener(this);
-////
-////        callbackManager = CallbackManager.Factory.create();
-////
-////        LoginButton loginButton = (LoginButton) findViewById(R.id.fb_login_button);
-////        loginButton.setReadPermissions("user_friends");
-////        // If using in a fragment
-//////        loginButton.setFragment(this);
-////        // Other app specific specialization
-////
-////        // Callback registration
-////        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-////            @Override
-////            public void onSuccess(LoginResult loginResult) {
-////                System.out.println("onSuccess...");
-////            }
-////
-////            @Override
-////            public void onCancel() {
-////                System.out.println("onCancel...");
-////            }
-////
-////            @Override
-////            public void onError(FacebookException exception) {
-////                System.out.println("onError...");
-////            }
-////        });
-//
-////        client.startSignIn();
-//    }
-//
-//
-//    private void showProfilePage(com.google.identitytoolkit.IdToken idToken, GitkitUser user) {
-//        setContentView(R.layout.profile);
-//        showAccount(user);
-//        findViewById(R.id.sign_out).setOnClickListener(this);
-//    }
-//
-//
-//    // Step 5: Respond to user actions.
-//    // If the user clicks sign in, call GitkitClient.startSignIn() to trigger the sign in flow.
-//
-//    @Override
-//    public void onClick(View v) {
-//        if (v.getId() == R.id.sign_in) {
-//            client.startSignIn();
-//        } else if (v.getId() == R.id.sign_out) {
-//            showSignInPage();
-//        }
-//    }
-//
-//
-//    private void showAccount(GitkitUser user) {
-//        ((TextView) findViewById(R.id.account_email)).setText(user.getEmail());
-//
-//        if (user.getDisplayName() != null) {
-//            ((TextView) findViewById(R.id.account_name)).setText(user.getDisplayName());
-//        }
-//
-//        if (user.getPhotoUrl() != null) {
-//            final ImageView pictureView = (ImageView) findViewById(R.id.account_picture);
-////            new AsyncTask<String, Void, Bitmap>() {
-////
-////                @Override
-////                protected Bitmap doInBackground(String... arg) {
-////                    try {
-////                        byte[] result = HttpUtils.get(arg[0]);
-////                        return BitmapFactory.decodeByteArray(result, 0, result.length);
-////                    } catch (IOException e) {
-////                        return null;
-////                    }
-////                }
-////
-////                @Override
-////                protected void onPostExecute(Bitmap bitmap) {
-////                    if (bitmap != null) {
-////                        pictureView.setImageBitmap(bitmap);
-////                    }
-////                }
-////            }.execute(user.getPhotoUrl());
-//        }
-//    }
+    /**
+     * API to return GoogleApiClient Make sure to create new after revoking
+     * access or for first time sign in
+     *
+     * @return
+     */
+    private GoogleApiClient buildGoogleAPIClient() {
+        return new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API, Plus.PlusOptions.builder().build())
+                .addScope(Plus.SCOPE_PLUS_LOGIN).build();
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // make sure to initiate connection
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // disconnect api if it is connected
+        if (mGoogleApiClient.isConnected())
+            mGoogleApiClient.disconnect();
+    }
+
+
+    /**
+     * API to update layout views based upon user signed in status
+     *
+     * @param isUserSignedIn
+     */
+    private void processUIUpdate(boolean isUserSignedIn) {
+        if (isUserSignedIn) {
+            signInButton.setVisibility(View.GONE);
+            signOutButton.setVisibility(View.VISIBLE);
+        } else {
+            signInButton.setVisibility(View.VISIBLE);
+            signOutButton.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Handle results for your startActivityForResult() calls. Use requestCode
+     * to differentiate.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SIGN_IN_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                mSignInClicked = false;
+            }
+
+            mIntentInProgress = false;
+
+            if (!mGoogleApiClient.isConnecting()) {
+                mGoogleApiClient.connect();
+            }
+        }
+
+    }
+
+
+
+    @OnClick(R.id.sign_out_button)
+    public void processSignOut() {
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            mGoogleApiClient.disconnect();
+            mGoogleApiClient.connect();
+            processUIUpdate(false);
+        }
+
+    }
+
+    @OnClick(R.id.sign_in_button)
+    public void processSignIn() {
+        if (!mGoogleApiClient.isConnecting()) {
+            processSignInError();
+            mSignInClicked = true;
+        }
+    }
+
+    /**
+     * API to process sign in error Handle error based on ConnectionResult
+     */
+    private void processSignInError() {
+        if (mConnectionResult != null && mConnectionResult.hasResolution()) {
+            try {
+                mIntentInProgress = true;
+                mConnectionResult.startResolutionForResult(this,
+                        SIGN_IN_REQUEST_CODE);
+            } catch (IntentSender.SendIntentException e) {
+                mIntentInProgress = false;
+                mGoogleApiClient.connect();
+            }
+        }
+    }
+
+    /**
+     * Callback for GoogleApiClient connection failure
+     */
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        if (!result.hasResolution()) {
+            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
+                    ERROR_DIALOG_REQUEST_CODE).show();
+            return;
+        }
+        if (!mIntentInProgress) {
+            mConnectionResult = result;
+
+            if (mSignInClicked) {
+                processSignInError();
+            }
+        }
+
+    }
+
+    /**
+     * Callback for GoogleApiClient connection success
+     */
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        mSignInClicked = false;
+        Toast.makeText(getApplicationContext(), "Signed In Successfully",
+                Toast.LENGTH_LONG).show();
+
+        processUserInfoAndUpdateUI();
+
+        processUIUpdate(true);
+
+    }
+
+    /**
+     * Callback for suspension of current connection
+     */
+    @Override
+    public void onConnectionSuspended(int cause) {
+        mGoogleApiClient.connect();
+
+    }
+
+    /**
+     * API to update signed in user information
+     */
+    private void processUserInfoAndUpdateUI() {
+        Person signedInUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        if (signedInUser != null) {
+//
+//            if (signedInUser.hasDisplayName()) {
+//                String userName = signedInUser.getDisplayName();
+//                this.userName.setText("Name: " + userName);
+//            }
+//
+//            if (signedInUser.hasTagline()) {
+//                String tagLine = signedInUser.getTagline();
+//                this.userTagLine.setText("TagLine: " + tagLine);
+//                this.userTagLine.setVisibility(View.VISIBLE);
+//            }
+//
+//            if (signedInUser.hasAboutMe()) {
+//                String aboutMe = signedInUser.getAboutMe();
+//                this.userAboutMe.setText("About Me: " + aboutMe);
+//                this.userAboutMe.setVisibility(View.VISIBLE);
+//            }
+//
+//            if (signedInUser.hasBirthday()) {
+//                String birthday = signedInUser.getBirthday();
+//                this.userBirthday.setText("DOB " + birthday);
+//                this.userBirthday.setVisibility(View.VISIBLE);
+//            }
+//
+//            if (signedInUser.hasCurrentLocation()) {
+//                String userLocation = signedInUser.getCurrentLocation();
+//                this.userLocation.setText("Location: " + userLocation);
+//                this.userLocation.setVisibility(View.VISIBLE);
+//            }
+//
+//            String userEmail = Plus.AccountApi.getAccountName(mGoogleApiClient);
+//            this.userEmail.setText("Email: " + userEmail);
+//
+//            if (signedInUser.hasImage()) {
+//                String userProfilePicUrl = signedInUser.getImage().getUrl();
+//                // default size is 50x50 in pixels.changes it to desired size
+//                int profilePicRequestSize = 250;
+//
+//                userProfilePicUrl = userProfilePicUrl.substring(0,
+//                        userProfilePicUrl.length() - 2) + profilePicRequestSize;
+//                new UpdateProfilePicTask(userProfilePic)
+//                        .execute(userProfilePicUrl);
+//            }
+
+        }
+    }
 }

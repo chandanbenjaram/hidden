@@ -34,8 +34,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.facebook.FacebookSdk;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.squareup.otto.Subscribe;
 
 import java.util.Map;
