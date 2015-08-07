@@ -32,8 +32,9 @@
         android:text="@string/contd_sign_in_label"
         android:textColor="@color/white_text" />
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/fb_login_button"
+    <fragment
+        android:id="@+id/fb_fragment"
+        android:name="droid.samepinch.co.app.helpers.LoginFBFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
