@@ -1,10 +1,14 @@
 package co.samepinch.android.app.helpers;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -17,11 +21,13 @@ import butterknife.ButterKnife;
 import co.samepinch.android.app.R;
 
 public class LoginFBFragment extends android.support.v4.app.Fragment {
+    public static final String LOG_TAG = "DotWallFragment";
 
     @Bind(R.id.fb_login_button)
     LoginButton loginButton;
 
     CallbackManager callbackManager;
+    private AccessTokenTracker accessTokenTracker;
 
     public LoginFBFragment() {
     }
@@ -29,6 +35,14 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
+                                                       AccessToken currentAccessToken) {
+//                fetchUserInfo();
+//                updateUI();
+            }
+        };
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -36,20 +50,19 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        // App code
+                        Log.v(LOG_TAG, "success");
                     }
 
                     @Override
                     public void onCancel() {
-                        // App code
+                        Log.v(LOG_TAG, "cancel");
                     }
 
                     @Override
                     public void onError(FacebookException exception) {
-                        // App code
+                        Log.v(LOG_TAG, "error");
                     }
                 });
-
     }
 
     @Override
@@ -60,32 +73,46 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
         loginButton.setReadPermissions("user_friends");
         // If using in a fragment
-        loginButton.setFragment(this);
+        loginButton.setFragment(LoginFBFragment.this);
         // Other app specific specialization
 
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                System.out.println("onSuccess...");
+                Log.v(LOG_TAG, "success");
             }
 
             @Override
             public void onCancel() {
-                System.out.println("onCancel...");
+                Log.v(LOG_TAG, "cancel");
             }
 
             @Override
             public void onError(FacebookException exception) {
-                System.out.println("onError...");
+                Log.v(LOG_TAG, "error");
             }
         });
         return view;
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setRetainInstance(true);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
+        accessTokenTracker.stopTracking();
+
         ButterKnife.unbind(this);
     }
 }

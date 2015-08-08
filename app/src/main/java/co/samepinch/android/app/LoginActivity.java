@@ -36,34 +36,17 @@ public class LoginActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private boolean mSignInClicked;
     private boolean mIntentInProgress;
-    // contains all possible error codes for when a client fails to connect to
-    // Google Play services
+
     private ConnectionResult mConnectionResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome);
-        ButterKnife.bind(this);
+        ButterKnife.bind(LoginActivity.this);
 
         // Initializing google plus api client
         mGoogleApiClient = buildGoogleAPIClient();
-    }
-
-    /**
-     * API to return GoogleApiClient Make sure to create new after revoking
-     * access or for first time sign in
-     *
-     * @return
-     */
-    private GoogleApiClient buildGoogleAPIClient() {
-        return new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addScope(Plus.SCOPE_PLUS_PROFILE)
-                .build();
     }
 
     @Override
@@ -81,7 +64,6 @@ public class LoginActivity extends AppCompatActivity implements
             mGoogleApiClient.disconnect();
     }
 
-
     /**
      * API to update layout views based upon user signed in status
      *
@@ -92,6 +74,8 @@ public class LoginActivity extends AppCompatActivity implements
             signInButton.setVisibility(View.GONE);
             signOutButton.setVisibility(View.VISIBLE);
         } else {
+
+            this.onActivityResult(0, 0, null);
             signInButton.setVisibility(View.VISIBLE);
             signOutButton.setVisibility(View.GONE);
         }
@@ -117,9 +101,8 @@ public class LoginActivity extends AppCompatActivity implements
             }
         }
 
+        finish();
     }
-
-
 
     @OnClick(R.id.sign_out_button)
     public void processSignOut() {
@@ -129,7 +112,6 @@ public class LoginActivity extends AppCompatActivity implements
             mGoogleApiClient.connect();
             processUIUpdate(false);
         }
-
     }
 
     @OnClick(R.id.sign_in_button)
@@ -140,14 +122,11 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    /**
-     * API to process sign in error Handle error based on ConnectionResult
-     */
     private void processSignInError() {
         if (mConnectionResult != null && mConnectionResult.hasResolution()) {
             try {
                 mIntentInProgress = true;
-                mConnectionResult.startResolutionForResult(this,
+                mConnectionResult.startResolutionForResult(LoginActivity.this,
                         SIGN_IN_REQUEST_CODE);
             } catch (IntentSender.SendIntentException e) {
                 mIntentInProgress = false;
@@ -168,12 +147,10 @@ public class LoginActivity extends AppCompatActivity implements
         }
         if (!mIntentInProgress) {
             mConnectionResult = result;
-
             if (mSignInClicked) {
                 processSignInError();
             }
         }
-
     }
 
     /**
@@ -182,13 +159,9 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle connectionHint) {
         mSignInClicked = false;
-        Toast.makeText(getApplicationContext(), "Signed In Successfully",
-                Toast.LENGTH_LONG).show();
 
         processUserInfoAndUpdateUI();
-
         processUIUpdate(true);
-
     }
 
     /**
@@ -197,12 +170,18 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
-
     }
 
-    /**
-     * API to update signed in user information
-     */
+    private GoogleApiClient buildGoogleAPIClient() {
+        return new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
+                .build();
+    }
+
     private void processUserInfoAndUpdateUI() {
         Person signedInUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
         if (signedInUser != null) {

@@ -51,10 +51,7 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-
-
     Adapter adapterViewPager;
-
 
     @Override
     public void onResume() {
