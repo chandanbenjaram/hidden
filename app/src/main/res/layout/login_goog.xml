@@ -42,7 +42,6 @@
         android:layout_marginBottom="20dip"
         android:text="status" />
 
-
     <TextView
         android:id="@+id/circles_title"
         android:layout_width="wrap_content"

@@ -61,9 +61,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        BusProvider.INSTANCE.getBus().unregister(this);
     }
 
     @Subscribe
@@ -198,7 +204,30 @@ public class MainActivity extends AppCompatActivity {
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return position == 0? AppConstants.K.Wall.name(): "";
+            return position == 0 ? AppConstants.K.Wall.name() : "";
         }
     }
+
+    @Subscribe
+    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                invalidateOptionsMenu();
+            }
+        });
+    }
+
+    @Subscribe
+    public void onAuthFailEvent(final Events.AuthFailEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                invalidateOptionsMenu();
+            }
+        });
+    }
+
 }

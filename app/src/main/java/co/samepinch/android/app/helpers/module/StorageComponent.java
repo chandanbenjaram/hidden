@@ -2,6 +2,7 @@ package co.samepinch.android.app.helpers.module;
 
 import javax.inject.Singleton;
 
+import co.samepinch.android.rest.ReqLogin;
 import dagger.Component;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqPosts;
@@ -14,5 +15,6 @@ import co.samepinch.android.rest.ReqPosts;
 public interface StorageComponent {
     ReqPosts provideReqPosts();
     User provideAnonymousDot();
+    ReqLogin provideReqLogin();
 
 }

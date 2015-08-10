@@ -24,16 +24,26 @@ public class Events {
         }
     }
 
-
     public static class TagRefreshedEvent extends EventBase {
         public TagRefreshedEvent(Map<String, String> metaData) {
             super(metaData);
         }
     }
 
-
     public static class PostDetailsRefreshEvent extends EventBase {
         public PostDetailsRefreshEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
+    public static class AuthSuccessEvent extends EventBase {
+        public AuthSuccessEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
+    public static class AuthFailEvent extends EventBase {
+        public AuthFailEvent(Map<String, String> metaData) {
             super(metaData);
         }
     }

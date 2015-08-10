@@ -47,7 +47,7 @@ public class PostListFragment extends Fragment {
     public static final String LOG_TAG = "PostListFragment";
 
     PostCursorRecyclerViewAdapter mViewAdapter;
-    private Intent mServiceIntent;
+
     private LinearLayoutManager mLayoutManager;
     FragmentActivity activity;
 
@@ -123,7 +123,7 @@ public class PostListFragment extends Fragment {
         }
 
         // call for intent
-        mServiceIntent =
+        Intent mServiceIntent =
                 new Intent(activity, PostsPullService.class);
         mServiceIntent.putExtras(iArgs);
         activity.startService(mServiceIntent);
