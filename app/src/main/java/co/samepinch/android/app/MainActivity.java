@@ -30,9 +30,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
+import android.widget.HeaderViewListAdapter;
+import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
 
@@ -51,13 +56,16 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
     Adapter adapterViewPager;
+    transient volatile boolean isLoggedIn;
+
 
     @Override
     public void onResume() {
         super.onResume();
         // register to event bus
-        BusProvider.INSTANCE.getBus().register(this);
+//        BusProvider.INSTANCE.getBus().register(this);
     }
 
     @Override
@@ -81,9 +89,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Fresco.initialize(getApplicationContext());
-//        Utils.PreferencesManager.initializeInstance(this);
-//        FacebookSdk.sdkInitialize(getApplicationContext());
+        BusProvider.INSTANCE.getBus().register(this);
 
         setContentView(R.layout.activity_main);
 
@@ -96,10 +102,9 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
-        }
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        setupDrawerContent(mNavigationView);
+
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         if (viewPager != null) {
@@ -162,17 +167,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(adapterViewPager);
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
-                        return true;
-                    }
-                });
-    }
 
     // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
     static class Adapter extends SmartFragmentStatePagerAdapter {
@@ -208,26 +202,66 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    }
+                });
+    }
+
+
     @Subscribe
     public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
+        isLoggedIn = Boolean.TRUE;
+
         Map<String, String> eventData = event.getMetaData();
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                invalidateOptionsMenu();
+                FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
+                headerWrapper.removeAllViews();
+                LayoutInflater.from(getApplicationContext()).inflate(R.layout.nav_header_logged_in, headerWrapper);
+
+                Menu navMenu = mNavigationView.getMenu();
+                navMenu.clear();
+                getMenuInflater().inflate(R.menu.drawer_view_logged_in, navMenu);
+                notifyDrawerContentChange(mNavigationView);
             }
         });
     }
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
+        isLoggedIn = Boolean.FALSE;
         Map<String, String> eventData = event.getMetaData();
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                invalidateOptionsMenu();
+                FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
+                headerWrapper.removeAllViews();
+
+                Menu navMenu = mNavigationView.getMenu();
+                navMenu.clear();
+                getMenuInflater().inflate(R.menu.drawer_view, navMenu);
+                notifyDrawerContentChange(mNavigationView);
             }
         });
     }
 
+    private void notifyDrawerContentChange(NavigationView navigationView) {
+        for (int i = 0, count = navigationView.getChildCount(); i < count; i++) {
+            final View child = navigationView.getChildAt(i);
+            if (child != null && child instanceof ListView) {
+                final ListView menuView = (ListView) child;
+                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
+                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
+                wrapped.notifyDataSetChanged();
+            }
+        }
+    }
 }

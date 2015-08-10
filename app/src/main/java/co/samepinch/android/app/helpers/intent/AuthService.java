@@ -75,24 +75,12 @@ public class AuthService extends IntentService {
                 }
             }
 
-            System.out.println("resp..." + resp);
-            // publish this event
-//            Map<String, String> metaData = new HashMap<>();
-//            RespPosts.Body respBody = null;
-//            metaData.put(KEY_LAST_MODIFIED.getValue(), respBody.getLastModifiedStr());
-//            metaData.put(KEY_ETAG.getValue(), respBody.getEtag());
-//            metaData.put(KEY_POST_COUNT.getValue(), String.valueOf(respBody.getPostCount()));
-//
-//            ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());
-//            if(ops != null){
-//                ContentProviderResult[] result = getContentResolver().
-//                        applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
-//                BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
-//            }
-
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
         } catch (Exception e) {
 //            e.printStackTrace();
+            // get rid of auth session
+            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
             BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(null));
         }
     }

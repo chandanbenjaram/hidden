@@ -8,6 +8,7 @@ public class AppConstants {
     public enum API {
         SHARED_PREFS_NAME("co.samepinch.android.app.pref"),
         ACCESS_TOKEN("access_token"),
+        PREF_AUTH_USER("auth.user"),
         PREF_POSTS_LIST("posts.lists"),
         DEFAULT_DATE_FORMAT("MM/dd/yyyy hh:mma"),
 
