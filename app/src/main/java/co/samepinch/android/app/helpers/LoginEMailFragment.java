@@ -1,6 +1,7 @@
 package co.samepinch.android.app.helpers;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
@@ -18,6 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.SignupActivity;
 import co.samepinch.android.app.helpers.intent.AuthService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
@@ -27,7 +30,6 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSW
 
 public class LoginEMailFragment extends android.support.v4.app.Fragment {
     public static final String LOG_TAG = "LoginEMailFragment";
-    AppCompatActivity activity;
     View mView;
 
     @Bind(R.id.input_email)
@@ -36,14 +38,14 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     @Bind(R.id.input_password)
     EditText mPasswordView;
 
-
     @Bind(R.id.btn_login)
     Button mLoginButton;
+
+    ProgressDialog progressDialog;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (AppCompatActivity) activity;
     }
 
     @Override
@@ -68,9 +70,25 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     @OnClick(R.id.btn_login)
     public void onLogin() {
         //call to authenticate
-        mEmailIdView.setEnabled(false);
-        mPasswordView.setEnabled(false);
+        if (!validate()) {
+            onLogInFail();
+            return;
+        }
+
+        progressDialog = new ProgressDialog(getActivity(),
+                R.style.Theme_AppCompat_Light_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("authenticating...");
+        progressDialog.show();
+
+        mLoginButton.setEnabled(Boolean.FALSE);
         callForAuth();
+    }
+
+    @OnClick(R.id.link_signup)
+    public void onSignup() {
+        Intent intent = new Intent(getActivity().getApplicationContext(), SignupActivity.class);
+        startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
     }
 
     private void callForAuth() {
@@ -81,34 +99,59 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
 
         // call for intent
         Intent mServiceIntent =
-                new Intent(activity, AuthService.class);
+                new Intent(getActivity(), AuthService.class);
         mServiceIntent.putExtras(iArgs);
-        activity.startService(mServiceIntent);
+        getActivity().startService(mServiceIntent);
     }
 
     @Subscribe
     public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
         Map<String, String> eventData = event.getMetaData();
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mLoginButton.setText("logout");
-            }
-        });
+        if(progressDialog !=null){
+            progressDialog.dismiss();
+        }
+       getActivity().finish();
     }
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
         Map<String, String> eventData = event.getMetaData();
-        activity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEmailIdView.setEnabled(true);
-                mPasswordView.setEnabled(true);
-                mLoginButton.setText("login");
+                onLogInFail();
             }
         });
+    }
+
+    private void onLogInFail(){
+        if(progressDialog !=null){
+            progressDialog.dismiss();
+        }
+        mLoginButton.setEnabled(Boolean.TRUE);
+    }
+
+    public boolean validate() {
+        boolean valid = true;
+
+        String email = mEmailIdView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mEmailIdView.setError("enter a valid email address");
+            valid = false;
+        } else {
+            mEmailIdView.setError(null);
+        }
+
+        if (password.isEmpty() || password.length() < 6) {
+            mPasswordView.setError("minimum 6 characters long");
+            valid = false;
+        } else {
+            mPasswordView.setError(null);
+        }
+
+        return valid;
     }
 
     @Override

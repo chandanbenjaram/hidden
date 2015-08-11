@@ -32,6 +32,8 @@
         <activity android:name=".PostDetailActivity" />
         <activity android:name=".ActivityFragment" />
         <activity android:name=".LoginActivity" />
+        <activity android:name=".SignupActivity" />
+
 
         <provider
             android:name="co.samepinch.android.data.dao.SPContentProvider"

@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
     <!--  Email Label -->
     <android.support.design.widget.TextInputLayout
@@ -45,10 +45,8 @@
 
     <TextView
         android:id="@+id/link_signup"
-        android:layout_width="fill_parent"
+        android:textColorLink="@color/blue_700"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="center"
-        android:text="No account yet? Create one"
-        android:textSize="16dip" />
+        android:text="No account yet? Create one" />
 </LinearLayout>

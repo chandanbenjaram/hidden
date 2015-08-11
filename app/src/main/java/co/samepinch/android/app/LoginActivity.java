@@ -15,6 +15,7 @@ import com.google.android.gms.plus.model.people.Person;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import co.samepinch.android.app.helpers.AppConstants;
 
 public class LoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -56,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         // disconnect api if it is connected
-        if (mGoogleApiClient.isConnected()){
+        if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
     }
@@ -90,18 +91,18 @@ public class LoginActivity extends AppCompatActivity implements
             if (resultCode != RESULT_OK) {
                 mSignInClicked = false;
             }
-
             mIntentInProgress = false;
-
             if (!mGoogleApiClient.isConnecting()) {
                 mGoogleApiClient.connect();
             }
+        } else if (requestCode == AppConstants.KV.REQUEST_SIGNUP.getIntValue()) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
         }
-
-        //finish();
     }
 
-//    @OnClick(R.id.sign_out_button)
+    //    @OnClick(R.id.sign_out_button)
     public void processSignOut() {
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);

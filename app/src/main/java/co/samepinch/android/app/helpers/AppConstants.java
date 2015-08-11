@@ -73,6 +73,7 @@ public class AppConstants {
         CLIENT_SECRET("client_secret", "813c95cc2eb6c0cf4f49d30d0add0c6fc3ea82863d30507beb6733c0e643927c"),
         SCOPE("scope", "imsocl"),
         PLATFORM("platform", "android"),
+        REQUEST_SIGNUP("REQUEST_SIGNUP", "108")
         ;
 
         private final String key, value;
@@ -107,6 +108,6 @@ public class AppConstants {
         Wall,
         POST,
         facebook,
-        provider,
+        provider
     }
 }
