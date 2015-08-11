@@ -8,6 +8,7 @@ import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqLogin;
 import co.samepinch.android.rest.ReqPosts;
+import co.samepinch.android.rest.ReqSetBody;
 import dagger.Module;
 import dagger.Provides;
 
@@ -43,6 +44,12 @@ public class DataModule {
         instance.setPlatform(AppConstants.KV.PLATFORM.getValue());
         instance.setDeviceToken(AppConstants.KV.CLIENT_SECRET.getValue());
 
+        return instance;
+    }
+
+    @Provides
+    ReqSetBody provideReqSetBody() {
+        ReqSetBody instance = new ReqSetBody();
         return instance;
     }
 

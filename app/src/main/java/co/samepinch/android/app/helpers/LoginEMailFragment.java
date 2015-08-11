@@ -26,18 +26,18 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
 public class LoginEMailFragment extends android.support.v4.app.Fragment {
-    public static final String LOG_TAG = "DotWallFragment";
+    public static final String LOG_TAG = "LoginEMailFragment";
     AppCompatActivity activity;
     View mView;
 
-    @Bind(R.id.email_id)
+    @Bind(R.id.input_email)
     EditText mEmailIdView;
 
-    @Bind(R.id.password_id)
+    @Bind(R.id.input_password)
     EditText mPasswordView;
 
 
-    @Bind(R.id.button_login)
+    @Bind(R.id.btn_login)
     Button mLoginButton;
 
     @Override
@@ -65,7 +65,7 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
 //        super.onActivityResult(requestCode, resultCode, data);
 //    }
 
-    @OnClick(R.id.button_login)
+    @OnClick(R.id.btn_login)
     public void onLogin() {
         //call to authenticate
         mEmailIdView.setEnabled(false);

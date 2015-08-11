@@ -2,7 +2,6 @@ package co.samepinch.android.app.helpers;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,29 +9,23 @@ import android.view.ViewGroup;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.Profile;
-import com.facebook.ProfileTracker;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.squareup.otto.Subscribe;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.intent.AuthService;
 import co.samepinch.android.app.helpers.intent.FBAuthService;
-
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
+import co.samepinch.android.app.helpers.intent.SignOutService;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 
 public class LoginFBFragment extends android.support.v4.app.Fragment {
     public static final String LOG_TAG = "LoginFBFragment";
@@ -55,8 +48,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
                                                        AccessToken currentAccessToken) {
                 fetchUserInfo();
-//                updateUI();
-
             }
         };
 
@@ -83,11 +74,13 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         System.out.println("fetching fb user...");
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null) {
-            // logout user
+            // call for intent
+            Intent mServiceIntent =
+                    new Intent(getActivity(), SignOutService.class);
+            getActivity().startService(mServiceIntent);
             return;
         }
         // login user
-
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject user, GraphResponse response) {
@@ -111,16 +104,50 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    @Subscribe
+    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            }
+        });
+    }
+
+    @Subscribe
+    public void onAuthFailEvent(final Events.AuthFailEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            }
+        });
+    }
+
+    @Subscribe
+    public void onAuthOutEvent(final Events.AuthOutEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            }
+        });
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        BusProvider.INSTANCE.getBus().register(this);
+
         setRetainInstance(true);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(accessTokenTracker.isTracking()){
+        if (accessTokenTracker.isTracking()) {
             accessTokenTracker.stopTracking();
         }
     }
@@ -129,5 +156,11 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 }

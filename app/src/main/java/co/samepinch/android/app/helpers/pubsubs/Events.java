@@ -42,6 +42,12 @@ public class Events {
         }
     }
 
+    public static class AuthOutEvent extends EventBase {
+        public AuthOutEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
     public static class AuthFailEvent extends EventBase {
         public AuthFailEvent(Map<String, String> metaData) {
             super(metaData);

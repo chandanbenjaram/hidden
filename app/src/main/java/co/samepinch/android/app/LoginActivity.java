@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -27,8 +25,8 @@ public class LoginActivity extends AppCompatActivity implements
     @Bind(R.id.sign_in_button)
     SignInButton signInButton;
 
-    @Bind(R.id.sign_out_button)
-    Button signOutButton;
+//    @Bind(R.id.sign_out_button)
+//    Button signOutButton;
 
     // For communicating with Google APIs
     private GoogleApiClient mGoogleApiClient;
@@ -40,7 +38,7 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.welcome);
+        setContentView(R.layout.login);
         ButterKnife.bind(LoginActivity.this);
 
         // Initializing google plus api client
@@ -58,8 +56,9 @@ public class LoginActivity extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         // disconnect api if it is connected
-        if (mGoogleApiClient.isConnected())
+        if (mGoogleApiClient.isConnected()){
             mGoogleApiClient.disconnect();
+        }
     }
 
     /**
@@ -69,13 +68,13 @@ public class LoginActivity extends AppCompatActivity implements
      */
     private void processUIUpdate(boolean isUserSignedIn) {
         if (isUserSignedIn) {
-            signInButton.setVisibility(View.GONE);
-            signOutButton.setVisibility(View.VISIBLE);
+//            signInButton.setVisibility(View.GONE);
+//            signOutButton.setVisibility(View.VISIBLE);
         } else {
 
             this.onActivityResult(0, 0, null);
-            signInButton.setVisibility(View.VISIBLE);
-            signOutButton.setVisibility(View.GONE);
+//            signInButton.setVisibility(View.VISIBLE);
+//            signOutButton.setVisibility(View.GONE);
         }
     }
 
@@ -102,7 +101,7 @@ public class LoginActivity extends AppCompatActivity implements
         //finish();
     }
 
-    @OnClick(R.id.sign_out_button)
+//    @OnClick(R.id.sign_out_button)
     public void processSignOut() {
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);

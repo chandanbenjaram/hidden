@@ -9,6 +9,7 @@ public class AppConstants {
         SHARED_PREFS_NAME("co.samepinch.android.app.pref"),
         ACCESS_TOKEN("access_token"),
         PREF_AUTH_USER("auth.user"),
+        PREF_AUTH_PROVIDER("auth.provider"),
         PREF_POSTS_LIST("posts.lists"),
         DEFAULT_DATE_FORMAT("MM/dd/yyyy hh:mma"),
 
@@ -16,6 +17,7 @@ public class AppConstants {
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         POSTS_WITH_FILTER(BASE.getValue().concat("api/v2/posts")),
         USERS(BASE.getValue().concat("api/users")),
+        USERS_EXT(BASE.getValue().concat("api/v2/users")),
         POSTS(BASE.getValue().concat("api/posts")),
         GROUPS(BASE.getValue().concat("api/groups")),
         CONTENT_AUTHORITY("co.samepinch.android.app");
@@ -103,6 +105,8 @@ public class AppConstants {
         KEY_TAG,
         KEY_DOT,
         Wall,
-        POST
+        POST,
+        facebook,
+        provider,
     }
 }

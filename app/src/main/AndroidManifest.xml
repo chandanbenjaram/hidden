@@ -48,9 +48,14 @@
         <service
             android:name=".helpers.intent.PostDetailsService"
             android:exported="false" />
-
+        <service
+            android:name=".helpers.intent.FBAuthService"
+            android:exported="false" />
         <service
             android:name=".helpers.intent.AuthService"
+            android:exported="false" />
+        <service
+            android:name=".helpers.intent.SignOutService"
             android:exported="false" />
 
         <meta-data

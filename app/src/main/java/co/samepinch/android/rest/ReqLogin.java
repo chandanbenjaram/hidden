@@ -15,7 +15,6 @@ public class ReqLogin extends RestBase<Map<String, String>> {
     transient String platform;
 
     @Override
-
     public Map<String, String> getBody() {
         return body;
     }

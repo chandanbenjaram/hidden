@@ -1,14 +1,10 @@
 package co.samepinch.android.app.helpers.intent;
 
-import android.animation.TypeConverter;
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Bundle;
-
-import com.facebook.AccessToken;
-import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
@@ -26,28 +24,26 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.rest.ReqLogin;
+import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.RespLogin;
 import co.samepinch.android.rest.RestClient;
-
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
 /**
  * Created by imaginationcoder on 6/26/15.
  */
 public class FBAuthService extends IntentService {
-    public static final String LOG_TAG = "AuthService";
+    public static final String LOG_TAG = "FBAuthService";
 
     public FBAuthService() {
-        super("AuthService");
+        super("FBAuthService");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.facebook.name());
 
         StorageComponent component = DaggerStorageComponent.create();
-        ReqLogin loginReq = component.provideReqLogin();
+        ReqSetBody loginReq = component.provideReqSetBody();
 
         //headers
         HttpHeaders headers = new HttpHeaders();
@@ -55,35 +51,28 @@ public class FBAuthService extends IntentService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
             JSONObject userObj = new JSONObject(intent.getStringExtra("user"));
-            String uid = userObj.getString("id");
-            String fName = userObj.getString("first_name");
-            String lName = userObj.getString("last_name");
-            String email = userObj.getString("email");
+            Map<String, String> reqBody = toBodyPayload(userObj);
+            loginReq.setBody(reqBody);
 
-            String name = userObj.getString("email");
-            String pinchHandle = StringUtils.strip(name, "");
-
-
-            Bundle iArgs = intent.getExtras();
             // set base args
-            loginReq.setToken(Utils.getAppToken(false));
-            loginReq.setCmd("signIn");
-            // set context args
-            loginReq.setEmail(iArgs.getString("user"));
+            String token = Utils.getAppToken(false);
+            if(StringUtils.isBlank(token)){
+                token = Utils.getAppToken(true);
+            }
+            loginReq.setToken(token);
+            loginReq.setCmd("externalSignIn");
 
-
-            HttpEntity<ReqLogin> payloadEntity;
+            HttpEntity<ReqSetBody> payloadEntity;
             ResponseEntity<RespLogin> resp = null;
             try {
                 // call remote
-                payloadEntity = new HttpEntity<>(loginReq.build(), headers);
-                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
-
+                payloadEntity = new HttpEntity<>(loginReq, headers);
+                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
             } catch (HttpStatusCodeException e) {
                 if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                     // try resetting token?
                     loginReq.setToken(Utils.getAppToken(true));
-                    payloadEntity = new HttpEntity<>(loginReq.build(), headers);
+                    payloadEntity = new HttpEntity<>(loginReq, headers);
                     resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
                 } else {
                     throw new IllegalStateException("un-known response code.", e);
@@ -95,8 +84,21 @@ public class FBAuthService extends IntentService {
         } catch (Exception e) {
 //            e.printStackTrace();
             // get rid of auth session
+            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
             Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
             BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(null));
         }
+    }
+
+    private Map<String, String> toBodyPayload(JSONObject arg0) throws JSONException{
+        Map<String, String> body = new HashMap<>();
+        body.put(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
+        body.put("oauth_uid", Utils.emptyIfNull(arg0.getString("id")));
+        body.put("fname", Utils.emptyIfNull(arg0.getString("first_name")));
+        body.put("lname", Utils.emptyIfNull(arg0.getString("last_name")));
+        body.put("email", Utils.emptyIfNull(arg0.getString("email")));
+        body.put("pinch_handle", StringUtils.deleteWhitespace(arg0.getString("name")));
+        body.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
+        return body;
     }
 }
