@@ -22,3 +22,6 @@ Gapps(v2-4) - http://goo.gl/0aPPhx
 
 
 Gapps for v5(Lollipop) - http://goo.gl/0zOqQq
+
+
+https://github.com/sourcey/materiallogindemo/blob/master/app/src/main/java/com/sourcey/materiallogindemo/LoginActivity.java
