@@ -51,4 +51,6 @@
     <string name="close">Close</string>
     <string name="status_signed_out">Signed out</string>
     <string name="play_services_error">Google Play services is not available.  This application will close.</string>
+    <string name="signin_with_google">Sign in with Google</string>
+    <string name="signin_with_fb">Sign in with Facebook</string>
 </resources>

@@ -23,8 +23,8 @@ public class LoginActivity extends AppCompatActivity implements
     private static final int SIGN_IN_REQUEST_CODE = 10;
     private static final int ERROR_DIALOG_REQUEST_CODE = 11;
 
-    @Bind(R.id.sign_in_button)
-    SignInButton signInButton;
+    @Bind(R.id.btn_signin_google)
+    SignInButton gSignInButton;
 
 //    @Bind(R.id.sign_out_button)
 //    Button signOutButton;
@@ -42,6 +42,8 @@ public class LoginActivity extends AppCompatActivity implements
         setContentView(R.layout.login);
         ButterKnife.bind(LoginActivity.this);
 
+        gSignInButton.setSize(SignInButton.SIZE_WIDE);
+//        gSignInButton.setColorScheme();
         // Initializing google plus api client
         mGoogleApiClient = buildGoogleAPIClient();
     }
@@ -112,7 +114,7 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    @OnClick(R.id.sign_in_button)
+    @OnClick(R.id.btn_signin_google)
     public void processSignIn() {
         if (!mGoogleApiClient.isConnecting()) {
             processSignInError();

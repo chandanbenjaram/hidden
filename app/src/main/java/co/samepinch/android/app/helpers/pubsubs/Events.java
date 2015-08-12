@@ -53,4 +53,11 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class AuthAccExistsEvent extends EventBase {
+        public AuthAccExistsEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
 }
