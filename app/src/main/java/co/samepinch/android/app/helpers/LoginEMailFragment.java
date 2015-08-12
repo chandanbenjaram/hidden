@@ -87,7 +87,12 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
 
     @OnClick(R.id.link_signup)
     public void onSignup() {
+        // construct context from preferences if any?
+        Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
+
         Intent intent = new Intent(getActivity().getApplicationContext(), SignupActivity.class);
+        intent.putExtras(iArgs);
         startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
     }
 

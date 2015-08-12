@@ -501,4 +501,8 @@ public class Utils {
         view.setMovementMethod(LinkMovementMethod.getInstance());
         view.setText(spanTxt, TextView.BufferType.SPANNABLE);
     }
+
+    public static String getUniqueImageFilename(){
+        return Long.toString(System.currentTimeMillis());
+    }
 }
