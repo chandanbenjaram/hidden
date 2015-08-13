@@ -144,12 +144,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue()) == null){
-            menu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
-            menu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
-        }else{
+        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
             menu.findItem(R.id.menuitem_sign_in_id).setVisible(false);
             menu.findItem(R.id.menuitem_sign_out_id).setVisible(true);
+        } else {
+            menu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
+            menu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
         }
 
         return true;
@@ -255,6 +255,15 @@ public class MainActivity extends AppCompatActivity {
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
         isLoggedIn = Boolean.FALSE;
         Map<String, String> eventData = event.getMetaData();
+        redrawUIForNoLogin();
+    }
+
+    @Subscribe
+    public void onAuthOutEvent(final Events.AuthOutEvent event) {
+        redrawUIForNoLogin();
+    }
+
+    private void redrawUIForNoLogin() {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -266,17 +275,6 @@ public class MainActivity extends AppCompatActivity {
                 getMenuInflater().inflate(R.menu.drawer_view, navMenu);
                 notifyDrawerContentChange(mNavigationView);
 
-                mMenu.findItem(R.id.menuitem_sign_in_id).setVisible(false);
-                mMenu.findItem(R.id.menuitem_sign_out_id).setVisible(true);
-            }
-        });
-    }
-
-    @Subscribe
-    public void onAuthOutEvent(final Events.AuthOutEvent event) {
-        MainActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
                 mMenu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
                 mMenu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
             }

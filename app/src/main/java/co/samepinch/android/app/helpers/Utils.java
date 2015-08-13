@@ -386,6 +386,10 @@ public class Utils {
                     .commit();
         }
 
+        public boolean contains(String key) {
+            return mPref.contains(key);
+        }
+
         public String getValue(String key) {
             return mPref.getString(key, "");
         }

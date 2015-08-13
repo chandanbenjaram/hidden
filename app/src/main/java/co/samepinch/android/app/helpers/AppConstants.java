@@ -113,7 +113,8 @@ public class AppConstants {
         Wall,
         POST,
         facebook,
-        provider,
-        via_email_password
+        google,
+        via_email_password,
+        provider
     }
 }

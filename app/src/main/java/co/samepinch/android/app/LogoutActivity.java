@@ -1,52 +1,58 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
-import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
-import com.facebook.login.LoginManager;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.intent.SignOutService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
-public class LogoutActivity extends AppCompatActivity  {
+public class LogoutActivity extends AppCompatActivity {
 
-    // For communicating with Google APIs
-    private GoogleApiClient mGoogleApiClient;
+    @Bind(R.id.txt_logout_text)
+    TextView mLogoutText;
 
-    private ConnectionResult mConnectionResult;
+    @Bind(R.id.btn_tryagain)
+    Button mTryAgain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.logout);
 
+        ButterKnife.bind(LogoutActivity.this);
         BusProvider.INSTANCE.getBus().register(this);
 
         // call for intent
         Intent mServiceIntent =
-                new Intent(this, SignOutService.class);
+                new Intent(LogoutActivity.this, SignOutService.class);
         startService(mServiceIntent);
     }
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
+
+    @OnClick(R.id.btn_tryagain)
+    public void tryAgainListener(){
+        mLogoutText.setText("retrying...");
+
+        // call for intent
+        Intent mServiceIntent =
+                new Intent(LogoutActivity.this, SignOutService.class);
+        startService(mServiceIntent);
     }
 
     @Subscribe
@@ -59,4 +65,15 @@ public class LogoutActivity extends AppCompatActivity  {
         });
     }
 
+
+    @Subscribe
+    public void onAuthOutFailEvent(final Events.AuthOutFailEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLogoutText.setText("something went wrong. try again.");
+                mTryAgain.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 }

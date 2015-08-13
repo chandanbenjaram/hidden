@@ -11,6 +11,7 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.squareup.otto.Subscribe;
 
@@ -70,8 +71,13 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void fetchUserInfo() {
-        System.out.println("fetching fb user...");
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null) {
             // call for intent
@@ -98,43 +104,47 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         request.executeAsync();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-
-    @Subscribe
-    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
-        Map<String, String> eventData = event.getMetaData();
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            }
-        });
-    }
-
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
         Map<String, String> eventData = event.getMetaData();
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                LoginManager.getInstance().logOut();
             }
         });
     }
-
-    @Subscribe
-    public void onAuthOutEvent(final Events.AuthOutEvent event) {
-        Map<String, String> eventData = event.getMetaData();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            }
-        });
-    }
+//
+//    @Subscribe
+//    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
+//        Map<String, String> eventData = event.getMetaData();
+//
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        });
+//    }
+//
+//    @Subscribe
+//    public void onAuthFailEvent(final Events.AuthFailEvent event) {
+//        Map<String, String> eventData = event.getMetaData();
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        });
+//    }
+//
+//    @Subscribe
+//    public void onAuthOutEvent(final Events.AuthOutEvent event) {
+//        Map<String, String> eventData = event.getMetaData();
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        });
+//    }
 
     @Override
     public void onResume() {
