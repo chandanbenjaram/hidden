@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     Adapter adapterViewPager;
     transient volatile boolean isLoggedIn;
 
+    private Menu mMenu;
+
 
     @Override
     public void onResume() {
@@ -114,11 +116,6 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Create Post", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
-//                setFragment(new TagWallFragment());
-
                 Bundle iArgs = new Bundle();
                 Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                 Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
@@ -141,6 +138,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.mMenu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if(Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue()) == null){
+            menu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
+            menu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
+        }else{
+            menu.findItem(R.id.menuitem_sign_in_id).setVisible(false);
+            menu.findItem(R.id.menuitem_sign_out_id).setVisible(true);
+        }
+
         return true;
     }
 
@@ -151,11 +162,15 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.menuitem_sign_in_id:
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(intent);
+                Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(loginIntent);
                 return true;
             case R.id.menuitem_sign_out_id:
+                Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
+                logOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                logOutIntent.putExtra("logout", true);
+                getApplicationContext().startActivity(logOutIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -230,6 +245,8 @@ public class MainActivity extends AppCompatActivity {
                 navMenu.clear();
                 getMenuInflater().inflate(R.menu.drawer_view_logged_in, navMenu);
                 notifyDrawerContentChange(mNavigationView);
+
+                supportInvalidateOptionsMenu();
             }
         });
     }
@@ -248,6 +265,20 @@ public class MainActivity extends AppCompatActivity {
                 navMenu.clear();
                 getMenuInflater().inflate(R.menu.drawer_view, navMenu);
                 notifyDrawerContentChange(mNavigationView);
+
+                mMenu.findItem(R.id.menuitem_sign_in_id).setVisible(false);
+                mMenu.findItem(R.id.menuitem_sign_out_id).setVisible(true);
+            }
+        });
+    }
+
+    @Subscribe
+    public void onAuthOutEvent(final Events.AuthOutEvent event) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMenu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
+                mMenu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
             }
         });
     }

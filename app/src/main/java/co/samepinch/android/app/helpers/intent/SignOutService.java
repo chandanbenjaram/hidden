@@ -4,6 +4,10 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -32,6 +36,24 @@ public class SignOutService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        // google
+        GoogleApiClient mGoogleApiClient =
+                new GoogleApiClient.Builder(this)
+                        .addApi(Plus.API, Plus.PlusOptions.builder().build())
+                        .addScope(Plus.SCOPE_PLUS_LOGIN)
+                        .addScope(Plus.SCOPE_PLUS_PROFILE)
+                        .build();
+
+        mGoogleApiClient.blockingConnect();
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            mGoogleApiClient.disconnect();
+            mGoogleApiClient.connect();
+        }
+
+        // fb
+        LoginManager.getInstance().logOut();
+
         //headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

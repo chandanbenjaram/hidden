@@ -101,18 +101,6 @@ public class SignUpActivity extends AppCompatActivity {
                 _pinchHandle.setText(extras.getString("pinch_handle"));
             }
         }
-//         body.put("fname", Utils.emptyIfNull(arg0.getString("first_name")));
-//        body.put("lname", Utils.emptyIfNull(arg0.getString("last_name")));
-//        body.put("email", Utils.emptyIfNull(arg0.getString("email")));
-//        body.put("pinch_handle", StringUtils.deleteWhitespace(arg0.getString("name")));
-//        body.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
-//        _loginLink.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Finish the registration screen and return to the Login activity
-//                finish();
-//            }
-//        });
     }
 
     @OnClick(R.id.link_login)
@@ -172,7 +160,6 @@ public class SignUpActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 _signupButton.setEnabled(Boolean.TRUE);
-
                 Map<String, String> eventData = event == null ? null : event.getMetaData();
                 if (eventData != null && eventData.containsKey("message")) {
                     Snackbar.make(findViewById(R.id.bottomsheet), eventData.get("message"), Snackbar.LENGTH_LONG).show();

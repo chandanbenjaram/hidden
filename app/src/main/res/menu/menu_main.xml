@@ -5,12 +5,12 @@
         android:id="@+id/menuitem_sign_in_id"
         android:orderInCategory="99"
         android:title="@string/sign_in_label"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/menuitem_sign_out_id"
         android:orderInCategory="199"
         android:title="@string/sign_out_label"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <!--<item-->
     <!--android:id="@+id/menuitem_post_share_id"-->
     <!--android:icon="@drawable/icon_share_2x"-->

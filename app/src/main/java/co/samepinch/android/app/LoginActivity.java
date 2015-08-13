@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity implements
             }
         } else if (requestCode == AppConstants.KV.REQUEST_SIGNUP.getIntValue()) {
             if (resultCode == RESULT_OK) {
-                processUIUpdate(true);
+                BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
                 finish();
             }
         }
@@ -99,8 +99,6 @@ public class LoginActivity extends AppCompatActivity implements
      */
     private void processUIUpdate(boolean isUserSignedIn) {
         if (isUserSignedIn) {
-            BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
-
 //            signInButton.setVisibility(View.GONE);
 //            signOutButton.setVisibility(View.VISIBLE);
         } else {
