@@ -20,12 +20,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.SignUpActivity;
+import co.samepinch.android.app.SignupActivity;
 import co.samepinch.android.app.helpers.intent.AuthService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_CHECK_EMAIL_EXISTENCE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
@@ -109,7 +108,7 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         Bundle iArgs = new Bundle();
         iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
 
-        Intent intent = new Intent(getActivity().getApplicationContext(), SignUpActivity.class);
+        Intent intent = new Intent(getActivity().getApplicationContext(), SignupActivity.class);
         intent.putExtras(iArgs);
         getActivity().startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
     }
@@ -146,7 +145,7 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         Bundle iArgs = new Bundle();
         iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
 
-        Intent intent = new Intent(getActivity().getApplicationContext(), SignUpActivity.class);
+        Intent intent = new Intent(getActivity().getApplicationContext(), SignupActivity.class);
         intent.putExtras(iArgs);
         startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
     }

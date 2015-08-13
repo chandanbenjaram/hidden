@@ -16,7 +16,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Subscribe;
@@ -41,9 +40,9 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
 
-    private static final String TAG = "SignUpActivity";
+    private static final String TAG = "SignupActivity";
     private static Uri outputFileUri;
 
     @Bind(R.id.view_avatar)
@@ -78,9 +77,9 @@ public class SignUpActivity extends AppCompatActivity {
         BusProvider.INSTANCE.getBus().register(this);
 
         setContentView(R.layout.activity_signup);
-        ButterKnife.bind(SignUpActivity.this);
+        ButterKnife.bind(SignupActivity.this);
 
-        progressDialog = new ProgressDialog(SignUpActivity.this,
+        progressDialog = new ProgressDialog(SignupActivity.this,
                 R.style.Theme_AppCompat_Dialog);
 
         Bundle extras = getIntent().getExtras();
