@@ -11,7 +11,7 @@ import android.view.ViewGroup;
  */
 public abstract class SmartFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
     // Sparse array to keep track of registered fragments in memory
-    private SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+    protected SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
     public SmartFragmentStatePagerAdapter(FragmentManager fm) {
         super(fm);
@@ -35,5 +35,10 @@ public abstract class SmartFragmentStatePagerAdapter extends FragmentStatePagerA
     // Returns the fragment for the position (if instantiated)
     public Fragment getRegisteredFragment(int position) {
         return registeredFragments.get(position);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 }

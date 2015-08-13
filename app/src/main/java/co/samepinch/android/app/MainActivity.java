@@ -43,9 +43,13 @@ import com.squareup.otto.Subscribe;
 
 import java.util.Map;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
@@ -54,85 +58,48 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
  * TODO
  */
 public class MainActivity extends AppCompatActivity {
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
 
-    private DrawerLayout mDrawerLayout;
-    private NavigationView mNavigationView;
-    Adapter adapterViewPager;
-    transient volatile boolean isLoggedIn;
+    @Bind(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
 
-    private Menu mMenu;
+    @Bind(R.id.nav_view)
+    NavigationView mNavigationView;
 
+    @Bind(R.id.tabs)
+    TabLayout mTabLayout;
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // register to event bus
-//        BusProvider.INSTANCE.getBus().register(this);
-    }
+    @Bind(R.id.viewpager)
+    ViewPager mViewPager;
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        BusProvider.INSTANCE.getBus().unregister(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        BusProvider.INSTANCE.getBus().unregister(this);
-    }
-
-    @Subscribe
-    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
-        Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
-    }
+    SPFragmentPagerAdapter adapterViewPager;
+    Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BusProvider.INSTANCE.getBus().register(this);
 
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(MainActivity.this);
+        BusProvider.INSTANCE.getBus().register(this);
 
-        final ActionBar ab = getSupportActionBar();
+        setSupportActionBar(mToolbar);
+        ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         setupDrawerContent(mNavigationView);
+        setupViewPager(mViewPager);
 
+//        tabLayout.getTabAt(0).setIcon(R.drawable.com_facebook_button_icon);
+        mTabLayout.setupWithViewPager(mViewPager);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        if (viewPager != null) {
-            setupViewPager(viewPager);
+        for(int i=0; i< mTabLayout.getTabCount(); i++){
+            TabLayout.Tab tab = mTabLayout.getTabAt(i);
+            tab.setCustomView(adapterViewPager.getTabView(getApplicationContext(), i));
         }
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle iArgs = new Bundle();
-                Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-                Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
-                for (Map.Entry<String, String> e : pPosts.entrySet()) {
-                    iArgs.putString(e.getKey(), e.getValue());
-                }
-
-                // call for intent
-                Intent mServiceIntent =
-                        new Intent(getApplicationContext(), PostsPullService.class);
-                mServiceIntent.putExtras(iArgs);
-                startService(mServiceIntent);
-            }
-        });
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -176,45 +143,65 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
     private void setupViewPager(ViewPager viewPager) {
-        adapterViewPager = new Adapter(getSupportFragmentManager());
+        adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
+        adapterViewPager.setCount(2);
         viewPager.setAdapter(adapterViewPager);
     }
 
+//    // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
+//    static class Adapter extends SmartFragmentStatePagerAdapter {
+//        private int count;
+//
+//        public Adapter(FragmentManager fragmentManager) {
+//            super(fragmentManager);
+//        }
+//
+//        public void setCount(int count) {
+//            this.count = count;
+//        }
+//
+//        // Returns total number of pages
+//        @Override
+//        public int getCount() {
+//            return count;
+//        }
+//
+//        // Returns the fragment to display for that page
+//        @Override
+//        public Fragment getItem(int position) {
+//            switch (position) {
+//                case 0: // Fragment # 0 - This will show FirstFragment
+//                    return new PostListFragment();
+//                case 1: // Fragment # 0 - This will show FirstFragment different title
+//                    return new PostListFragment();
+//                default:
+//                    return null;
+//            }
+//        }
+//
+//        // Returns the page title for the top indicator
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            return position == 0 ? AppConstants.K.Wall.name() : "#" + position;
+//        }
+//
+////        public View getTabView(int position){
+////            View v = LayoutInflater.from(getC)
+////        }
+//
+////        @Override
+////        public int getItemPosition(Object object) {
+////            return super.getItemPosition(object);
+////        }
+//    }
 
-    // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
-    static class Adapter extends SmartFragmentStatePagerAdapter {
-        private static int NUM_ITEMS = 1;
-
-        public Adapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
-
-        // Returns total number of pages
-        @Override
-        public int getCount() {
-            return NUM_ITEMS;
-        }
-
-        // Returns the fragment to display for that page
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0: // Fragment # 0 - This will show FirstFragment
-                    return new PostListFragment();
-                case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return new PostListFragment();
-                default:
-                    return null;
-            }
-        }
-
-        // Returns the page title for the top indicator
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return position == 0 ? AppConstants.K.Wall.name() : "";
-        }
-    }
 
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
@@ -229,14 +216,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @OnClick(R.id.fab)
+    public void onClickFAB() {
+//        int newposition = adapterViewPager.getCount();
+//        adapterViewPager.startUpdate(mViewPager);
+//        adapterViewPager.setCount(newposition + 1);
+//        adapterViewPager.instantiateItem(mViewPager, newposition);
+//        adapterViewPager.finishUpdate(mViewPager);
+//        adapterViewPager.notifyDataSetChanged();
+//        mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.id.), newposition);
+
+        Bundle iArgs = new Bundle();
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
+        for (Map.Entry<String, String> e : pPosts.entrySet()) {
+            iArgs.putString(e.getKey(), e.getValue());
+        }
+
+        // call for intent
+        Intent mServiceIntent =
+                new Intent(getApplicationContext(), PostsPullService.class);
+        mServiceIntent.putExtras(iArgs);
+        startService(mServiceIntent);
+    }
+
+
     @Subscribe
     public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
-        isLoggedIn = Boolean.TRUE;
-
         Map<String, String> eventData = event.getMetaData();
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+//                adapterViewPager.startUpdate(mViewPager);
+//                adapterViewPager.setCount(2);
+//                adapterViewPager.finishUpdate(mViewPager);
+//                adapterViewPager.notifyDataSetChanged();
+
                 FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
                 headerWrapper.removeAllViews();
                 LayoutInflater.from(getApplicationContext()).inflate(R.layout.nav_header_logged_in, headerWrapper);
@@ -247,13 +262,14 @@ public class MainActivity extends AppCompatActivity {
                 notifyDrawerContentChange(mNavigationView);
 
                 supportInvalidateOptionsMenu();
+
+
             }
         });
     }
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
-        isLoggedIn = Boolean.FALSE;
         Map<String, String> eventData = event.getMetaData();
         redrawUIForNoLogin();
     }
@@ -261,6 +277,11 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onAuthOutEvent(final Events.AuthOutEvent event) {
         redrawUIForNoLogin();
+    }
+
+    @Subscribe
+    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
+        Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
     }
 
     private void redrawUIForNoLogin() {
