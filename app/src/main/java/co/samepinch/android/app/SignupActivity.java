@@ -3,7 +3,6 @@ package co.samepinch.android.app;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -11,39 +10,41 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.flipboard.bottomsheet.BottomSheetLayout;
-import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
-
-import org.apache.commons.lang3.StringUtils;
+import com.squareup.otto.Subscribe;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.intent.SignUpService;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 
-public class SignupActivity extends AppCompatActivity {
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
 
-    private static final String TAG = "SignupActivity";
+public class SignUpActivity extends AppCompatActivity {
+
+    private static final String TAG = "SignUpActivity";
+    private static Uri outputFileUri;
 
     @Bind(R.id.view_avatar)
     SimpleDraweeView _avatarView;
@@ -69,11 +70,18 @@ public class SignupActivity extends AppCompatActivity {
     @Bind(R.id.link_login)
     TextView _loginLink;
 
+    ProgressDialog progressDialog;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BusProvider.INSTANCE.getBus().register(this);
+
         setContentView(R.layout.activity_signup);
-        ButterKnife.bind(SignupActivity.this);
+        ButterKnife.bind(SignUpActivity.this);
+
+        progressDialog = new ProgressDialog(SignUpActivity.this,
+                R.style.Theme_AppCompat_Dialog);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -117,64 +125,102 @@ public class SignupActivity extends AppCompatActivity {
     @OnClick(R.id.btn_signup)
     public void signup() {
         Log.d(TAG, "Signup");
-
+        _signupButton.setEnabled(Boolean.FALSE);
         if (!validate()) {
-            onSignupFailed();
+            onSignUpFailEvent(null);
             return;
         }
 
-        _signupButton.setEnabled(false);
-
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
-                R.style.Theme_AppCompat_Light_Dialog);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("authenticating...");
+        progressDialog.setMessage("creating your account...");
         progressDialog.show();
 
+        String fName = _fNameText.getText().toString();
+        String lName = _lNameText.getText().toString();
 
-        String fname = _fNameText.getText().toString();
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        // TODO: Implement your own signup logic here.
+        String pinchHandle = _pinchHandle.getText().toString();
 
-//        new android.os.Handler().postDelayed(
-//                new Runnable() {
-//                    public void run() {
-//                        // On complete call either onSignupSuccess or onSignupFailed
-//                        // depending on success
-//                        onSignupSuccess();
-//                        // onSignupFailed();
-//                        progressDialog.dismiss();
-//                    }
-//                }, 3000);
+        Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_FNAME.getValue(), fName);
+        iArgs.putString(KEY_LNAME.getValue(), lName);
+        iArgs.putString(KEY_EMAIL.getValue(), email);
+        iArgs.putString(KEY_PASSWORD.getValue(), password);
+        iArgs.putString(KEY_PINCH_HANDLE.getValue(), pinchHandle);
+
+        // call for intent
+        Intent mServiceIntent =
+                new Intent(getApplicationContext(), SignUpService.class);
+        mServiceIntent.putExtras(iArgs);
+        startService(mServiceIntent);
     }
 
-
-    public void onSignupSuccess() {
-        _signupButton.setEnabled(true);
-        setResult(RESULT_OK, null);
-        finish();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 
-    public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+    @Subscribe
+    public void onSignUpFailEvent(final Events.SignUpFailEvent event) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                _signupButton.setEnabled(Boolean.TRUE);
 
-        _signupButton.setEnabled(true);
+                Map<String, String> eventData = event == null ? null : event.getMetaData();
+                if (eventData != null && eventData.containsKey("message")) {
+                    Snackbar.make(findViewById(R.id.bottomsheet), eventData.get("message"), Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(findViewById(R.id.bottomsheet), "try again", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void onSignUpSuccessEvent(final Events.SignUpSuccessEvent event) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                setResult(RESULT_OK, null);
+                finish();
+            }
+        });
     }
 
     public boolean validate() {
         boolean valid = true;
 
-        String name = _fNameText.getText().toString();
+        String fName = _fNameText.getText().toString();
+        String lName = _lNameText.getText().toString();
+
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        if (name.isEmpty() || name.length() < 3) {
+        String pinchHandle = _pinchHandle.getText().toString();
+
+
+        if (fName.isEmpty() || fName.length() < 3) {
             _fNameText.setError("at least 3 characters");
             valid = false;
         } else {
             _fNameText.setError(null);
+        }
+
+        if (lName.isEmpty() || lName.length() < 3) {
+            _lNameText.setError("at least 3 characters");
+            valid = false;
+        } else {
+            _lNameText.setError(null);
         }
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -191,10 +237,16 @@ public class SignupActivity extends AppCompatActivity {
             _passwordText.setError(null);
         }
 
+
+        if (pinchHandle.isEmpty()) {
+            _pinchHandle.setError("choose your pinch handle");
+            valid = false;
+        } else {
+            _pinchHandle.setError(null);
+        }
+
         return valid;
     }
-
-    private static Uri outputFileUri;
 
     @OnClick(R.id.view_avatar)
     public void openImageIntent() {

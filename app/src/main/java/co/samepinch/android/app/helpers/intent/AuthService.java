@@ -24,10 +24,11 @@ import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.rest.ReqLogin;
 import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespLogin;
 import co.samepinch.android.rest.RestClient;
 
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_CHECK_EXISTANCE;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_CHECK_EMAIL_EXISTENCE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
@@ -43,11 +44,12 @@ public class AuthService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Map<String, String> eData = new HashMap<>();
 
         // get caller data
         Bundle iArgs = intent.getExtras();
-        if (iArgs.getBoolean(KEY_CHECK_EXISTANCE.getValue(), Boolean.FALSE)) {
-            checkExistanceOnly(iArgs.getString(KEY_EMAIL.getValue()));
+        if (iArgs.getBoolean(KEY_CHECK_EMAIL_EXISTENCE.getValue(), Boolean.FALSE)) {
+            checkExistenceOnly(iArgs.getString(KEY_EMAIL.getValue()));
             return;
         }
 
@@ -87,14 +89,19 @@ public class AuthService extends IntentService {
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
         } catch (Exception e) {
-//            e.printStackTrace();
+            Resp resp = Utils.parseAsRespSilently(e);
+            if (resp != null) {
+                eData.put("message", resp.getMessage());
+            }
             // get rid of auth session
+            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
             Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
-            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(null));
+
+            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eData));
         }
     }
 
-    private void checkExistanceOnly(String email) {
+    private void checkExistenceOnly(String email) {
         StorageComponent component = DaggerStorageComponent.create();
         ReqSetBody req = component.provideReqSetBody();
 
@@ -117,9 +124,14 @@ public class AuthService extends IntentService {
 
             payloadEntity = new HttpEntity<>(req, headers);
             resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
-
             BusProvider.INSTANCE.getBus().post(new Events.AuthAccExistsEvent(null));
         } catch (Exception e) {
+            if (e instanceof HttpStatusCodeException) {
+                if (HttpStatus.BAD_REQUEST == ((HttpStatusCodeException) e).getStatusCode()) {
+                    BusProvider.INSTANCE.getBus().post(new Events.AuthAccNotExistsEvent(null));
+                    return;
+                }
+            }
             BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(null));
         }
     }

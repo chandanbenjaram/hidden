@@ -50,10 +50,13 @@ public class AppConstants {
         KEY_NEW("new"),
         KEY_NAME("name"),
         KEY_UID("uid"),
+        KEY_FNAME("fname"),
+        KEY_LNAME("lname"),
+        KEY_PINCH_HANDLE("pinch_handle"),
         KEY_EMAIL("email"),
         KEY_PASSWORD("password"),
         KEY_DEVICE_TOKEN("device_token"),
-        KEY_CHECK_EXISTANCE("checkExistance"),
+        KEY_CHECK_EMAIL_EXISTENCE("checkEmailExistence"),
         ;
 
         private final String value;
@@ -110,6 +113,7 @@ public class AppConstants {
         Wall,
         POST,
         facebook,
-        provider
+        provider,
+        via_email_password
     }
 }

@@ -19,10 +19,12 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +48,7 @@ import co.samepinch.android.data.dto.Commenter;
 import co.samepinch.android.data.dto.Post;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
+import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.DEFAULT_DATE_FORMAT;
@@ -504,5 +507,18 @@ public class Utils {
 
     public static String getUniqueImageFilename(){
         return Long.toString(System.currentTimeMillis());
+    }
+
+    public static Resp parseAsRespSilently(Exception e){
+        Resp resp = null;
+        try{
+            if(e instanceof HttpClientErrorException){
+                Gson gson = new Gson();
+                resp = gson.fromJson(((HttpClientErrorException)e).getResponseBodyAsString(), Resp.class);
+            }
+        }catch(Exception muted){
+            // ignored
+        }
+        return resp;
     }
 }

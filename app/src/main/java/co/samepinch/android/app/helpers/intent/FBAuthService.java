@@ -40,8 +40,6 @@ public class FBAuthService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.facebook.name());
-
         StorageComponent component = DaggerStorageComponent.create();
         ReqSetBody loginReq = component.provideReqSetBody();
 
@@ -78,7 +76,7 @@ public class FBAuthService extends IntentService {
                     throw new IllegalStateException("un-known response code.", e);
                 }
             }
-
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.facebook.name());
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
         } catch (Exception e) {

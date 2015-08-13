@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +20,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.SignupActivity;
+import co.samepinch.android.app.SignUpActivity;
 import co.samepinch.android.app.helpers.intent.AuthService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_CHECK_EXISTANCE;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_CHECK_EMAIL_EXISTENCE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
 public class LoginEMailFragment extends android.support.v4.app.Fragment {
     public static final String LOG_TAG = "LoginEMailFragment";
@@ -34,11 +36,18 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     @Bind(R.id.input_email)
     EditText mEmailIdView;
 
-//    @Bind(R.id.input_password)
-//    EditText mPasswordView;
+    @Bind(R.id.input_password)
+    EditText mPasswordView;
 
     @Bind(R.id.btn_login)
     Button mLoginButton;
+
+
+    @Bind(R.id.btn_signup)
+    Button mSignUpButton;
+
+    @Bind(R.id.btn_forgot)
+    Button mForgotButton;
 
     ProgressDialog progressDialog;
 
@@ -75,12 +84,15 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         }
 
         progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Light_Dialog);
+                R.style.Theme_AppCompat_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("authenticating...");
         progressDialog.show();
 
         mLoginButton.setEnabled(Boolean.FALSE);
+//        mSignUpButton.setEnabled(Boolean.FALSE);
+//        mForgotButton.setEnabled(Boolean.FALSE);
+
         callForAuth();
     }
 
@@ -97,17 +109,17 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         Bundle iArgs = new Bundle();
         iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
 
-        Intent intent = new Intent(getActivity().getApplicationContext(), SignupActivity.class);
+        Intent intent = new Intent(getActivity().getApplicationContext(), SignUpActivity.class);
         intent.putExtras(iArgs);
-        startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
+        getActivity().startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
     }
 
     private void callForAuth() {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
-        iArgs.putBoolean(KEY_CHECK_EXISTANCE.getValue(), Boolean.TRUE);
+//        iArgs.putBoolean(KEY_CHECK_EMAIL_EXISTENCE.getValue(), Boolean.TRUE);
         iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
-//        iArgs.putString(KEY_PASSWORD.getValue(), mPasswordView.getText().toString());
+        iArgs.putString(KEY_PASSWORD.getValue(), mPasswordView.getText().toString());
 
         // call for intent
         Intent mServiceIntent =
@@ -119,18 +131,40 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     @Subscribe
     public void onAuthAccExistsEvent(final Events.AuthAccExistsEvent event) {
         Map<String, String> eventData = event.getMetaData();
-        if(progressDialog !=null){
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
     }
 
     @Subscribe
-    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
+    public void onAuthAccNotExistsEvent(final Events.AuthAccNotExistsEvent event) {
         Map<String, String> eventData = event.getMetaData();
-        if(progressDialog !=null){
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
-       getActivity().finish();
+
+        Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
+
+        Intent intent = new Intent(getActivity().getApplicationContext(), SignUpActivity.class);
+        intent.putExtras(iArgs);
+        startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
+    }
+
+
+    @Subscribe
+    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                getActivity().setResult(Activity.RESULT_OK, null);
+                getActivity().finish();
+            }
+        });
     }
 
     @Subscribe
@@ -139,13 +173,23 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                onLogInFail();
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                mLoginButton.setEnabled(Boolean.TRUE);
+
+                Map<String, String> eventData = event == null ? null : event.getMetaData();
+                if (eventData != null && eventData.containsKey("message")) {
+                    Snackbar.make(mView, eventData.get("message"), Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(mView, "try again", Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
-    private void onLogInFail(){
-        if(progressDialog !=null){
+    private void onLogInFail() {
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
         mLoginButton.setEnabled(Boolean.TRUE);

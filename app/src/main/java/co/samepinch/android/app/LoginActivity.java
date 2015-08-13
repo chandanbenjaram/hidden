@@ -16,6 +16,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 
 public class LoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -25,9 +27,6 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Bind(R.id.btn_signin_google)
     SignInButton gSignInButton;
-
-//    @Bind(R.id.sign_out_button)
-//    Button signOutButton;
 
     // For communicating with Google APIs
     private GoogleApiClient mGoogleApiClient;
@@ -43,9 +42,14 @@ public class LoginActivity extends AppCompatActivity implements
         ButterKnife.bind(LoginActivity.this);
 
         gSignInButton.setSize(SignInButton.SIZE_WIDE);
-//        gSignInButton.setColorScheme();
-        // Initializing google plus api client
-        mGoogleApiClient = buildGoogleAPIClient();
+        mGoogleApiClient =
+                new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Plus.API, Plus.PlusOptions.builder().build())
+                        .addScope(Plus.SCOPE_PLUS_LOGIN)
+                        .addScope(Plus.SCOPE_PLUS_PROFILE)
+                        .build();
     }
 
     @Override
@@ -57,28 +61,11 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        super.onStop();
         // disconnect api if it is connected
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-    }
-
-    /**
-     * API to update layout views based upon user signed in status
-     *
-     * @param isUserSignedIn
-     */
-    private void processUIUpdate(boolean isUserSignedIn) {
-        if (isUserSignedIn) {
-//            signInButton.setVisibility(View.GONE);
-//            signOutButton.setVisibility(View.VISIBLE);
-        } else {
-
-            this.onActivityResult(0, 0, null);
-//            signInButton.setVisibility(View.VISIBLE);
-//            signOutButton.setVisibility(View.GONE);
-        }
+        super.onStop();
     }
 
     /**
@@ -99,10 +86,31 @@ public class LoginActivity extends AppCompatActivity implements
             }
         } else if (requestCode == AppConstants.KV.REQUEST_SIGNUP.getIntValue()) {
             if (resultCode == RESULT_OK) {
+                processUIUpdate(true);
                 finish();
             }
         }
     }
+
+    /**
+     * API to update layout views based upon user signed in status
+     *
+     * @param isUserSignedIn
+     */
+    private void processUIUpdate(boolean isUserSignedIn) {
+        if (isUserSignedIn) {
+            BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
+
+//            signInButton.setVisibility(View.GONE);
+//            signOutButton.setVisibility(View.VISIBLE);
+        } else {
+
+            this.onActivityResult(0, 0, null);
+//            signInButton.setVisibility(View.VISIBLE);
+//            signOutButton.setVisibility(View.GONE);
+        }
+    }
+
 
     //    @OnClick(R.id.sign_out_button)
     public void processSignOut() {
@@ -172,15 +180,6 @@ public class LoginActivity extends AppCompatActivity implements
         mGoogleApiClient.connect();
     }
 
-    private GoogleApiClient buildGoogleAPIClient() {
-        return new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addScope(Plus.SCOPE_PLUS_PROFILE)
-                .build();
-    }
 
     private void processUserInfoAndUpdateUI() {
         Person signedInUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);

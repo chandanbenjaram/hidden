@@ -60,4 +60,21 @@ public class Events {
         }
     }
 
+    public static class AuthAccNotExistsEvent extends EventBase {
+        public AuthAccNotExistsEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
+    public static class SignUpSuccessEvent extends EventBase {
+        public SignUpSuccessEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
+    public static class SignUpFailEvent extends EventBase {
+        public SignUpFailEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }
