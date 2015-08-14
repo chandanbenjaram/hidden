@@ -1,8 +1,10 @@
 package co.samepinch.android.app.helpers.adapters;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -14,11 +16,11 @@ import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 /**
  * Created by cbenjaram on 8/13/15.
  */
-public class SPFragmentPagerAdapter extends SmartFragmentStatePagerAdapter {
+public class SPFragmentPagerAdapter extends FragmentPagerAdapter {
     private int count;
 
-    public SPFragmentPagerAdapter(FragmentManager fragmentManager) {
-        super(fragmentManager);
+    public SPFragmentPagerAdapter(FragmentManager fm) {
+        super(fm);
     }
 
     public void setCount(int count) {
@@ -35,9 +37,9 @@ public class SPFragmentPagerAdapter extends SmartFragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0: // Fragment # 0 - This will show FirstFragment
+            case 0:
                 return new PostListFragment();
-            case 1: // Fragment # 0 - This will show FirstFragment different title
+            case 1:
                 return new PostListFragment();
             default:
                 return null;
@@ -49,11 +51,12 @@ public class SPFragmentPagerAdapter extends SmartFragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         return position == 0 ? AppConstants.K.Wall.name() : "#" + position;
     }
-//
-        public View getTabView(Context context, int position){
-            View v = LayoutInflater.from(context).inflate(R.layout.custom_tab_main, null);
-            return v;
-        }
+
+    //
+    public static View getTabView(Context context, int position) {
+        View v = LayoutInflater.from(context).inflate(R.layout.custom_tab_main, null);
+        return v;
+    }
 
 //        @Override
 //        public int getItemPosition(Object object) {

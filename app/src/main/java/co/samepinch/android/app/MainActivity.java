@@ -41,6 +41,8 @@ import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 
 import butterknife.Bind;
@@ -95,10 +97,12 @@ public class MainActivity extends AppCompatActivity {
 
 //        tabLayout.getTabAt(0).setIcon(R.drawable.com_facebook_button_icon);
         mTabLayout.setupWithViewPager(mViewPager);
+        mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
 
-        for(int i=0; i< mTabLayout.getTabCount(); i++){
+        for (int i = 0; i < mTabLayout.getTabCount(); i++) {
             TabLayout.Tab tab = mTabLayout.getTabAt(i);
-            tab.setCustomView(adapterViewPager.getTabView(getApplicationContext(), i));
+            tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
         }
     }
 
@@ -136,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menuitem_sign_out_id:
                 Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
                 logOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                logOutIntent.putExtra("logout", true);
                 getApplicationContext().startActivity(logOutIntent);
                 return true;
         }
@@ -151,57 +154,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
-        adapterViewPager.setCount(2);
+        adapterViewPager.setCount(1);
         viewPager.setAdapter(adapterViewPager);
     }
-
-//    // Extend from SmartFragmentStatePagerAdapter now instead for more dynamic ViewPager items
-//    static class Adapter extends SmartFragmentStatePagerAdapter {
-//        private int count;
-//
-//        public Adapter(FragmentManager fragmentManager) {
-//            super(fragmentManager);
-//        }
-//
-//        public void setCount(int count) {
-//            this.count = count;
-//        }
-//
-//        // Returns total number of pages
-//        @Override
-//        public int getCount() {
-//            return count;
-//        }
-//
-//        // Returns the fragment to display for that page
-//        @Override
-//        public Fragment getItem(int position) {
-//            switch (position) {
-//                case 0: // Fragment # 0 - This will show FirstFragment
-//                    return new PostListFragment();
-//                case 1: // Fragment # 0 - This will show FirstFragment different title
-//                    return new PostListFragment();
-//                default:
-//                    return null;
-//            }
-//        }
-//
-//        // Returns the page title for the top indicator
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            return position == 0 ? AppConstants.K.Wall.name() : "#" + position;
-//        }
-//
-////        public View getTabView(int position){
-////            View v = LayoutInflater.from(getC)
-////        }
-//
-////        @Override
-////        public int getItemPosition(Object object) {
-////            return super.getItemPosition(object);
-////        }
-//    }
-
 
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
@@ -215,17 +170,8 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-
     @OnClick(R.id.fab)
     public void onClickFAB() {
-//        int newposition = adapterViewPager.getCount();
-//        adapterViewPager.startUpdate(mViewPager);
-//        adapterViewPager.setCount(newposition + 1);
-//        adapterViewPager.instantiateItem(mViewPager, newposition);
-//        adapterViewPager.finishUpdate(mViewPager);
-//        adapterViewPager.notifyDataSetChanged();
-//        mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.id.), newposition);
-
         Bundle iArgs = new Bundle();
         Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
         Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
@@ -247,10 +193,16 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                adapterViewPager.startUpdate(mViewPager);
-//                adapterViewPager.setCount(2);
-//                adapterViewPager.finishUpdate(mViewPager);
-//                adapterViewPager.notifyDataSetChanged();
+                // add logged in tab
+                int newposition = adapterViewPager.getCount();
+
+                TabLayout.Tab starTab = mTabLayout.newTab();
+                starTab.setTag("STAR");
+                starTab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), newposition));
+                adapterViewPager.setCount(newposition + 1);
+                adapterViewPager.instantiateItem(mViewPager, newposition);
+                adapterViewPager.notifyDataSetChanged();
+                mTabLayout.addTab(starTab, newposition, true);
 
                 FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
                 headerWrapper.removeAllViews();
@@ -262,8 +214,6 @@ public class MainActivity extends AppCompatActivity {
                 notifyDrawerContentChange(mNavigationView);
 
                 supportInvalidateOptionsMenu();
-
-
             }
         });
     }
@@ -288,6 +238,36 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                // add logged in tab
+//                int newposition = adapterViewPager.getCount();
+//
+//                TabLayout.Tab starTab = mTabLayout.newTab();
+//                starTab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), newposition));
+//                adapterViewPager.setCount(newposition + 1);
+//                adapterViewPager.instantiateItem(mViewPager, newposition);
+//                adapterViewPager.notifyDataSetChanged();
+                int starTabPosition = -1;
+                for (int i = 0; i < mTabLayout.getTabCount(); i++) {
+                    TabLayout.Tab tab = mTabLayout.getTabAt(i);
+                    Object tag = tab.getTag();
+                    if (tag instanceof String) {
+                        if (StringUtils.equalsIgnoreCase((String) tag, "STAR")) {
+                            starTabPosition = tab.getPosition();
+                            break;
+                        }
+                    }
+                }
+
+                if (starTabPosition > -1) {
+                    mTabLayout.removeTabAt(starTabPosition);
+                    Object toRemove = adapterViewPager.getItem(starTabPosition);
+                    adapterViewPager.destroyItem(mViewPager, starTabPosition, toRemove);
+                    adapterViewPager.setCount(adapterViewPager.getCount() - 1);
+                    adapterViewPager.notifyDataSetChanged();
+                }
+
+
                 FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
                 headerWrapper.removeAllViews();
 
