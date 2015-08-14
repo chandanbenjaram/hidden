@@ -35,6 +35,8 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".LogoutActivity" />
         <activity android:name=".SignupActivity" />
+        <activity android:name=".MainActivityIn" />
+
 
         <provider
             android:name="co.samepinch.android.data.dao.SPContentProvider"

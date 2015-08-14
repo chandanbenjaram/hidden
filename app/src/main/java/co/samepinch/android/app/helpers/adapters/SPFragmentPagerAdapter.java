@@ -1,10 +1,8 @@
 package co.samepinch.android.app.helpers.adapters;
 
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -16,7 +14,7 @@ import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 /**
  * Created by cbenjaram on 8/13/15.
  */
-public class SPFragmentPagerAdapter extends FragmentPagerAdapter {
+public class SPFragmentPagerAdapter extends SmartFragmentStatePagerAdapter {
     private int count;
 
     public SPFragmentPagerAdapter(FragmentManager fm) {

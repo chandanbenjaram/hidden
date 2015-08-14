@@ -30,10 +30,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.BaseAdapter;
-import android.widget.HeaderViewListAdapter;
-import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
 
@@ -52,8 +48,8 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 /**
  * TODO
  */
-public class MainActivity extends AppCompatActivity {
-    public static final String LOG_TAG = "MainActivity";
+public class MainActivityIn extends AppCompatActivity {
+    public static final String LOG_TAG = "MainActivityIn";
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -78,20 +74,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Log.d(LOG_TAG, "onCreate...");
-
-//        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-//            Intent intent = new Intent(this, MainActivityIn.class);
+//
+//        if (!Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
+//            Intent intent = new Intent(this, MainActivity.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
 //                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
 //                    Intent.FLAG_ACTIVITY_NEW_TASK);
 //            startActivity(intent);
-//            if (!this.isFinishing()) {
-//                finish();
-//            }
+//            finish();
 //        }
 
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(MainActivity.this);
+
+        ButterKnife.bind(MainActivityIn.this);
         BusProvider.INSTANCE.getBus().register(this);
 
         setSupportActionBar(mToolbar);
@@ -118,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Log.d(LOG_TAG, "onResume...");
 
-        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-            Intent intent = new Intent(this, MainActivityIn.class);
+        if (!Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
+            Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
                     Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -139,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
-        menu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
+        menu.findItem(R.id.menuitem_sign_in_id).setVisible(false);
+        menu.findItem(R.id.menuitem_sign_out_id).setVisible(true);
 
         return true;
     }
@@ -174,13 +169,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
-        adapterViewPager.setCount(1);
+        adapterViewPager.setCount(2);
         viewPager.setAdapter(adapterViewPager);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
         Menu navMenu = navigationView.getMenu();
-        getMenuInflater().inflate(R.menu.drawer_view, navMenu);
+        navMenu.clear();
+        getMenuInflater().inflate(R.menu.drawer_view_logged_in, navMenu);
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -209,51 +205,8 @@ public class MainActivity extends AppCompatActivity {
         startService(mServiceIntent);
     }
 
-//    @Subscribe
-//    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
-//        Map<String, String> eventData = event.getMetaData();
-//        MainActivity.this.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                // add logged in tab
-//                int newposition = adapterViewPager.getCount();
-//
-//                TabLayout.Tab starTab = mTabLayout.newTab();
-//                starTab.setTag("STAR");
-//                starTab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), newposition));
-//                adapterViewPager.setCount(newposition + 1);
-//                adapterViewPager.instantiateItem(mViewPager, newposition);
-//                adapterViewPager.notifyDataSetChanged();
-//                mTabLayout.addTab(starTab, newposition, true);
-//
-//                FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
-//                headerWrapper.removeAllViews();
-//                LayoutInflater.from(getApplicationContext()).inflate(R.layout.nav_header_logged_in, headerWrapper);
-//
-//                Menu navMenu = mNavigationView.getMenu();
-//                navMenu.clear();
-//                getMenuInflater().inflate(R.menu.drawer_view_logged_in, navMenu);
-//                notifyDrawerContentChange(mNavigationView);
-//
-//                supportInvalidateOptionsMenu();
-//            }
-//        });
-//    }
-
     @Subscribe
     public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
         Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
-    }
-
-    private void notifyDrawerContentChange(NavigationView navigationView) {
-        for (int i = 0, count = navigationView.getChildCount(); i < count; i++) {
-            final View child = navigationView.getChildAt(i);
-            if (child != null && child instanceof ListView) {
-                final ListView menuView = (ListView) child;
-                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-                wrapped.notifyDataSetChanged();
-            }
-        }
     }
 }

@@ -17,6 +17,7 @@ import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
 public class LogoutActivity extends AppCompatActivity {
+    public static final String LOG_TAG = "LogoutActivity";
 
     @Bind(R.id.txt_logout_text)
     TextView mLogoutText;
