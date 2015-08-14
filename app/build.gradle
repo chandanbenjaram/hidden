@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 22
@@ -27,8 +28,9 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/license.txt'
-
     }
+
+
 }
 
 repositories {
@@ -42,6 +44,8 @@ configurations.all {
     // check for updates every build
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
+
+//apply plugin: 'com.google.gms.google-services'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -75,13 +79,17 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'org.springframework.android:spring-android-rest-template:2.0.0.M1'
     compile 'com.facebook.fresco:fresco:0.5.3'
-    compile 'com.google.android.gms:play-services-base:7.5.0'
+//    compile('com.google.android.gms:play-services:7.8.0'){
+//        exclude module: ''
+//    }
     compile 'com.google.android.gms:play-services-plus:7.5.0'
     compile 'com.google.android.gms:play-services-identity:7.5.0'
+    compile 'com.google.android.gms:play-services-base:7.5.0'
 //    compile 'com.facebook.android:facebook-android-sdk:3.23.1'
-    compile (name:'identitytoolkit-api11', ext:'aar')
+//    compile (name:'identitytoolkit-api11', ext:'aar')
 //    compile (name:'identitytoolkit_fb', ext:'jar')
     compile 'com.facebook.android:facebook-android-sdk:4.1.0'
 
 
 }
+

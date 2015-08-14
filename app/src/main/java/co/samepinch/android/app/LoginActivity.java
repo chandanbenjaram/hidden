@@ -7,10 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
@@ -31,7 +33,6 @@ public class LoginActivity extends AppCompatActivity implements
     @Bind(R.id.btn_signin_google)
     SignInButton gSignInButton;
 
-    // For communicating with Google APIs
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -45,9 +46,9 @@ public class LoginActivity extends AppCompatActivity implements
                 new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
-                        .addApi(Plus.API, Plus.PlusOptions.builder().build())
-//                        .addScope(Plus.SCOPE_PLUS_LOGIN)
-                        .addScope(Plus.SCOPE_PLUS_PROFILE)
+                        .addApi(Plus.API)
+                        .addScope(new Scope(Scopes.PROFILE))
+                        .addScope(new Scope(Scopes.PLUS_LOGIN))
                         .build();
     }
 
@@ -59,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements
     private boolean mShouldResolve = false;
 
     @OnClick(R.id.btn_signin_google)
-    public void onClickGoogleSignIn(){
+    public void onClickGoogleSignIn() {
         onSignInClicked();
     }
 
@@ -136,22 +137,10 @@ public class LoginActivity extends AppCompatActivity implements
         mGoogleApiClient.connect();
     }
 
-
     @Override
     public void onResult(People.LoadPeopleResult peopleData) {
         switch (peopleData.getStatus().getStatusCode()) {
             case CommonStatusCodes.SUCCESS:
-//                PersonBuffer personBuffer = peopleData.getPersonBuffer();
-//                try {
-//                    int count = personBuffer.getCount();
-//                    for (int i = 0; i < count; i++) {
-//                        mListItems.add(personBuffer.get(i).getDisplayName());
-//                    }
-//                } finally {
-//                    personBuffer.close();
-//                }
-//
-//                mListAdapter.notifyDataSetChanged();
                 Person gPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
                 System.out.println("gPerson..." + gPerson);
                 break;
@@ -163,99 +152,10 @@ public class LoginActivity extends AppCompatActivity implements
 
             default:
                 Log.e(LOG_TAG, "err while logging-in G+ user: " + peopleData.getStatus());
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                mGoogleApiClient.disconnect();
+                mGoogleApiClient.connect();
                 break;
         }
     }
-
-    /**
-     * Handle results for your startActivityForResult() calls. Use requestCode
-     * to differentiate.
-     */
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == SIGN_IN_REQUEST_CODE) {
-//            if (resultCode != RESULT_OK) {
-//                mSignInClicked = false;
-//            }
-//            mIntentInProgress = false;
-//            if (!mGoogleApiClient.isConnecting()) {
-//                mGoogleApiClient.connect();
-//            }
-//        } else if (requestCode == AppConstants.KV.REQUEST_SIGNUP.getIntValue()) {
-//            if (resultCode == RESULT_OK) {
-//                BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
-//                finish();
-//            }
-//        }
-//    }
-
-
-//
-//    //    @OnClick(R.id.sign_out_button)
-//    public void processSignOut() {
-//        if (mGoogleApiClient.isConnected()) {
-//            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-//            mGoogleApiClient.reconnect();
-//            processUIUpdate(false);
-//        }
-//    }
-//
-//    @OnClick(R.id.btn_signin_google)
-//    public void processSignIn() {
-//        if (!mGoogleApiClient.isConnecting()) {
-//            processSignInError();
-//            mSignInClicked = true;
-//        }
-//    }
-
-//    private void processSignInError() {
-//        if (mConnectionResult != null && mConnectionResult.hasResolution()) {
-//            try {
-//                mIntentInProgress = true;
-//                mConnectionResult.startResolutionForResult(LoginActivity.this,
-//                        SIGN_IN_REQUEST_CODE);
-//            } catch (IntentSender.SendIntentException e) {
-//                mIntentInProgress = false;
-//                mGoogleApiClient.connect();
-//            }
-//        }
-//    }
-
-    /**
-     * Callback for GoogleApiClient connection failure
-     */
-//    @Override
-//    public void onConnectionFailed(ConnectionResult result) {
-//        if (!result.hasResolution()) {
-//            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
-//                    ERROR_DIALOG_REQUEST_CODE).show();
-//            return;
-//        }
-//        if (!mIntentInProgress) {
-//            mConnectionResult = result;
-//            if (mSignInClicked) {
-//                processSignInError();
-//            }
-//        }
-//    }
-
-    /**
-     * Callback for GoogleApiClient connection success
-     */
-//    @Override
-//    public void onConnected(Bundle connectionHint) {
-//        mSignInClicked = false;
-//
-//        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
-//    }
-//
-//    /**
-//     * Callback for suspension of current connection
-//     */
-//    @Override
-//    public void onConnectionSuspended(int cause) {
-//        mGoogleApiClient.connect();
-//    }
 }
