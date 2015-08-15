@@ -34,6 +34,8 @@ public class LoginActivity extends AppCompatActivity implements
     SignInButton gSignInButton;
 
     private GoogleApiClient mGoogleApiClient;
+    private boolean mIsResolving = false;
+    private boolean mShouldResolve = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +48,11 @@ public class LoginActivity extends AppCompatActivity implements
                 new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
-                        .addApi(Plus.API)
-                        .addScope(new Scope(Scopes.PROFILE))
-                        .addScope(new Scope(Scopes.PLUS_LOGIN))
+                        .addApi(Plus.API, Plus.PlusOptions.builder().build())
+                        .addScope(Plus.SCOPE_PLUS_LOGIN)
                         .build();
     }
 
-
-    /* Is there a ConnectionResult resolution in progress? */
-    private boolean mIsResolving = false;
-
-    /* Should we automatically resolve ConnectionResults when possible? */
-    private boolean mShouldResolve = false;
 
     @OnClick(R.id.btn_signin_google)
     public void onClickGoogleSignIn() {
@@ -69,9 +64,6 @@ public class LoginActivity extends AppCompatActivity implements
         // attempt to resolve any errors that occur.
         mShouldResolve = true;
         mGoogleApiClient.connect();
-
-        // Show a message to the user that we are signing in.
-//        mStatusTextView.setText(R.string.signing_in);
     }
 
 
@@ -126,7 +118,13 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle connectionHint) {
 //        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
-        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
+        Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        if(person != null ){
+            Log.d(LOG_TAG, "logged-in successfully");
+        }
+
+
+//        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
     }
 
     /**
@@ -141,8 +139,8 @@ public class LoginActivity extends AppCompatActivity implements
     public void onResult(People.LoadPeopleResult peopleData) {
         switch (peopleData.getStatus().getStatusCode()) {
             case CommonStatusCodes.SUCCESS:
-                Person gPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-                System.out.println("gPerson..." + gPerson);
+                Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+                Log.d(LOG_TAG, "\n\n\n****** onResult person located " + person);
                 break;
 
             case CommonStatusCodes.SIGN_IN_REQUIRED:
@@ -152,9 +150,6 @@ public class LoginActivity extends AppCompatActivity implements
 
             default:
                 Log.e(LOG_TAG, "err while logging-in G+ user: " + peopleData.getStatus());
-                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                mGoogleApiClient.disconnect();
-                mGoogleApiClient.connect();
                 break;
         }
     }

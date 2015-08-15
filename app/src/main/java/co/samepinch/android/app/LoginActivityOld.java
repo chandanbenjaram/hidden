@@ -1,31 +1,32 @@
-package co.samepinch.android.app.helpers;
+package co.samepinch.android.app;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.People.LoadPeopleResult;
+import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
@@ -47,19 +48,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import co.samepinch.android.app.R;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 
-/**
- * Android Google+ Quickstart activity.
- *
- * Demonstrates Google+ Sign-In and usage of the Google+ APIs to retrieve a
- * users profile information.
- */
-public class LoginGOOGFragment extends AppCompatActivity implements
-        ConnectionCallbacks, OnConnectionFailedListener,
-        ResultCallback<LoadPeopleResult>, View.OnClickListener, GoogleApiClient.ServerAuthCodeCallbacks {
+public class LoginActivityOld extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        ResultCallback<People.LoadPeopleResult>, GoogleApiClient.ServerAuthCodeCallbacks {
 
-    private static final String TAG = "android-plus-quickstart";
+    private static final String TAG = "LoginActivity";
 
     private static final int STATE_DEFAULT = 0;
     private static final int STATE_SIGN_IN = 1;
@@ -127,35 +127,28 @@ public class LoginGOOGFragment extends AppCompatActivity implements
     // so there would be nowhere to send the code.
     private boolean mServerHasToken = true;
 
-    private SignInButton mSignInButton;
-    private Button mSignOutButton;
-    private Button mRevokeButton;
-    private TextView mStatus;
-    private ListView mCirclesListView;
-    private ArrayAdapter<String> mCirclesAdapter;
-    private ArrayList<String> mCirclesList;
+
+    @Bind(R.id.btn_signin_google)
+    SignInButton gSignInButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_goog);
-
-        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
-        mRevokeButton = (Button) findViewById(R.id.revoke_access_button);
-        mStatus = (TextView) findViewById(R.id.sign_in_status);
-
-        // Button listeners
-        mSignInButton.setOnClickListener(this);
-        mSignOutButton.setOnClickListener(this);
-        mRevokeButton.setOnClickListener(this);
-
+        setContentView(R.layout.login);
+        ButterKnife.bind(LoginActivityOld.this);
         if (savedInstanceState != null) {
             mSignInProgress = savedInstanceState
                     .getInt(SAVED_PROGRESS, STATE_DEFAULT);
         }
 
+        gSignInButton.setSize(SignInButton.SIZE_WIDE);
         mGoogleApiClient = buildGoogleApiClient();
+    }
+
+    @OnClick(R.id.btn_signin_google)
+    public void onClickGoogleSignIn() {
+        mSignInProgress = STATE_SIGN_IN;
+        mGoogleApiClient.connect();
     }
 
     private GoogleApiClient buildGoogleApiClient() {
@@ -169,17 +162,10 @@ public class LoginGOOGFragment extends AppCompatActivity implements
                 .addScope(Plus.SCOPE_PLUS_LOGIN);
 
         if (mRequestServerAuthCode) {
-            checkServerAuthConfiguration();
             builder = builder.requestServerAuthCode(WEB_CLIENT_ID, this);
         }
 
         return builder.build();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
     }
 
     @Override
@@ -197,41 +183,6 @@ public class LoginGOOGFragment extends AppCompatActivity implements
         outState.putInt(SAVED_PROGRESS, mSignInProgress);
     }
 
-    @Override
-    public void onClick(View v) {
-        if (!mGoogleApiClient.isConnecting()) {
-            // We only process button clicks when GoogleApiClient is not transitioning
-            // between connected and not connected.
-            switch (v.getId()) {
-                case R.id.sign_in_button:
-                    mSignInProgress = STATE_SIGN_IN;
-                    mGoogleApiClient.connect();
-                    break;
-                case R.id.sign_out_button:
-                    // We clear the default account on sign out so that Google Play
-                    // services will not return an onConnected callback without user
-                    // interaction.
-                    if (mGoogleApiClient.isConnected()) {
-                        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                        mGoogleApiClient.disconnect();
-                    }
-                    onSignedOut();
-                    break;
-                case R.id.revoke_access_button:
-                    // After we revoke permissions for the user with a GoogleApiClient
-                    // instance, we must discard it and create a new one.
-                    Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                    // Our sample has caches no user data from Google+, however we
-                    // would normally register a callback on revokeAccessAndDisconnect
-                    // to delete user data so that we comply with Google developer
-                    // policies.
-                    Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient);
-                    mGoogleApiClient = buildGoogleApiClient();
-                    mGoogleApiClient.connect();
-                    break;
-            }
-        }
-    }
 
     /* onConnected is called when our Activity successfully connects to Google
      * Play services.  onConnected indicates that an account was selected on the
@@ -244,14 +195,9 @@ public class LoginGOOGFragment extends AppCompatActivity implements
         // Reaching onConnected means we consider the user signed in.
         Log.i(TAG, "onConnected");
 
-        // Update the user interface to reflect that the user is signed in.
-        mSignInButton.setEnabled(false);
-        mSignOutButton.setEnabled(true);
-        mRevokeButton.setEnabled(true);
 
         // Retrieve some profile information to personalize our app for the user.
         Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-
         Plus.PeopleApi.loadVisible(mGoogleApiClient, null)
                 .setResultCallback(this);
 
@@ -289,10 +235,6 @@ public class LoginGOOGFragment extends AppCompatActivity implements
                 resolveSignInError();
             }
         }
-
-        // In this sample we consider the user signed out whenever they do not have
-        // a connection to Google Play services.
-        onSignedOut();
     }
 
     /* Starts an appropriate intent or dialog for user interaction to resolve
@@ -316,7 +258,7 @@ public class LoginGOOGFragment extends AppCompatActivity implements
                 mSignInProgress = STATE_IN_PROGRESS;
                 startIntentSenderForResult(mSignInIntent.getIntentSender(),
                         RC_SIGN_IN, null, 0, 0, 0);
-            } catch (SendIntentException e) {
+            } catch (IntentSender.SendIntentException e) {
                 Log.i(TAG, "Sign in intent could not be sent: "
                         + e.getLocalizedMessage());
                 // The intent was canceled before it was sent.  Attempt to connect to
@@ -330,36 +272,6 @@ public class LoginGOOGFragment extends AppCompatActivity implements
             // dialog which may still start an intent on our behalf if the
             // user can resolve the issue.
             createErrorDialog().show();
-        }
-    }
-
-    private Dialog createErrorDialog() {
-        if (GooglePlayServicesUtil.isUserRecoverableError(mSignInError)) {
-            return GooglePlayServicesUtil.getErrorDialog(
-                    mSignInError,
-                    this,
-                    RC_SIGN_IN,
-                    new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            Log.e(TAG, "Google Play services resolution cancelled");
-                            mSignInProgress = STATE_DEFAULT;
-                            mStatus.setText(R.string.status_signed_out);
-                        }
-                    });
-        } else {
-            return new AlertDialog.Builder(this)
-                    .setMessage(R.string.play_services_error)
-                    .setPositiveButton(R.string.close,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Log.e(TAG, "Google Play services error could not be "
-                                            + "resolved: " + mSignInError);
-                                    mSignInProgress = STATE_DEFAULT;
-                                    mStatus.setText(R.string.status_signed_out);
-                                }
-                            }).create();
         }
     }
 
@@ -388,34 +300,22 @@ public class LoginGOOGFragment extends AppCompatActivity implements
     }
 
     @Override
-    public void onResult(LoadPeopleResult peopleData) {
+    public void onResult(People.LoadPeopleResult peopleData) {
         if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
-            mCirclesList.clear();
             PersonBuffer personBuffer = peopleData.getPersonBuffer();
             try {
                 int count = personBuffer.getCount();
                 for (int i = 0; i < count; i++) {
-                    mCirclesList.add(personBuffer.get(i).getDisplayName());
+                    personBuffer.get(i).getDisplayName();
                 }
             } finally {
                 personBuffer.close();
             }
-
-            mCirclesAdapter.notifyDataSetChanged();
         } else {
             Log.e(TAG, "Error requesting visible circles: " + peopleData.getStatus());
         }
     }
 
-    private void onSignedOut() {
-        // Update the UI to reflect that the user is signed out.
-        mSignInButton.setEnabled(true);
-        mSignOutButton.setEnabled(false);
-        mRevokeButton.setEnabled(false);
-
-        mCirclesList.clear();
-        mCirclesAdapter.notifyDataSetChanged();
-    }
 
     @Override
     public void onConnectionSuspended(int cause) {
@@ -423,6 +323,34 @@ public class LoginGOOGFragment extends AppCompatActivity implements
         // We call connect() to attempt to re-establish the connection or get a
         // ConnectionResult that we can attempt to resolve.
         mGoogleApiClient.connect();
+    }
+
+    private Dialog createErrorDialog() {
+        if (GooglePlayServicesUtil.isUserRecoverableError(mSignInError)) {
+            return GooglePlayServicesUtil.getErrorDialog(
+                    mSignInError,
+                    this,
+                    RC_SIGN_IN,
+                    new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            Log.e(TAG, "Google Play services resolution cancelled");
+                            mSignInProgress = STATE_DEFAULT;
+                        }
+                    });
+        } else {
+            return new AlertDialog.Builder(this)
+                    .setMessage(R.string.play_services_error)
+                    .setPositiveButton(R.string.close,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.e(TAG, "Google Play services error could not be "
+                                            + "resolved: " + mSignInError);
+                                    mSignInProgress = STATE_DEFAULT;
+                                }
+                            }).create();
+        }
     }
 
     @Override
@@ -503,7 +431,7 @@ public class LoginGOOGFragment extends AppCompatActivity implements
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(LoginGOOGFragment.this, responseBody, Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivityOld.this, responseBody, Toast.LENGTH_LONG).show();
                 }
             });
             return (statusCode == 200);
@@ -513,26 +441,6 @@ public class LoginGOOGFragment extends AppCompatActivity implements
         } catch (IOException e) {
             Log.e(TAG, "Error in auth code exchange.", e);
             return false;
-        }
-    }
-
-    private void checkServerAuthConfiguration() {
-        // Check that the server URL is configured before allowing this box to
-        // be unchecked
-        if ("WEB_CLIENT_ID".equals(WEB_CLIENT_ID) ||
-                "SERVER_BASE_URL".equals(SERVER_BASE_URL)) {
-            Log.w(TAG, "WEB_CLIENT_ID or SERVER_BASE_URL configured incorrectly.");
-            Dialog dialog = new AlertDialog.Builder(this)
-                    .setMessage("")
-                    .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .create();
-
-            dialog.show();
         }
     }
 }
