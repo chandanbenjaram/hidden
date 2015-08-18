@@ -3,9 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/fb_login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_gravity="center_horizontal" />
+    <ViewSwitcher
+        android:id="@+id/vs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/fb_login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Last Name Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/strut1"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/input_pinchHandle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Pinch Handle"
+                android:inputType="textAutoComplete|textAutoCorrect"
+                android:singleLine="true" />
+        </android.support.design.widget.TextInputLayout>
+
+
+    </ViewSwitcher>
 </FrameLayout>

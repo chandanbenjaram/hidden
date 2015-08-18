@@ -83,4 +83,10 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class MessageEvent extends EventBase {
+        public MessageEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }

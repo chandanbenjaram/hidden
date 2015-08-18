@@ -2,6 +2,7 @@ package co.samepinch.android.app.helpers;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +10,10 @@ import android.view.ViewGroup;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.squareup.otto.Subscribe;
@@ -18,10 +21,12 @@ import com.squareup.otto.Subscribe;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.intent.FBAuthService;
 import co.samepinch.android.app.helpers.intent.SignOutService;
@@ -29,8 +34,8 @@ import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
 public class LoginFBFragment extends android.support.v4.app.Fragment {
-    public static final String LOG_TAG = "LoginFBFragment";
-    private static final String PROVIDER = "facebook";
+    public static final String TAG = "LoginFBFragment";
+    private static final int CHOOSE_PINCH_HANDLE = 77;
 
     @Bind(R.id.fb_login_button)
     LoginButton loginButton;
@@ -44,6 +49,12 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // fallback
+        if (!FacebookSdk.isInitialized()) {
+            Fresco.initialize(getActivity().getApplicationContext());
+        }
+
+        // tracker
         accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
@@ -52,6 +63,7 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
             }
         };
 
+        // callback
         callbackManager = CallbackManager.Factory.create();
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null) {
@@ -73,8 +85,15 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CHOOSE_PINCH_HANDLE) {
+            String pinchHandle = data.getStringExtra("PINCH_HANDLE");
+        }
+
     }
 
     private void fetchUserInfo() {
@@ -94,11 +113,26 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
                 if (user != null) {
                     iArgs.putString("user", user.toString());
                 }
-                // call for intent
-                Intent mServiceIntent =
-                        new Intent(getActivity(), FBAuthService.class);
-                mServiceIntent.putExtras(iArgs);
-                getActivity().startService(mServiceIntent);
+
+                Map<String, String> msg = new HashMap<>();
+                msg.put(AppConstants.K.MESSAGE.name(), "facebook log-in successful.\nlogging into SamePinch...hang-on!");
+                BusProvider.INSTANCE.getBus().post(new Events.MessageEvent(msg));
+
+                if (true) {
+                    // TARGET
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+                    // intent
+                    Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+                    startActivityForResult(intent, CHOOSE_PINCH_HANDLE);
+                } else {
+                    // call for intent
+                    Intent mServiceIntent =
+                            new Intent(getActivity(), FBAuthService.class);
+                    mServiceIntent.putExtras(iArgs);
+                    getActivity().startService(mServiceIntent);
+                }
             }
         });
         request.executeAsync();
@@ -114,37 +148,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
             }
         });
     }
-//
-//    @Subscribe
-//    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
-//        Map<String, String> eventData = event.getMetaData();
-//
-//        getActivity().runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        });
-//    }
-//
-//    @Subscribe
-//    public void onAuthFailEvent(final Events.AuthFailEvent event) {
-//        Map<String, String> eventData = event.getMetaData();
-//        getActivity().runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        });
-//    }
-//
-//    @Subscribe
-//    public void onAuthOutEvent(final Events.AuthOutEvent event) {
-//        Map<String, String> eventData = event.getMetaData();
-//        getActivity().runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        });
-//    }
 
     @Override
     public void onResume() {

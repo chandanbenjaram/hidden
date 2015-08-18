@@ -98,8 +98,7 @@ public class SignOutService extends IntentService {
             mGoogleApiClient.blockingConnect();
             if (mGoogleApiClient.isConnected()) {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                mGoogleApiClient.disconnect();
-                mGoogleApiClient.connect();
+                mGoogleApiClient.reconnect();
             }
         }
 //        Runnable runnable = new Runnable() {

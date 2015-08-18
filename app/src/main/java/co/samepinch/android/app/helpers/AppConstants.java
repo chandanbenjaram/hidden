@@ -108,6 +108,7 @@ public class AppConstants {
         FRAGMENT_TAGWALL,
         FRAGMENT_DOTWALL,
         FRAGMENT_COMMENT,
+        FRAGMENT_CHOOSE_HANDLE,
         KEY_TAG,
         KEY_DOT,
         Wall,
@@ -115,6 +116,7 @@ public class AppConstants {
         facebook,
         google,
         via_email_password,
-        provider
+        provider,
+        MESSAGE
     }
 }

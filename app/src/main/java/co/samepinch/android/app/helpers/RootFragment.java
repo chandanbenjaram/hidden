@@ -44,6 +44,9 @@ public class RootFragment extends Fragment {
             case FRAGMENT_COMMENT:
                 fragment = new CommentFragment();
                 break;
+            case FRAGMENT_CHOOSE_HANDLE:
+                fragment = new ChooseHandleFragment();
+                break;
             default:
                 throw new IllegalArgumentException("invalid URI");
         }
