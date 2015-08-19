@@ -21,6 +21,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
@@ -316,7 +317,6 @@ public class Utils {
     }
 
 
-
     public static void setupLoadingImageHolder(SimpleDraweeView iView, String imageUrl) {
         Uri uri = Uri.parse(imageUrl);
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
@@ -333,6 +333,15 @@ public class Utils {
         return arg0 == null ? "" : arg0;
     }
 
+
+    public static String getNonBlankAppToken() {
+        String token = getAppToken(false);
+        if (StringUtils.isBlank(token)) {
+            token = getAppToken(true);
+        }
+
+        return token;
+    }
 
     public static String getAppToken(boolean renew) {
         Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
@@ -453,13 +462,13 @@ public class Utils {
         return date;
     }
 
-    public static String dateToString(long ts){
+    public static String dateToString(long ts) {
         long localTS = ts - TimeZone.getDefault().getRawOffset();
         return DateFormatUtils.format(localTS, DEFAULT_DATE_FORMAT.getValue());
     }
 
-    public static String dateToString(Date date){
-        if(date == null){
+    public static String dateToString(Date date) {
+        if (date == null) {
             return "";
         }
         return DateFormatUtils.format(date, DEFAULT_DATE_FORMAT.getValue());
@@ -509,18 +518,18 @@ public class Utils {
         view.setText(spanTxt, TextView.BufferType.SPANNABLE);
     }
 
-    public static String getUniqueImageFilename(){
+    public static String getUniqueImageFilename() {
         return Long.toString(System.currentTimeMillis());
     }
 
-    public static Resp parseAsRespSilently(Exception e){
+    public static Resp parseAsRespSilently(Exception e) {
         Resp resp = null;
-        try{
-            if(e instanceof HttpClientErrorException){
+        try {
+            if (e instanceof HttpClientErrorException) {
                 Gson gson = new Gson();
-                resp = gson.fromJson(((HttpClientErrorException)e).getResponseBodyAsString(), Resp.class);
+                resp = gson.fromJson(((HttpClientErrorException) e).getResponseBodyAsString(), Resp.class);
             }
-        }catch(Exception muted){
+        } catch (Exception muted) {
             // ignored
         }
         return resp;

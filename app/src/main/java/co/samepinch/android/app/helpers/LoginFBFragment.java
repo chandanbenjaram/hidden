@@ -1,7 +1,11 @@
 package co.samepinch.android.app.helpers;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +22,14 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,8 +41,13 @@ import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.intent.FBAuthService;
 import co.samepinch.android.app.helpers.intent.SignOutService;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RestClient;
 
 public class LoginFBFragment extends android.support.v4.app.Fragment {
     public static final String TAG = "LoginFBFragment";
@@ -43,16 +59,24 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
 
-    public LoginFBFragment() {
-    }
+    ProgressDialog progressDialog;
+    private JSONObject fbUserObject;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
+
         // fallback
         if (!FacebookSdk.isInitialized()) {
             Fresco.initialize(getActivity().getApplicationContext());
         }
+
+        progressDialog = new ProgressDialog(getActivity(),
+                R.style.Theme_AppCompat_Dialog);
+        progressDialog.setCancelable(Boolean.FALSE);
 
         // tracker
         accessTokenTracker = new AccessTokenTracker() {
@@ -92,12 +116,25 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
         if (requestCode == CHOOSE_PINCH_HANDLE) {
             String pinchHandle = data.getStringExtra("PINCH_HANDLE");
+            Bundle iArgs = new Bundle();
+            if (fbUserObject != null && StringUtils.isNotBlank(pinchHandle)) {
+                try{
+                    fbUserObject.put("pinch_handle", pinchHandle);
+                }catch(JSONException e){
+                    //muted
+                }
+                iArgs.putString("user", fbUserObject.toString());
+            }
+            // call for intent
+            Intent mServiceIntent =
+                    new Intent(getActivity(), FBAuthService.class);
+            mServiceIntent.putExtras(iArgs);
+            getActivity().startService(mServiceIntent);
         }
-
     }
 
     private void fetchUserInfo() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        final AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null) {
             // call for intent
             Intent mServiceIntent =
@@ -105,34 +142,37 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
             getActivity().startService(mServiceIntent);
             return;
         }
+
+        progressDialog.setMessage("facebook sign-in success");
+        progressDialog.show();
+
         // login user
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject user, GraphResponse response) {
-                Bundle iArgs = new Bundle();
-                if (user != null) {
-                    iArgs.putString("user", user.toString());
-                }
+                fbUserObject = user;
 
-                Map<String, String> msg = new HashMap<>();
-                msg.put(AppConstants.K.MESSAGE.name(), "facebook log-in successful.\nlogging into SamePinch...hang-on!");
-                BusProvider.INSTANCE.getBus().post(new Events.MessageEvent(msg));
+//                Map<String, String> msg = new HashMap<>();
+//                msg.put(AppConstants.K.MESSAGE.name(), "facebook log-in successful.\nlogging into SamePinch...hang-on!");
+//                BusProvider.INSTANCE.getBus().post(new Events.MessageEvent(msg));
 
-                if (true) {
-                    // TARGET
-                    Bundle args = new Bundle();
-                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
-                    // intent
-                    Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
-                    intent.putExtras(args);
-                    startActivityForResult(intent, CHOOSE_PINCH_HANDLE);
-                } else {
-                    // call for intent
-                    Intent mServiceIntent =
-                            new Intent(getActivity(), FBAuthService.class);
-                    mServiceIntent.putExtras(iArgs);
-                    getActivity().startService(mServiceIntent);
-                }
+                new CheckExistenceTask().execute(accessToken.getUserId());
+
+//                if (true) {
+//                    // TARGET
+//                    Bundle args = new Bundle();
+//                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+//                    // intent
+//                    Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+//                    intent.putExtras(args);
+//                    startActivityForResult(intent, CHOOSE_PINCH_HANDLE);
+//                } else {
+//                    // call for intent
+//                    Intent mServiceIntent =
+//                            new Intent(getActivity(), FBAuthService.class);
+//                    mServiceIntent.putExtras(iArgs);
+//                    getActivity().startService(mServiceIntent);
+//                }
             }
         });
         request.executeAsync();
@@ -176,4 +216,107 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
     }
+
+    private class CheckExistenceTask extends AsyncTask<String, Integer, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setMessage("locating your account");
+        }
+
+        @Override
+        protected Boolean doInBackground(String... args) {
+            StorageComponent component = DaggerStorageComponent.create();
+            ReqSetBody req = component.provideReqSetBody();
+            // set base args
+            req.setToken(Utils.getNonBlankAppToken());
+            req.setCmd("isUserExists");
+
+            Map<String, String> body = new HashMap<>();
+            body.put(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
+            body.put("oauth_uid", args[0]);
+            req.setBody(body);
+
+            //headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            try {
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp.getBody() != null) {
+                    return resp.getBody().getStatus() == 400;
+                }
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                if (resp != null && resp.getStatus() == 400) {
+                    return Boolean.TRUE;
+                } else {
+                    Log.e(TAG, "err validating...");
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            Intent resultIntent = new Intent();
+            if (result != null) {
+                if (result.booleanValue()) {
+                    handler.sendEmptyMessage(1);
+                } else {
+                    handler.sendEmptyMessage(0);
+                }
+            } else {
+                handler.sendEmptyMessage(-1);
+            }
+        }
+    }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            // call for intent
+            Intent signOutIntent =
+                    new Intent(getActivity(), SignOutService.class);
+            switch (msg.what) {
+                case 0:
+                    progressDialog.setMessage("setting up your account...");
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+                    // intent
+                    Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+                    startActivityForResult(intent, CHOOSE_PINCH_HANDLE);
+                    break;
+                case 1:
+                    progressDialog.setMessage("found your account.\nsigning-in...");
+                    Bundle iArgs = new Bundle();
+                    if (fbUserObject != null) {
+                        iArgs.putString("user", fbUserObject.toString());
+                    } else {
+                        progressDialog.setMessage("sign-in failed\ntry again");
+                        progressDialog.dismiss();
+                        // call for intent
+                        getActivity().startService(signOutIntent);
+                        return;
+                    }
+                    // call for intent
+                    Intent mServiceIntent =
+                            new Intent(getActivity(), FBAuthService.class);
+                    mServiceIntent.putExtras(iArgs);
+                    getActivity().startService(mServiceIntent);
+                    break;
+                default:
+                    progressDialog.setMessage("sign-in failed\ntry again");
+                    progressDialog.dismiss();
+                    getActivity().startService(signOutIntent);
+                    break;
+            }
+        }
+    };
+
 }

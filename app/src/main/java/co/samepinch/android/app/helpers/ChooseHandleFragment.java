@@ -32,6 +32,7 @@ import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
 public class ChooseHandleFragment extends android.support.v4.app.Fragment {
@@ -44,7 +45,7 @@ public class ChooseHandleFragment extends android.support.v4.app.Fragment {
     EditText mInputPinchHandle;
 
     @Bind(R.id.status)
-    TextView mStatus;
+    TextView status;
 
     @Bind(R.id.btn_clear)
     Button mClearButton;
@@ -92,7 +93,6 @@ public class ChooseHandleFragment extends android.support.v4.app.Fragment {
 
     }
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -105,7 +105,7 @@ public class ChooseHandleFragment extends android.support.v4.app.Fragment {
             StorageComponent component = DaggerStorageComponent.create();
             ReqSetBody req = component.provideReqSetBody();
             // set base args
-            req.setToken(Utils.getAppToken(false));
+            req.setToken(Utils.getNonBlankAppToken());
             req.setCmd("validatePinchHandle");
 
             Map<String, String> body = new HashMap<>();
@@ -117,32 +117,40 @@ public class ChooseHandleFragment extends android.support.v4.app.Fragment {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             try {
-                HttpEntity<ReqSetBody> payloadEntity;
-                ResponseEntity<String> resp = null;
-
-                payloadEntity = new HttpEntity<>(req, headers);
-                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
-                return Boolean.TRUE;
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp != null) {
+                    return resp.getBody().getStatus() == 200;
+                }
             } catch (Exception e) {
-                //muted
-                Log.d(TAG, "e:" + e);
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                if (resp != null && resp.getStatus() == 400) {
+                    return Boolean.FALSE;
+                } else {
+                    Log.e(TAG, "err validating...");
+                }
+
             }
 
-            return Boolean.FALSE;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean != null && aBoolean.booleanValue()) {
-                mStatus.setText("available");
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("PINCH_HANDLE", mInputPinchHandle.getText().toString());
-                getActivity().setResult(Activity.RESULT_OK, resultIntent);
-                getActivity().finish();
-            } else {
-                mInputPinchHandle.setError("taken. choose a different handle.");
+        protected void onPostExecute(Boolean result) {
+            if (result != null) {
+                if (result.booleanValue()) {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("PINCH_HANDLE", mInputPinchHandle.getText().toString());
+                    getActivity().setResult(Activity.RESULT_OK, resultIntent);
+                    getActivity().finish();
+                } else {
+                    mInputPinchHandle.setError("already taken. choose another one.");
+                }
+                return;
             }
+
+            status.setText("try again...");
         }
     }
-
 }

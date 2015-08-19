@@ -54,7 +54,7 @@ public class FBAuthService extends IntentService {
 
             // set base args
             String token = Utils.getAppToken(false);
-            if(StringUtils.isBlank(token)){
+            if (StringUtils.isBlank(token)) {
                 token = Utils.getAppToken(true);
             }
             loginReq.setToken(token);
@@ -88,14 +88,16 @@ public class FBAuthService extends IntentService {
         }
     }
 
-    private Map<String, String> toBodyPayload(JSONObject arg0) throws JSONException{
+    private Map<String, String> toBodyPayload(JSONObject arg0) throws JSONException {
         Map<String, String> body = new HashMap<>();
         body.put(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
         body.put("oauth_uid", Utils.emptyIfNull(arg0.getString("id")));
         body.put("fname", Utils.emptyIfNull(arg0.getString("first_name")));
         body.put("lname", Utils.emptyIfNull(arg0.getString("last_name")));
         body.put("email", Utils.emptyIfNull(arg0.getString("email")));
-        body.put("pinch_handle", StringUtils.deleteWhitespace(arg0.getString("name")));
+        if (arg0.has("pinch_handle")) {
+            body.put("pinch_handle", arg0.getString("pinch_handle"));
+        }
         body.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
         return body;
     }

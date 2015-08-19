@@ -28,9 +28,12 @@
             fresco:roundAsCircle="true" />
 
         <TextView
+            android:id="@+id/status"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="almost done. choose your unique pinch handle." />
+            android:layout_height="wrap_content"
+            android:text="almost done."
+            android:gravity="center"
+            android:paddingTop="24dp"/>
 
         <!-- Pinch Handle Label -->
         <android.support.design.widget.TextInputLayout
@@ -44,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:capitalize="none"
-                android:hint="Pinch Handle"
+                android:hint="CHOOSE YOUR UNIQUE PINCH HANDLE"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
 
@@ -72,11 +75,5 @@
                 android:padding="5dp"
                 android:text="Done" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="almost done. choose your unique pinch handle." />
     </LinearLayout>
 </ScrollView>
