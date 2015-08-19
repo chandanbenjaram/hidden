@@ -48,8 +48,7 @@ public class FBAuthService extends IntentService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
-            JSONObject userObj = new JSONObject(intent.getStringExtra("user"));
-            Map<String, String> reqBody = toBodyPayload(userObj);
+            Map<String, String> reqBody = (Map<String, String>) intent.getSerializableExtra("user");
             loginReq.setBody(reqBody);
 
             // set base args
@@ -76,7 +75,7 @@ public class FBAuthService extends IntentService {
                     throw new IllegalStateException("un-known response code.", e);
                 }
             }
-            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.facebook.name());
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), intent.getStringExtra("provider"));
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
         } catch (Exception e) {
@@ -88,7 +87,7 @@ public class FBAuthService extends IntentService {
         }
     }
 
-    private Map<String, String> toBodyPayload(JSONObject arg0) throws JSONException {
+    public static Map<String, String> toMap(JSONObject arg0) throws JSONException {
         Map<String, String> body = new HashMap<>();
         body.put(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
         body.put("oauth_uid", Utils.emptyIfNull(arg0.getString("id")));

@@ -1,8 +1,12 @@
 package co.samepinch.android.app;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,15 +20,34 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.squareup.otto.Subscribe;
 
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.intent.FBAuthService;
+import co.samepinch.android.app.helpers.intent.SignOutService;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RestClient;
 
 public class LoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ServerAuthCodeCallbacks {
@@ -39,12 +62,20 @@ public class LoginActivity extends AppCompatActivity implements
     private boolean mIsResolving = false;
     private boolean mShouldResolve = false;
 
+    private ProgressDialog progressDialog;
+    private Map<String, String> gUserObject;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         ButterKnife.bind(LoginActivity.this);
         BusProvider.INSTANCE.getBus().register(this);
+
+        progressDialog = new ProgressDialog(LoginActivity.this,
+                R.style.Theme_AppCompat_Dialog);
+        progressDialog.setCancelable(Boolean.FALSE);
 
         gSignInButton.setSize(SignInButton.SIZE_WIDE);
         mGoogleApiClient =
@@ -96,23 +127,57 @@ public class LoginActivity extends AppCompatActivity implements
                 BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
                 finish();
             }
+        } else if (requestCode == Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue())) {
+            try {
+                gUserObject.put("pinch_handle", data.getStringExtra("PINCH_HANDLE"));
+                Bundle iArgs = new Bundle();
+                iArgs.putString(AppConstants.K.provider.name(), AppConstants.K.google.name());
+                iArgs.putSerializable("user", (Serializable) gUserObject);
+                // call for intent
+                Intent mServiceIntent =
+                        new Intent(getApplicationContext(), FBAuthService.class);
+                mServiceIntent.putExtras(iArgs);
+                startService(mServiceIntent);
+            } catch (Exception e) {
+                // call for intent
+                Intent signOutIntent =
+                        new Intent(getApplicationContext(), SignOutService.class);
+                startService(signOutIntent);
+            }
         }
     }
 
     @Override
     public void onConnected(Bundle data) {
+        progressDialog.setMessage("google sign-in successful");
+        progressDialog.show();
 //        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
-        Log.i(TAG, "data is null?" + (data == null));
-
+        String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
         Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-//        Plus.PeopleApi.loadConnected(mGoogleApiClient);
-//        if(person != null ){
-//            Log.d(TAG, "logged-in successfully...");
-//        }
+        Person.Name personName = person.getName();
+        String fName = personName.getGivenName();
+        String lName = personName.getFamilyName();
+        Person.Image personImage = person.getImage();
+        String imageUrl = personImage.getUrl();
 
+        // clear user object
+        if (gUserObject == null) {
+            gUserObject = new HashMap<>();
+        } else {
+            gUserObject.clear();
+        }
+        gUserObject.put(AppConstants.K.provider.name(), AppConstants.K.google.name());
+        gUserObject.put("oauth_uid", person.getId());
+        gUserObject.put("fname", fName);
+        gUserObject.put("lname", lName);
+        gUserObject.put("email", email);
+        gUserObject.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
+
+        new CheckExistenceTask().execute(person.getId());
 
 //        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
     }
+
 
     /**
      * Callback for suspension of current connection
@@ -289,9 +354,130 @@ public class LoginActivity extends AppCompatActivity implements
             LoginActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
                     Snackbar.make(findViewById(R.id.login_layout), event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
                 }
             });
     }
+
+    @Subscribe
+    public void onAuthFailEvent(final Events.AuthFailEvent event) {
+        Map<String, String> eventData = event.getMetaData();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.dismissSilently(progressDialog);
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                if(mGoogleApiClient.isConnected()){
+                    mGoogleApiClient.disconnect();
+                }
+            }
+        });
+    }
+
+    private class CheckExistenceTask extends AsyncTask<String, Integer, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setMessage("locating your account");
+        }
+
+        @Override
+        protected Boolean doInBackground(String... args) {
+            StorageComponent component = DaggerStorageComponent.create();
+            ReqSetBody req = component.provideReqSetBody();
+            // set base args
+            req.setToken(Utils.getNonBlankAppToken());
+            req.setCmd("isUserExists");
+
+            Map<String, String> body = new HashMap<>();
+            body.put(AppConstants.K.provider.name(), AppConstants.K.google.name());
+            body.put("oauth_uid", args[0]);
+            req.setBody(body);
+
+            //headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            try {
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp.getBody() != null) {
+                    return resp.getBody().getStatus() == 400;
+                }
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                if (resp != null && resp.getStatus() == 400) {
+                    return Boolean.TRUE;
+                } else {
+                    Log.e(TAG, "err validating...");
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            Intent resultIntent = new Intent();
+            if (result != null) {
+                if (result.booleanValue()) {
+                    handler.sendEmptyMessage(1);
+                } else {
+                    handler.sendEmptyMessage(0);
+                }
+            } else {
+                handler.sendEmptyMessage(-1);
+            }
+        }
+    }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            // call for intent
+            Intent signOutIntent =
+                    new Intent(LoginActivity.this, SignOutService.class);
+            switch (msg.what) {
+                case 0:
+                    progressDialog.setMessage("setting up your account...");
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+                    // intent
+                    Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+                    startActivityForResult(intent, Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue()));
+                    break;
+                case 1:
+                    Bundle iArgs = new Bundle();
+                    if (gUserObject != null) {
+                        iArgs.putString(AppConstants.K.provider.name(), AppConstants.K.google.name());
+                        try {
+                            iArgs.putSerializable("user", (Serializable) gUserObject);
+                        } catch (Exception e) {
+                            // muted
+                        }
+                    } else {
+                        progressDialog.setMessage("sign-in failed\ntry again");
+                        Utils.dismissSilently(progressDialog);
+                        // call for intent
+                        startService(signOutIntent);
+                        return;
+                    }
+                    // call for intent
+                    Intent mServiceIntent =
+                            new Intent(getApplicationContext(), FBAuthService.class);
+                    mServiceIntent.putExtras(iArgs);
+                    startService(mServiceIntent);
+                    break;
+                default:
+                    progressDialog.setMessage("sign-in failed\ntry again");
+                    Utils.dismissSilently(progressDialog);
+                    startService(signOutIntent);
+                    break;
+            }
+        }
+    };
+
 }

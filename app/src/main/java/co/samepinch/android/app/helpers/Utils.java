@@ -1,5 +1,6 @@
 package co.samepinch.android.app.helpers;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -533,5 +534,11 @@ public class Utils {
             // ignored
         }
         return resp;
+    }
+
+    public static void dismissSilently(ProgressDialog dialog){
+        if(dialog !=null && dialog.isShowing()){
+            dialog.dismiss();
+        }
     }
 }

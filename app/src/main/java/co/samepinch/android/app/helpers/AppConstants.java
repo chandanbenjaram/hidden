@@ -57,6 +57,7 @@ public class AppConstants {
         KEY_PASSWORD("password"),
         KEY_DEVICE_TOKEN("device_token"),
         KEY_CHECK_EMAIL_EXISTENCE("checkEmailExistence"),
+        CHOOSE_PINCH_HANDLE("77")
         ;
 
         private final String value;

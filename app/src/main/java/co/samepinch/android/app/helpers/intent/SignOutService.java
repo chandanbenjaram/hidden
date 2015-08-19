@@ -100,6 +100,22 @@ public class SignOutService extends IntentService {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
                 mGoogleApiClient.reconnect();
             }
+        }else{
+            // do all
+            LoginManager.getInstance().logOut();
+            // google
+            GoogleApiClient mGoogleApiClient =
+                    new GoogleApiClient.Builder(getApplicationContext())
+                            .addApi(Plus.API, Plus.PlusOptions.builder().build())
+                            .addScope(Plus.SCOPE_PLUS_LOGIN)
+                            .addScope(Plus.SCOPE_PLUS_PROFILE)
+                            .build();
+
+            mGoogleApiClient.blockingConnect();
+            if (mGoogleApiClient.isConnected()) {
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                mGoogleApiClient.disconnect();
+            }
         }
 //        Runnable runnable = new Runnable() {
 //            @Override
