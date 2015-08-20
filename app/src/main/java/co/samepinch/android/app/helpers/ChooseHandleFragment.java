@@ -2,6 +2,7 @@ package co.samepinch.android.app.helpers;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -68,6 +69,14 @@ public class ChooseHandleFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_handle, container, false);
         ButterKnife.bind(this, view);
+
+        Bundle iArgs = getArguments();
+        if(iArgs !=null){
+            if(StringUtils.isNotBlank(iArgs.getString("image", ""))) {
+                Uri imgUri = Uri.parse(iArgs.getString("image"));
+                mAvatar.setImageURI(imgUri);
+            }
+        }
 
         return view;
     }

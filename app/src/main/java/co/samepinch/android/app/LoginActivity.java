@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
@@ -22,7 +21,6 @@ import com.google.android.gms.plus.model.people.Person;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -174,7 +172,7 @@ public class LoginActivity extends AppCompatActivity implements
         gUserObject.put("fname", fName);
         gUserObject.put("lname", lName);
         gUserObject.put("email", email);
-        gUserObject.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
+        gUserObject.put("rphoto", imageUrl);
 
         new CheckExistenceTask().execute(person.getId());
 //        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
@@ -460,6 +458,13 @@ public class LoginActivity extends AppCompatActivity implements
                     progressDialog.setMessage("setting up your account...");
                     Bundle args = new Bundle();
                     args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+                    try {
+                        args.putString("fname", gUserObject.get("fname"));
+                        args.putString("lname", gUserObject.get("lname"));
+                        args.putString("image", gUserObject.get("rphoto"));
+                    } catch (Exception e) {
+                        // muted
+                    }
                     // intent
                     Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
                     intent.putExtras(args);

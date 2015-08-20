@@ -3,16 +3,13 @@ package co.samepinch.android.app.helpers.intent;
 import android.app.IntentService;
 import android.content.Intent;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -92,7 +89,7 @@ public class FBAuthService extends IntentService {
         if (arg0.has("pinch_handle")) {
             body.put("pinch_handle", arg0.getString("pinch_handle"));
         }
-        body.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
+        body.put("rphoto", Utils.emptyIfNull(arg0.getString("image")));
         return body;
     }
 }

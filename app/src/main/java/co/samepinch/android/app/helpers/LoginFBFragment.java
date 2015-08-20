@@ -17,15 +17,14 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.plus.Plus;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -63,6 +62,8 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
     private ProgressDialog progressDialog;
     private JSONObject fbUserObject;
+    private String fbUserImg;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,7 +118,9 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
         if (requestCode == Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue())) {
             try {
+                fbUserObject.put("image", fbUserImg);
                 fbUserObject.put("pinch_handle", data.getStringExtra("PINCH_HANDLE"));
+
                 Bundle iArgs = new Bundle();
                 iArgs.putString(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
                 iArgs.putSerializable("user", (Serializable) FBAuthService.toMap(fbUserObject));
@@ -134,8 +137,7 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     }
 
     private void fetchUserInfo() {
-        final AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken == null) {
+        if (AccessToken.getCurrentAccessToken() == null) {
 //            // call for intent
 //            Intent mServiceIntent =
 //                    new Intent(getActivity(), SignOutService.class);
@@ -143,39 +145,54 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
             return;
         }
 
+        final String userId = AccessToken.getCurrentAccessToken().getUserId();
         progressDialog.setMessage("facebook sign-in successful");
         progressDialog.show();
 
-        // login user
-        GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
-            @Override
-            public void onCompleted(JSONObject user, GraphResponse response) {
-                fbUserObject = user;
+        //     public GraphRequest(AccessToken accessToken, String graphPath, Bundle parameters, HttpMethod httpMethod, GraphRequest.Callback callback) {
 
-//                Map<String, String> msg = new HashMap<>();
-//                msg.put(AppConstants.K.MESSAGE.name(), "facebook log-in successful.\nlogging into SamePinch...hang-on!");
-//                BusProvider.INSTANCE.getBus().post(new Events.MessageEvent(msg));
+        GraphRequest meReq = GraphRequest.newMeRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject jsonObject,
+                            GraphResponse response) {
+                        fbUserObject = jsonObject;
+                    }
+                });
 
-                new CheckExistenceTask().execute(accessToken.getUserId());
+        String imgQuery = String.format("me", userId);
+        Bundle imgReqParams = new Bundle();
+        imgReqParams.putString("fields", "picture.width(999)");
+//        GraphRequest imageReq = new GraphRequest(AccessToken.getCurrentAccessToken(), imgQuery, null, com.facebook.HttpMethod.GET, new GraphRequest.Callback() {
+//            public void onCompleted(GraphResponse response) {
+//                fbUserImg = "";
+//            }
+//        });
 
-//                if (true) {
-//                    // TARGET
-//                    Bundle args = new Bundle();
-//                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
-//                    // intent
-//                    Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
-//                    intent.putExtras(args);
-//                    startActivityForResult(intent, CHOOSE_PINCH_HANDLE);
-//                } else {
-//                    // call for intent
-//                    Intent mServiceIntent =
-//                            new Intent(getActivity(), FBAuthService.class);
-//                    mServiceIntent.putExtras(iArgs);
-//                    getActivity().startService(mServiceIntent);
-//                }
+
+        GraphRequest imageReq = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(), "me", new GraphRequest.Callback() {
+            public void onCompleted(GraphResponse response) {
+                try {
+                    fbUserImg = response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url");
+                } catch (Exception e) {
+                    fbUserImg = "";
+                }
             }
         });
-        request.executeAsync();
+        imageReq.setParameters(imgReqParams);
+
+        GraphRequestBatch batch = new GraphRequestBatch(meReq, imageReq);
+        batch.addCallback(new GraphRequestBatch.Callback() {
+            @Override
+            public void onBatchCompleted(GraphRequestBatch graphRequests) {
+                // Application code for when the batch finishes
+                Log.d(TAG, graphRequests == null ? "true" : "false");
+                new CheckExistenceTask().execute(userId);
+            }
+        });
+        batch.executeAsync();
     }
 
     @Subscribe
@@ -308,6 +325,13 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
                     progressDialog.setMessage("setting up your account...");
                     Bundle args = new Bundle();
                     args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+                    try {
+                        args.putString("fname", fbUserObject.getString("first_name"));
+                        args.putString("lname", fbUserObject.getString("last_name"));
+                        args.putString("image", fbUserImg);
+                    } catch (Exception e) {
+                        // muted
+                    }
                     // intent
                     Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
                     intent.putExtras(args);
