@@ -53,7 +53,8 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
  * TODO
  */
 public class MainActivity extends AppCompatActivity {
-    public static final String LOG_TAG = "MainActivity";
+    public static final String TAG = "MainActivity";
+    private static final int INTENT_LOGIN = 0;
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -71,14 +72,10 @@ public class MainActivity extends AppCompatActivity {
     ViewPager mViewPager;
 
     SPFragmentPagerAdapter adapterViewPager;
-    Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d(LOG_TAG, "onCreate...");
-
 //        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
 //            Intent intent = new Intent(this, MainActivityIn.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
@@ -114,26 +111,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume...");
-
-        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-            Intent intent = new Intent(this, MainActivityIn.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                    Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            if (!this.isFinishing()) {
-                finish();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+        if (requestCode == INTENT_LOGIN) {
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, MainActivityIn.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                if (!this.isFinishing()) {
+                    finish();
+                }
             }
         }
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        Log.d(LOG_TAG, "onResume...");
+//
+//        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
+//            Intent intent = new Intent(this, MainActivityIn.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+//                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
+//                    Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+//            if (!this.isFinishing()) {
+//                finish();
+//            }
+//        }
+//    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        this.mMenu = menu;
         return true;
     }
 
@@ -154,12 +168,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menuitem_sign_in_id:
                 Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(loginIntent);
-                return true;
-            case R.id.menuitem_sign_out_id:
-                Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
-                logOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(logOutIntent);
+                startActivityForResult(loginIntent, INTENT_LOGIN);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -244,6 +253,26 @@ public class MainActivity extends AppCompatActivity {
     public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
         Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
     }
+
+//    @Subscribe
+//    public void onAuthSuccessEvent(Events.AuthSuccessEvent event) {
+//        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
+//            Intent intent = new Intent(this, MainActivityIn.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+//                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
+//                    Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+//            if (!this.isFinishing()) {
+//                finish();
+//            }
+//        }
+//    }
+//
+//    @Subscribe
+//    public void onAuthOutEvent(Events.AuthOutEvent event) {
+//        Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
+//    }
+
 
     private void notifyDrawerContentChange(NavigationView navigationView) {
         for (int i = 0, count = navigationView.getChildCount(); i < count; i++) {

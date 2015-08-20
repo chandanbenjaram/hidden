@@ -60,6 +60,11 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.login_email, container, false);
@@ -156,11 +161,10 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
+                Utils.dismissSilently(progressDialog);
+
                 getActivity().setResult(Activity.RESULT_OK, null);
-                getActivity().finish();
+//                getActivity().finish();
             }
         });
     }

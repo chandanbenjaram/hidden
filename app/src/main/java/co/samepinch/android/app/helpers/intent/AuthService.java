@@ -58,7 +58,7 @@ public class AuthService extends IntentService {
         ReqLogin loginReq = component.provideReqLogin();
 
         // set base args
-        loginReq.setToken(Utils.getNonBlankAppToken());
+        loginReq.setToken(Utils.getAppToken(true));
         loginReq.setCmd("signIn");
 
         // set context args

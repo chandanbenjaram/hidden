@@ -54,7 +54,7 @@ public class FBAuthService extends IntentService {
             loginReq.setBody(reqBody);
 
             // set base args
-            loginReq.setToken(Utils.getNonBlankAppToken());
+            loginReq.setToken(Utils.getAppToken(true));
             loginReq.setCmd("externalSignIn");
 
             HttpEntity<ReqSetBody> payloadEntity;

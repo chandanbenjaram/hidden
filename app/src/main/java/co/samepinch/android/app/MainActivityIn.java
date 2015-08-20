@@ -49,7 +49,8 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
  * TODO
  */
 public class MainActivityIn extends AppCompatActivity {
-    public static final String LOG_TAG = "MainActivityIn";
+    public static final String TAG = "MainActivityIn";
+    private static final int INTENT_LOGOUT = 1;
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -67,23 +68,10 @@ public class MainActivityIn extends AppCompatActivity {
     ViewPager mViewPager;
 
     SPFragmentPagerAdapter adapterViewPager;
-    Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d(LOG_TAG, "onCreate...");
-//
-//        if (!Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-//            Intent intent = new Intent(this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-//                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-//                    Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            finish();
-//        }
-
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(MainActivityIn.this);
@@ -109,18 +97,19 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume...");
-
-        if (!Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                    Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            if (!this.isFinishing()) {
-                finish();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+        if (requestCode == INTENT_LOGOUT) {
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                if (!this.isFinishing()) {
+                    finish();
+                }
             }
         }
     }
@@ -128,7 +117,6 @@ public class MainActivityIn extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        this.mMenu = menu;
         return true;
     }
 
@@ -146,15 +134,10 @@ public class MainActivityIn extends AppCompatActivity {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.menuitem_sign_in_id:
-                Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(loginIntent);
-                return true;
             case R.id.menuitem_sign_out_id:
                 Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
                 logOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(logOutIntent);
+                startActivityForResult(logOutIntent, INTENT_LOGOUT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
