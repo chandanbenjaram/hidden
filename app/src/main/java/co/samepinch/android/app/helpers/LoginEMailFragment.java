@@ -162,9 +162,8 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
             @Override
             public void run() {
                 Utils.dismissSilently(progressDialog);
-
-                getActivity().setResult(Activity.RESULT_OK, null);
-//                getActivity().finish();
+                getActivity().setResult(Activity.RESULT_OK);
+                getActivity().finish();
             }
         });
     }

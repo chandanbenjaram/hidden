@@ -166,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.menuitem_sign_in_id:
-                Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+//                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivityForResult(loginIntent, INTENT_LOGIN);
                 return true;
         }

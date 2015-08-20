@@ -1,5 +1,6 @@
 package co.samepinch.android.app;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -28,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,13 +60,14 @@ public class LoginActivity extends AppCompatActivity implements
     @Bind(R.id.btn_signin_google)
     SignInButton gSignInButton;
 
-    private GoogleApiClient mGoogleApiClient;
-    private boolean mIsResolving = false;
-    private boolean mShouldResolve = false;
+    GoogleApiClient mGoogleApiClient;
+    boolean mIsResolving = false;
+    boolean mShouldResolve = false;
 
-    private ProgressDialog progressDialog;
-    private Map<String, String> gUserObject;
+    ProgressDialog progressDialog;
+    Map<String, String> gUserObject;
 
+    private LocalHandler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,8 @@ public class LoginActivity extends AppCompatActivity implements
                         .addScope(new Scope(Scopes.PROFILE))
                         .addScope(new Scope(Scopes.PLUS_LOGIN))
                         .build();
+
+        mHandler = new LocalHandler(this);
     }
 
     @Override
@@ -124,7 +129,7 @@ public class LoginActivity extends AppCompatActivity implements
             mGoogleApiClient.connect();
         } else if (requestCode == AppConstants.KV.REQUEST_SIGNUP.getIntValue()) {
             if (resultCode == RESULT_OK) {
-                BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
+                setResult(RESULT_OK);
                 finish();
             }
         } else if (requestCode == Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue())) {
@@ -376,7 +381,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     private void socialSignOutLocally(Map<String, String> metaData) {
         String provider;
-        if(metaData == null || (provider =  metaData.get(AppConstants.K.provider.name())) == null){
+        if (metaData == null || (provider = metaData.get(AppConstants.K.provider.name())) == null) {
             return;
         }
 
@@ -436,69 +441,74 @@ public class LoginActivity extends AppCompatActivity implements
             Intent resultIntent = new Intent();
             if (result != null) {
                 if (result.booleanValue()) {
-                    handler.sendEmptyMessage(1);
+                    mHandler.sendEmptyMessage(1);
                 } else {
-                    handler.sendEmptyMessage(0);
+                    mHandler.sendEmptyMessage(0);
                 }
             } else {
-                handler.sendEmptyMessage(-1);
+                mHandler.sendEmptyMessage(-1);
             }
         }
     }
 
-    Handler handler = new Handler() {
+    private static final class LocalHandler extends Handler {
+        private final WeakReference<LoginActivity> mActivity;
+        public LocalHandler(LoginActivity parent) {
+            mActivity = new WeakReference<LoginActivity>(parent);
+
+        }
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             // call for intent
             Intent signOutIntent =
-                    new Intent(LoginActivity.this, SignOutService.class);
+                    new Intent(mActivity.get(), SignOutService.class);
             switch (msg.what) {
                 case 0:
-                    progressDialog.setMessage("setting up your account...");
+                    mActivity.get().progressDialog.setMessage("setting up your account...");
                     Bundle args = new Bundle();
                     args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
                     try {
-                        args.putString("fname", gUserObject.get("fname"));
-                        args.putString("lname", gUserObject.get("lname"));
-                        args.putString("image", gUserObject.get("rphoto"));
+                        args.putString("fname", mActivity.get().gUserObject.get("fname"));
+                        args.putString("lname", mActivity.get().gUserObject.get("lname"));
+                        args.putString("image", mActivity.get().gUserObject.get("rphoto"));
                     } catch (Exception e) {
                         // muted
                     }
                     // intent
-                    Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                    Intent intent = new Intent(mActivity.get().getApplicationContext(), ActivityFragment.class);
                     intent.putExtras(args);
-                    startActivityForResult(intent, Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue()));
+                    mActivity.get().startActivityForResult(intent, Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue()));
                     break;
                 case 1:
                     Bundle iArgs = new Bundle();
-                    if (gUserObject != null) {
+                    if (mActivity.get().gUserObject != null) {
                         iArgs.putString(AppConstants.K.provider.name(), AppConstants.K.google.name());
                         try {
-                            iArgs.putSerializable("user", (Serializable) gUserObject);
+                            iArgs.putSerializable("user", (Serializable) mActivity.get().gUserObject);
                         } catch (Exception e) {
                             // muted
                         }
                     } else {
-                        progressDialog.setMessage("sign-in failed\ntry again");
-                        Utils.dismissSilently(progressDialog);
+                        mActivity.get().progressDialog.setMessage("sign-in failed\ntry again");
+                        Utils.dismissSilently(mActivity.get().progressDialog);
                         // call for intent
-                        startService(signOutIntent);
+                        mActivity.get().startService(signOutIntent);
                         return;
                     }
                     // call for intent
                     Intent mServiceIntent =
-                            new Intent(getApplicationContext(), FBAuthService.class);
+                            new Intent(mActivity.get().getApplicationContext(), FBAuthService.class);
                     mServiceIntent.putExtras(iArgs);
-                    startService(mServiceIntent);
+                    mActivity.get().startService(mServiceIntent);
                     break;
                 default:
-                    progressDialog.setMessage("sign-in failed\ntry again");
-                    Utils.dismissSilently(progressDialog);
-                    startService(signOutIntent);
+                    mActivity.get().progressDialog.setMessage("sign-in failed\ntry again");
+                    Utils.dismissSilently(mActivity.get().progressDialog);
+                    mActivity.get().startService(signOutIntent);
                     break;
             }
         }
-    };
-
+    }
 }

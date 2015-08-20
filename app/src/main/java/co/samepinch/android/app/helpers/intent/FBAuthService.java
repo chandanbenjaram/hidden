@@ -87,9 +87,12 @@ public class FBAuthService extends IntentService {
         body.put("lname", Utils.emptyIfNull(arg0.getString("last_name")));
         body.put("email", Utils.emptyIfNull(arg0.getString("email")));
         if (arg0.has("pinch_handle")) {
-            body.put("pinch_handle", arg0.getString("pinch_handle"));
+            body.put("pinch_handle", Utils.emptyIfNull(arg0.getString("pinch_handle")));
         }
-        body.put("rphoto", Utils.emptyIfNull(arg0.getString("image")));
+
+        if (arg0.has("image")) {
+            body.put("rphoto", Utils.emptyIfNull(arg0.getString("image")));
+        }
         return body;
     }
 }

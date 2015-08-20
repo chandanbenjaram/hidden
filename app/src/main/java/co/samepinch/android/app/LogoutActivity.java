@@ -61,6 +61,7 @@ public class LogoutActivity extends AppCompatActivity {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                setResult(RESULT_OK);
                 finish();
             }
         });

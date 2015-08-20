@@ -136,7 +136,6 @@ public class MainActivityIn extends AppCompatActivity {
                 return true;
             case R.id.menuitem_sign_out_id:
                 Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
-                logOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivityForResult(logOutIntent, INTENT_LOGOUT);
                 return true;
         }
