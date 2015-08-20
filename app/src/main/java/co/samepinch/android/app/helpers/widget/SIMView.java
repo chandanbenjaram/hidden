@@ -2,13 +2,19 @@ package co.samepinch.android.app.helpers.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
@@ -31,7 +37,6 @@ public class SIMView extends RelativeLayout {
     public SIMView(Context context) {
         super(context);
         initView(context);
-//        onFinishInflate();
     }
 
     public SIMView(Context context, AttributeSet attrs) {
@@ -80,13 +85,38 @@ public class SIMView extends RelativeLayout {
         if (StringUtils.isBlank(imgUri)) {
             return;
         }
+        mSIMView.setAspectRatio(1.33f);
         ImageRequest fImageReq =
                 ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri)).build();
-        DraweeController contrlr = Fresco.newDraweeControllerBuilder()
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(fImageReq)
                 .setOldController(mSIMView.getController())
                 .setAutoPlayAnimations(true)
                 .build();
-        mSIMView.setController(contrlr);
+        mSIMView.setController(controller);
+    }
+
+    public void populateImageViewWithAdjustedAspect(String imgUri) {
+        if (StringUtils.isBlank(imgUri)) {
+            return;
+        }
+
+        // aspect adjust
+        ControllerListener listener = new BaseControllerListener<ImageInfo>() {
+            @Override
+            public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                mSIMView.setAspectRatio((float) imageInfo.getWidth() / imageInfo.getHeight());
+            }
+        };
+
+        ImageRequest fImageReq =
+                ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri)).build();
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(fImageReq)
+                .setOldController(mSIMView.getController())
+                .setAutoPlayAnimations(true)
+                .setControllerListener(listener)
+                .build();
+        mSIMView.setController(controller);
     }
 }

@@ -76,16 +76,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-//            Intent intent = new Intent(this, MainActivityIn.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-//                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-//                    Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            if (!this.isFinishing()) {
-//                finish();
-//            }
-//        }
+        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
+            Intent intent = new Intent(this, MainActivityIn.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                    Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            if (!this.isFinishing()) {
+                finish();
+            }
+        }
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(MainActivity.this);
@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         setupDrawerContent(mNavigationView);
         setupViewPager(mViewPager);
 
-//        tabLayout.getTabAt(0).setIcon(R.drawable.com_facebook_button_icon);
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
@@ -113,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
         if (requestCode == INTENT_LOGIN) {
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, MainActivityIn.class);
@@ -127,23 +125,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        Log.d(LOG_TAG, "onResume...");
-//
-//        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-//            Intent intent = new Intent(this, MainActivityIn.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-//                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-//                    Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            if (!this.isFinishing()) {
-//                finish();
-//            }
-//        }
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menuitem_sign_in_id:
                 Intent loginIntent = new Intent(this, LoginActivity.class);
-//                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivityForResult(loginIntent, INTENT_LOGIN);
                 return true;
         }
@@ -188,9 +168,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        Menu navMenu = navigationView.getMenu();
-        getMenuInflater().inflate(R.menu.drawer_view, navMenu);
-
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -218,71 +195,8 @@ public class MainActivity extends AppCompatActivity {
         startService(mServiceIntent);
     }
 
-//    @Subscribe
-//    public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {
-//        Map<String, String> eventData = event.getMetaData();
-//        MainActivity.this.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                // add logged in tab
-//                int newposition = adapterViewPager.getCount();
-//
-//                TabLayout.Tab starTab = mTabLayout.newTab();
-//                starTab.setTag("STAR");
-//                starTab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), newposition));
-//                adapterViewPager.setCount(newposition + 1);
-//                adapterViewPager.instantiateItem(mViewPager, newposition);
-//                adapterViewPager.notifyDataSetChanged();
-//                mTabLayout.addTab(starTab, newposition, true);
-//
-//                FrameLayout headerWrapper = (FrameLayout) mNavigationView.findViewById(R.id.nav_header_wrapper);
-//                headerWrapper.removeAllViews();
-//                LayoutInflater.from(getApplicationContext()).inflate(R.layout.nav_header_logged_in, headerWrapper);
-//
-//                Menu navMenu = mNavigationView.getMenu();
-//                navMenu.clear();
-//                getMenuInflater().inflate(R.menu.drawer_view_logged_in, navMenu);
-//                notifyDrawerContentChange(mNavigationView);
-//
-//                supportInvalidateOptionsMenu();
-//            }
-//        });
-//    }
-
     @Subscribe
     public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
         Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
-    }
-
-//    @Subscribe
-//    public void onAuthSuccessEvent(Events.AuthSuccessEvent event) {
-//        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
-//            Intent intent = new Intent(this, MainActivityIn.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-//                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-//                    Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            if (!this.isFinishing()) {
-//                finish();
-//            }
-//        }
-//    }
-//
-//    @Subscribe
-//    public void onAuthOutEvent(Events.AuthOutEvent event) {
-//        Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
-//    }
-
-
-    private void notifyDrawerContentChange(NavigationView navigationView) {
-        for (int i = 0, count = navigationView.getChildCount(); i < count; i++) {
-            final View child = navigationView.getChildAt(i);
-            if (child != null && child instanceof ListView) {
-                final ListView menuView = (ListView) child;
-                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-                wrapped.notifyDataSetChanged();
-            }
-        }
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="LOGGED OUT ABOUT THE APP">
+    <item android:title="ABOUT">
         <menu>
             <item android:title="SYSTEM STATUS" />
             <item android:title="SPREAD THE LOVE" />

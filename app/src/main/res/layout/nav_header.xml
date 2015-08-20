@@ -1,12 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:fresco="http://schemas.android.com/apk/res-auto"--><!--android:id="@+id/nav_header_switch"--><!--android:layout_width="match_parent"--><!--android:layout_height="192dp"--><!--android:background="?attr/colorPrimaryDark"--><!--android:padding="16dp"--><!--android:theme="@style/ThemeOverlay.AppCompat.Light"--><!--android:orientation="vertical"--><!--android:gravity="bottom">-->
+
+<!--<com.facebook.drawee.view.SimpleDraweeView--><!--android:id="@+id/nav_header_img"--><!--android:layout_width="@dimen/list_item_avatar_size"--><!--android:layout_height="@dimen/list_item_avatar_size"--><!--android:adjustViewBounds="true"--><!--android:clickable="true"--><!--fresco:placeholderImageScaleType="fitCenter"--><!--fresco:roundAsCircle="false"--><!--android:background="@drawable/avatar_border" />--><!--</FrameLayout>-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_header_wrapper"
     android:layout_width="match_parent"
     android:layout_height="192dp"
     android:background="?attr/colorPrimaryDark"
-    android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:gravity="bottom"
     android:orientation="vertical"
-    android:gravity="bottom">
+    android:padding="0dp">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <!--<com.facebook.drawee.view.SimpleDraweeView-->
+        <!--android:id="@+id/nav_header_img"-->
+        <!--android:background="#ffffff"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:layout_height="192dp"-->
+        <!--fresco:actualImageScaleType="focusCrop"-->
+        <!--fresco:placeholderImageScaleType="fitCenter"/>-->
+
+        <co.samepinch.android.app.helpers.widget.SIMView
+            android:id="@+id/nav_header_img"
+            android:layout_width="match_parent"
+            android:layout_height="192dp"></co.samepinch.android.app.helpers.widget.SIMView>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/nav_header_img"
+            android:layout_alignLeft="@+id/nav_header_img"
+            android:layout_alignRight="@+id/nav_header_img"
+            android:layout_alignTop="@+id/nav_header_img"
+            android:gravity="center_horizontal|top"
+            android:text="header..." />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/nav_header_img"
+            android:layout_alignLeft="@+id/nav_header_img"
+            android:layout_alignRight="@+id/nav_header_img"
+            android:layout_alignTop="@+id/nav_header_img"
+            android:gravity="center_horizontal|bottom"
+            android:text="footer..." />
+    </RelativeLayout>
 </FrameLayout>

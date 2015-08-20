@@ -17,6 +17,8 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
+import android.graphics.drawable.Animatable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -31,7 +33,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.squareup.otto.Subscribe;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -44,6 +52,7 @@ import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.app.helpers.widget.SIMView;
 
 /**
  * TODO
@@ -67,12 +76,16 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.viewpager)
     ViewPager mViewPager;
 
+
+    @Bind(R.id.nav_header_img)
+    SIMView mNavHeaderImg;
+
     SPFragmentPagerAdapter adapterViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_in);
 
         ButterKnife.bind(MainActivityIn.this);
         BusProvider.INSTANCE.getBus().register(this);
@@ -82,10 +95,15 @@ public class MainActivityIn extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
+
+        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+        if (StringUtils.isNotBlank(userInfo.get("photo"))) {
+            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get("photo"));
+        }
+
         setupDrawerContent(mNavigationView);
         setupViewPager(mViewPager);
 
-//        tabLayout.getTabAt(0).setIcon(R.drawable.com_facebook_button_icon);
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
@@ -99,7 +117,6 @@ public class MainActivityIn extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
         if (requestCode == INTENT_LOGOUT) {
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, MainActivity.class);
@@ -156,10 +173,10 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        Menu navMenu = navigationView.getMenu();
-        navMenu.clear();
-        getMenuInflater().inflate(R.menu.drawer_view_logged_in, navMenu);
 
+//        SIMView imgView = new SIMView(getApplicationContext());
+//        imgView.populateImageView(userInfo.get("photo"));
+//        navigationView.addHeaderView(imgView);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override

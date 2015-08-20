@@ -19,7 +19,7 @@
             android:title="Discussion" />
     </group>
 
-    <item android:title="LOGGED IN ABOUT THE APP">
+    <item android:title="ABOUT">
         <menu>
             <item android:title="SYSTEM STATUS" />
             <item android:title="SPREAD THE LOVE" />
