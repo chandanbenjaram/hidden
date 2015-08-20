@@ -25,6 +25,7 @@ import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespLogin;
 import co.samepinch.android.rest.RestClient;
 
@@ -40,6 +41,8 @@ public class FBAuthService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Map<String, String> eventData = new HashMap<>();
+
         StorageComponent component = DaggerStorageComponent.create();
         ReqSetBody loginReq = component.provideReqSetBody();
 
@@ -48,42 +51,34 @@ public class FBAuthService extends IntentService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
+            eventData.put(AppConstants.K.provider.name(), intent.getStringExtra("provider"));
+
             Map<String, String> reqBody = (Map<String, String>) intent.getSerializableExtra("user");
             loginReq.setBody(reqBody);
 
             // set base args
-            String token = Utils.getAppToken(false);
-            if (StringUtils.isBlank(token)) {
-                token = Utils.getAppToken(true);
-            }
-            loginReq.setToken(token);
+            loginReq.setToken(Utils.getNonBlankAppToken());
             loginReq.setCmd("externalSignIn");
 
             HttpEntity<ReqSetBody> payloadEntity;
             ResponseEntity<RespLogin> resp = null;
-            try {
-                // call remote
-                payloadEntity = new HttpEntity<>(loginReq, headers);
-                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
-            } catch (HttpStatusCodeException e) {
-                if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                    // try resetting token?
-                    loginReq.setToken(Utils.getAppToken(true));
-                    payloadEntity = new HttpEntity<>(loginReq, headers);
-                    resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
-                } else {
-                    throw new IllegalStateException("un-known response code.", e);
-                }
-            }
+            // call remote
+            payloadEntity = new HttpEntity<>(loginReq, headers);
+            resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
+
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), intent.getStringExtra("provider"));
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
-            BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
+
+            BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(eventData));
         } catch (Exception e) {
-//            e.printStackTrace();
-            // get rid of auth session
-            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
-            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(null));
+            Resp resp = Utils.parseAsRespSilently(e);
+            if (resp != null) {
+                eventData.put(AppConstants.K.MESSAGE.name(), resp.getMessage());
+            }
+
+//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
+//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
+            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eventData));
         }
     }
 

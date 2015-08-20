@@ -13,6 +13,8 @@ import android.widget.EditText;
 
 import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 
 import butterknife.Bind;
@@ -51,13 +53,10 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     ProgressDialog progressDialog;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // retain this fragment across configuration changes.
+        setRetainInstance(true);
     }
 
     @Override
@@ -168,23 +167,26 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
-        Map<String, String> eventData = event.getMetaData();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
-                mLoginButton.setEnabled(Boolean.TRUE);
+        final Map<String, String> eventData = event.getMetaData();
+        if (eventData == null) {
+            return;
+        }
 
-                Map<String, String> eventData = event == null ? null : event.getMetaData();
-                if (eventData != null && eventData.containsKey("message")) {
-                    Snackbar.make(mView, eventData.get("message"), Snackbar.LENGTH_LONG).show();
-                } else {
-                    Snackbar.make(mView, "try again", Snackbar.LENGTH_SHORT).show();
+        if (StringUtils.equals(eventData.get(AppConstants.K.provider.name()), AppConstants.K.via_email_password.name())) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Utils.dismissSilently(progressDialog);
+                    mLoginButton.setEnabled(Boolean.TRUE);
+
+                    if (eventData.containsKey(AppConstants.K.MESSAGE.name())) {
+                        Snackbar.make(mView, eventData.get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_LONG).show();
+                    } else {
+                        Snackbar.make(mView, "try again", Snackbar.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void onLogInFail() {

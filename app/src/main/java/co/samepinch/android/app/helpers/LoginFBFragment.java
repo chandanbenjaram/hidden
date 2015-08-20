@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.facebook.GraphResponse;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.plus.Plus;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -66,7 +68,7 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Retain this fragment across configuration changes.
+        // retain this fragment across configuration changes.
         setRetainInstance(true);
 
         // fallback
@@ -126,11 +128,7 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
                 getActivity().startService(mServiceIntent);
             } catch (Exception e) {
                 Utils.dismissSilently(progressDialog);
-
-                // call for intent
-                Intent signOutIntent =
-                        new Intent(getActivity(), SignOutService.class);
-                getActivity().startService(signOutIntent);
+                LoginManager.getInstance().logOut();
             }
         }
     }
@@ -138,10 +136,10 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     private void fetchUserInfo() {
         final AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null) {
-            // call for intent
-            Intent mServiceIntent =
-                    new Intent(getActivity(), SignOutService.class);
-            getActivity().startService(mServiceIntent);
+//            // call for intent
+//            Intent mServiceIntent =
+//                    new Intent(getActivity(), SignOutService.class);
+//            getActivity().startService(mServiceIntent);
             return;
         }
 
@@ -182,14 +180,34 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
-        Map<String, String> eventData = event.getMetaData();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.dismissSilently(progressDialog);
-                LoginManager.getInstance().logOut();
-            }
-        });
+        Map<String, String> metaData = event.getMetaData();
+        if (metaData != null && StringUtils.isNotBlank(metaData.get(AppConstants.K.MESSAGE.name()))) {
+            Snackbar.make(loginButton, event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
+        }
+
+        socialSignOutLocally(event.getMetaData());
+    }
+
+    @Subscribe
+    public void onAuthOutEvent(final Events.AuthOutEvent event) {
+        socialSignOutLocally(event.getMetaData());
+    }
+
+    @Subscribe
+    public void onAuthOutFailEvent(final Events.AuthOutFailEvent event) {
+        socialSignOutLocally(event.getMetaData());
+    }
+
+    private void socialSignOutLocally(Map<String, String> metaData) {
+        String provider;
+        if (metaData == null || (provider = metaData.get(AppConstants.K.provider.name())) == null) {
+            return;
+        }
+
+        if (StringUtils.equals(provider, AppConstants.K.facebook.name())) {
+            Utils.dismissSilently(progressDialog);
+            LoginManager.getInstance().logOut();
+        }
     }
 
     @Override

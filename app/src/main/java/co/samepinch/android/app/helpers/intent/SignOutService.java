@@ -39,25 +39,20 @@ public class SignOutService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // before client logout, grab token
-        String token = Utils.getAppToken(false);
+        Map<String, String> eventData = new HashMap<>();
+        eventData.put(AppConstants.K.provider.name(), AppConstants.API.PREF_AUTH_PROVIDER.getValue());
 
-        // client logout
+        // local logout first
         logOutLocally();
-        if(StringUtils.isBlank(token)){
-            // no need to call remote. just notify.
-            BusProvider.INSTANCE.getBus().post(new Events.AuthOutEvent(null));
-            return;
-        }
 
-        //headers
+        // remote logout
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
             ReqSetBody logoutReq = new ReqSetBody();
+            logoutReq.setToken(Utils.getNonBlankAppToken());
 
-            logoutReq.setToken(token);
             logoutReq.setCmd("signOut");
             Map<String, String> body = new HashMap<>();
             body.put(AppConstants.KV.PLATFORM.getKey(), AppConstants.KV.PLATFORM.getValue());
@@ -69,20 +64,24 @@ public class SignOutService extends IntentService {
             payloadEntity = new HttpEntity<>(logoutReq, headers);
             resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
 
-            BusProvider.INSTANCE.getBus().post(new Events.AuthOutEvent(null));
+            BusProvider.INSTANCE.getBus().post(new Events.AuthOutEvent(eventData));
         } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage());
-            BusProvider.INSTANCE.getBus().post(new Events.AuthOutFailEvent(null));
+            Resp resp = Utils.parseAsRespSilently(e);
+            if (resp != null) {
+                eventData.put(AppConstants.K.MESSAGE.name(), resp.getMessage());
+            }
+
+            BusProvider.INSTANCE.getBus().post(new Events.AuthOutFailEvent(eventData));
         }
+
+        // clear pref state
+        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
+        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
+        Utils.PreferencesManager.getInstance().remove(AppConstants.API.ACCESS_TOKEN.getValue());
     }
 
     public void logOutLocally() {
         String currProvider = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-
-        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
-        Utils.PreferencesManager.getInstance().remove(AppConstants.API.ACCESS_TOKEN.getValue());
-
         if (StringUtils.equalsIgnoreCase(currProvider, AppConstants.K.facebook.name())) {
             // fb
             LoginManager.getInstance().logOut();
@@ -100,50 +99,6 @@ public class SignOutService extends IntentService {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
                 mGoogleApiClient.reconnect();
             }
-        }else{
-            // do all
-            LoginManager.getInstance().logOut();
-            // google
-            GoogleApiClient mGoogleApiClient =
-                    new GoogleApiClient.Builder(getApplicationContext())
-                            .addApi(Plus.API, Plus.PlusOptions.builder().build())
-                            .addScope(Plus.SCOPE_PLUS_LOGIN)
-                            .addScope(Plus.SCOPE_PLUS_PROFILE)
-                            .build();
-
-            mGoogleApiClient.blockingConnect();
-            if (mGoogleApiClient.isConnected()) {
-                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                mGoogleApiClient.disconnect();
-            }
         }
-//        Runnable runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                String currProvider = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-//                if (StringUtils.equalsIgnoreCase(currProvider, AppConstants.K.facebook.name())) {
-//                    // fb
-//                    LoginManager.getInstance().logOut();
-//                } else if (StringUtils.equalsIgnoreCase(currProvider, AppConstants.K.google.name())) {
-//                    // google
-//                    GoogleApiClient mGoogleApiClient =
-//                            new GoogleApiClient.Builder(getApplicationContext())
-//                                    .addApi(Plus.API, Plus.PlusOptions.builder().build())
-//                                    .addScope(Plus.SCOPE_PLUS_LOGIN)
-//                                    .addScope(Plus.SCOPE_PLUS_PROFILE)
-//                                    .build();
-//
-//                    mGoogleApiClient.blockingConnect();
-//                    if (mGoogleApiClient.isConnected()) {
-//                        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-//                        mGoogleApiClient.disconnect();
-//                        mGoogleApiClient.connect();
-//                    }
-//                }
-//
-//            }
-//        };
-//
-//        runnable.run();
     }
 }

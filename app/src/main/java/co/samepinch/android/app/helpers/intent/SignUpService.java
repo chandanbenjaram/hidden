@@ -85,7 +85,7 @@ public class SignUpService extends IntentService {
         } catch (Exception e) {
             Resp resp = Utils.parseAsRespSilently(e);
             if(resp !=null){
-                eData.put("message", resp.getMessage());
+                eData.put(AppConstants.K.MESSAGE.name(), resp.getMessage());
             }
             // get rid of auth session
             Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());

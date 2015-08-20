@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
@@ -20,6 +21,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -139,10 +141,11 @@ public class LoginActivity extends AppCompatActivity implements
                 mServiceIntent.putExtras(iArgs);
                 startService(mServiceIntent);
             } catch (Exception e) {
-                // call for intent
-                Intent signOutIntent =
-                        new Intent(getApplicationContext(), SignOutService.class);
-                startService(signOutIntent);
+                Utils.dismissSilently(progressDialog);
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                if (mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.disconnect();
+                }
             }
         }
     }
@@ -174,7 +177,6 @@ public class LoginActivity extends AppCompatActivity implements
         gUserObject.put("rphoto", "http://harrogatearchsoc.org/wp-content/uploads/2013/12/Active-Imagination-.jpg");
 
         new CheckExistenceTask().execute(person.getId());
-
 //        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
     }
 
@@ -238,7 +240,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Override
     public CheckResult onCheckServerAuthorization(String idToken, Set<Scope> scopeSet) {
-        Log.i(TAG, "Checking if server is authorized.");
+        Log.i(TAG, "checking if server is authorized.");
 
         HashSet<Scope> serverScopeSet = new HashSet<Scope>();
 
@@ -247,7 +249,7 @@ public class LoginActivity extends AppCompatActivity implements
         // thread it is OK to do synchronous network access in this check.
         //boolean serverHasToken = serverHasTokenFor(idToken);
         boolean serverHasToken = false;
-        Log.i(TAG, "Server has token: " + String.valueOf(serverHasToken));
+        Log.i(TAG, "server has token: " + String.valueOf(serverHasToken));
 
         if (!serverHasToken) {
             serverScopeSet.add(new Scope(Scopes.PLUS_LOGIN));
@@ -361,21 +363,35 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
-        Map<String, String> eventData = event.getMetaData();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.dismissSilently(progressDialog);
-                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                if(mGoogleApiClient.isConnected()){
-                    mGoogleApiClient.disconnect();
-                }
+        socialSignOutLocally(event.getMetaData());
+    }
+
+    @Subscribe
+    public void onAuthOutEvent(final Events.AuthOutEvent event) {
+        socialSignOutLocally(event.getMetaData());
+    }
+
+    @Subscribe
+    public void onAuthOutFailEvent(final Events.AuthOutFailEvent event) {
+        socialSignOutLocally(event.getMetaData());
+    }
+
+    private void socialSignOutLocally(Map<String, String> metaData) {
+        String provider;
+        if(metaData == null || (provider =  metaData.get(AppConstants.K.provider.name())) == null){
+            return;
+        }
+
+        if (StringUtils.equals(provider, AppConstants.K.google.name())) {
+            Utils.dismissSilently(progressDialog);
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            if (mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.disconnect();
             }
-        });
+        }
     }
 
     private class CheckExistenceTask extends AsyncTask<String, Integer, Boolean> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

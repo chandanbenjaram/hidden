@@ -44,7 +44,8 @@ public class AuthService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Map<String, String> eData = new HashMap<>();
+        Map<String, String> eventData = new HashMap<>();
+        eventData.put(AppConstants.K.provider.name(), AppConstants.K.via_email_password.name());
 
         // get caller data
         Bundle iArgs = intent.getExtras();
@@ -57,8 +58,9 @@ public class AuthService extends IntentService {
         ReqLogin loginReq = component.provideReqLogin();
 
         // set base args
-        loginReq.setToken(Utils.getAppToken(false));
+        loginReq.setToken(Utils.getNonBlankAppToken());
         loginReq.setCmd("signIn");
+
         // set context args
         loginReq.setEmail(iArgs.getString(KEY_EMAIL.getValue()));
         loginReq.setPassword(iArgs.getString(KEY_PASSWORD.getValue()));
@@ -68,36 +70,22 @@ public class AuthService extends IntentService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
-            HttpEntity<ReqLogin> payloadEntity;
-            ResponseEntity<RespLogin> resp = null;
-            try {
-                // call remote
-                payloadEntity = new HttpEntity<>(loginReq.build(), headers);
-                resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
+            HttpEntity<ReqLogin> payloadEntity = new HttpEntity<>(loginReq.build(), headers);
+            ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
 
-            } catch (HttpStatusCodeException e) {
-                if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                    // try resetting token?
-                    loginReq.setToken(Utils.getAppToken(true));
-                    payloadEntity = new HttpEntity<>(loginReq.build(), headers);
-                    resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
-                } else {
-                    throw new IllegalStateException("un-known response code.", e);
-                }
-            }
-
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.via_email_password.name());
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
-            BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(null));
+            BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(eventData));
         } catch (Exception e) {
             Resp resp = Utils.parseAsRespSilently(e);
             if (resp != null) {
-                eData.put("message", resp.getMessage());
+                eventData.put(AppConstants.K.MESSAGE.name(), resp.getMessage());
             }
-            // get rid of auth session
-            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
+//            // get rid of auth session
+//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
+//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
 
-            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eData));
+            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eventData));
         }
     }
 
@@ -132,7 +120,9 @@ public class AuthService extends IntentService {
                     return;
                 }
             }
-            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(null));
+            Map<String, String> eventData = new HashMap<>();
+            eventData.put(AppConstants.K.provider.name(), AppConstants.K.via_email_password.name());
+            BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eventData));
         }
     }
 }

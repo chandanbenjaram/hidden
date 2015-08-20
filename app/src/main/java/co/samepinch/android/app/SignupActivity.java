@@ -160,8 +160,8 @@ public class SignupActivity extends AppCompatActivity {
                 }
                 _signupButton.setEnabled(Boolean.TRUE);
                 Map<String, String> eventData = event == null ? null : event.getMetaData();
-                if (eventData != null && eventData.containsKey("message")) {
-                    Snackbar.make(findViewById(R.id.bottomsheet), eventData.get("message"), Snackbar.LENGTH_LONG).show();
+                if (eventData != null && eventData.containsKey(AppConstants.K.MESSAGE.name())) {
+                    Snackbar.make(findViewById(R.id.bottomsheet), eventData.get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_LONG).show();
                 } else {
                     Snackbar.make(findViewById(R.id.bottomsheet), "try again", Snackbar.LENGTH_SHORT).show();
                 }
