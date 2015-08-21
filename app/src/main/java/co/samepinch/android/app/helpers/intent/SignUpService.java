@@ -3,16 +3,12 @@ package co.samepinch.android.app.helpers.intent;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.google.gson.Gson;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +18,6 @@ import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.rest.ReqNoBody;
 import co.samepinch.android.rest.ReqSignUp;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespLogin;
@@ -30,6 +25,7 @@ import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
@@ -72,6 +68,9 @@ public class SignUpService extends IntentService {
             req.setPassword(iArgs.getString(KEY_PASSWORD.getValue()));
             req.setPinchHandle(iArgs.getString(KEY_PINCH_HANDLE.getValue()));
 
+            if(iArgs.containsKey(KEY_KEY.getValue())){
+                req.setKey(iArgs.getString(KEY_KEY.getValue()));
+            }
 
             HttpEntity<ReqSignUp> payloadEntity;
             ResponseEntity<RespLogin> resp = null;

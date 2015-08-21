@@ -72,6 +72,52 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
+        <!-- AVIARY SETTINGS :: START -->
+        <meta-data
+            android:name="com.aviary.android.feather.v1.API_KEY"
+            android:value="3d668d735e29323d" />
+
+        <activity
+            android:name="com.aviary.android.feather.sdk.FeatherActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:finishOnTaskLaunch="true"
+            android:hardwareAccelerated="true"
+            android:process=":standalone"
+            android:screenOrientation="unspecified"
+            android:theme="@style/AviaryTheme.Dark"
+            android:uiOptions="splitActionBarWhenNarrow" />
+
+        <!-- CDS Content Service -->
+        <service
+            android:process=":aviarycds"
+            android:name="com.aviary.android.feather.cds.AviaryCdsService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="aviary.intent.action.CDS_DOWNLOAD_START"/>
+                <action android:name="aviary.intent.action.CDS_RESTORE_USER_ITEMS"/>
+            </intent-filter>
+        </service>
+
+        <!--
+            Cds Content Provider
+         -->
+        <provider
+            android:name="com.aviary.android.feather.cds.AviaryCdsProvider"
+            android:authorities="co.samepinch.android.app.AviaryCdsProvider"
+            android:process=":aviarycds"
+            android:exported="false"
+            android:syncable="true" />
+        <!-- CDS Download Receiver -->
+        <receiver
+            android:name="com.aviary.android.feather.cds.AviaryCdsReceiver"
+            android:process=":aviarycds" >
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- AVIARY SETTINGS :: END -->
+
     </application>
 
 </manifest>

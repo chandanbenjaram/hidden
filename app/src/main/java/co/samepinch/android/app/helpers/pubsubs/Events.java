@@ -89,4 +89,10 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class SignUpImageUploadEvent extends EventBase {
+        public SignUpImageUploadEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }

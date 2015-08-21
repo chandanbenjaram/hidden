@@ -5,23 +5,39 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.aviary.android.feather.headless.utils.MegaPixels;
+import com.aviary.android.feather.library.Constants;
+import com.aviary.android.feather.sdk.FeatherActivity;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +47,17 @@ import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.intent.SignUpService;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
@@ -71,6 +93,9 @@ public class SignupActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
 
+    String uploadedImageKey;
+    boolean uploadPending;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +106,8 @@ public class SignupActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(SignupActivity.this,
                 R.style.Theme_AppCompat_Dialog);
+        progressDialog.setCancelable(Boolean.FALSE);
+        progressDialog.setIndeterminate(true);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -102,6 +129,47 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue()) {
+                outputFileUri = (intent == null ? true : MediaStore.ACTION_IMAGE_CAPTURE.equals(intent.getAction())) ? outputFileUri : (intent == null ? null : intent.getData());
+                Intent editorIntent = new Intent(this, FeatherActivity.class);
+                editorIntent.setData(outputFileUri);
+
+                editorIntent.putExtra(Constants.EXTRA_IN_API_KEY_SECRET, "df619be610e54ffc");
+                editorIntent.putExtra(Constants.EXTRA_IN_HIRES_MEGAPIXELS, MegaPixels.Mp3.ordinal());
+                editorIntent.putExtra(Constants.EXTRA_TOOLS_DISABLE_VIBRATION, "any");
+                editorIntent.putExtra(Constants.EXTRA_OUTPUT_FORMAT, Bitmap.CompressFormat.JPEG.name());
+                editorIntent.putExtra(Constants.EXTRA_OUTPUT_QUALITY, 55);
+//                editorIntent.putExtra( Constants.EXTRA_OUTPUT, outputFileUri);
+                startActivityForResult(editorIntent, AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue());
+            } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
+                Uri processedImageUri = Uri.parse("file://" + intent.getData());
+
+                Bundle extra = intent.getExtras();
+                if (null != extra) {
+                    // image has been changed by the user?
+                    boolean changed = extra.getBoolean(Constants.EXTRA_OUT_BITMAP_CHANGED);
+                }
+
+                try {
+                    InputStream localImageIS = getContentResolver().openInputStream(Uri.parse(processedImageUri.toString()));
+                    byte[] localImageBytes = Utils.getBytes(localImageIS);
+                    String localImageEnc = Base64.encodeToString(localImageBytes, Base64.DEFAULT);
+                    new ImageUploadTask().execute(new String[]{"droid.jpeg", localImageEnc});
+
+                    this.uploadPending = Boolean.TRUE;
+
+                    _avatarView.setImageURI(processedImageUri);
+                    _avatarView.refreshDrawableState();
+                } catch (Exception e) {
+                    // muted
+                }
+            }
+        }
+    }
+
     @OnClick(R.id.link_login)
     public void signin() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
@@ -110,6 +178,23 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btn_signup)
+    public void onClickSignUp() {
+        Utils.dismissSilently(progressDialog);
+
+        if (uploadPending) {
+            _signupButton.setEnabled(Boolean.FALSE);
+            if (!validate()) {
+                onSignUpFailEvent(null);
+                return;
+            }
+
+            progressDialog.setMessage("uploading image...");
+            progressDialog.show();
+        } else {
+            signup();
+        }
+    }
+
     public void signup() {
         Log.d(TAG, "Signup");
         _signupButton.setEnabled(Boolean.FALSE);
@@ -118,16 +203,13 @@ public class SignupActivity extends AppCompatActivity {
             return;
         }
 
-        progressDialog.setIndeterminate(true);
         progressDialog.setMessage("creating your account...");
         progressDialog.show();
 
         String fName = _fNameText.getText().toString();
         String lName = _lNameText.getText().toString();
-
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
-
         String pinchHandle = _pinchHandle.getText().toString();
 
         Bundle iArgs = new Bundle();
@@ -136,6 +218,10 @@ public class SignupActivity extends AppCompatActivity {
         iArgs.putString(KEY_EMAIL.getValue(), email);
         iArgs.putString(KEY_PASSWORD.getValue(), password);
         iArgs.putString(KEY_PINCH_HANDLE.getValue(), pinchHandle);
+
+        if (StringUtils.isNotBlank(uploadedImageKey)) {
+            iArgs.putString(KEY_KEY.getValue(), uploadedImageKey);
+        }
 
         // call for intent
         Intent mServiceIntent =
@@ -268,14 +354,69 @@ public class SignupActivity extends AppCompatActivity {
         startActivityForResult(chooserIntent, AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue());
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (resultCode == RESULT_OK) {
-            if (requestCode == AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue()) {
-                outputFileUri = (intent == null ? true : MediaStore.ACTION_IMAGE_CAPTURE.equals(intent.getAction())) ? outputFileUri : (intent == null ? null : intent.getData());
-                _avatarView.setImageURI(outputFileUri);
-                _avatarView.refreshDrawableState();
+    @Subscribe
+    public void onSignUpImageUploadEvent(final Events.SignUpImageUploadEvent event) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                uploadPending = Boolean.FALSE;
+                if (event.getMetaData() != null) {
+                    uploadedImageKey = event.getMetaData().get(KEY_KEY.getValue());
+                }
+                if (progressDialog.isShowing()) {
+                    signup();
+                }
             }
+        });
+    }
+
+    static class ImageUploadTask extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+            try {
+                StorageComponent component = DaggerStorageComponent.create();
+                ReqSetBody req = component.provideReqSetBody();
+                // set base args
+                req.setToken(Utils.getNonBlankAppToken());
+                req.setCmd("s3upload");
+
+                Map<String, String> body = new HashMap<>();
+                body.put("name", args[0]);
+                body.put("content", args[1]);
+                body.put("content_type", "image/jpeg");
+
+                req.setBody(body);
+
+                //headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp.getBody() != null) {
+                    Map<String, Object> respBody = resp.getBody().getBody();
+                    return respBody == null ? null : (String) respBody.get(AppConstants.APP_INTENT.KEY_KEY.getValue());
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "err uploading...");
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Map<String, String> eventData = new HashMap<>();
+            eventData.put(AppConstants.APP_INTENT.KEY_KEY.getValue(), result);
+
+            BusProvider.INSTANCE.getBus().post(new Events.SignUpImageUploadEvent(eventData));
         }
     }
 }

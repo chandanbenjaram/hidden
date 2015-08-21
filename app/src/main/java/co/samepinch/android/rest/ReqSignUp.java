@@ -1,5 +1,7 @@
 package co.samepinch.android.rest;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +33,7 @@ public class ReqSignUp extends RestBase<Map<String, String>> {
     transient String email;
     transient String password;
     transient String pinchHandle;
+    transient String key;
 
     public String getFname() {
         return fname;
@@ -72,6 +75,14 @@ public class ReqSignUp extends RestBase<Map<String, String>> {
         this.pinchHandle = pinchHandle;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     @Override
     public Map<String, String> getBody() {
         return body;
@@ -89,6 +100,9 @@ public class ReqSignUp extends RestBase<Map<String, String>> {
         body.put("email", Utils.emptyIfNull(email));
         body.put("password", Utils.emptyIfNull(password));
         body.put("pinch_handle", Utils.emptyIfNull(pinchHandle));
+        if(StringUtils.isNotBlank(key)){
+            body.put("key", key);
+        }
 
         // const
         body.put(AppConstants.KV.PLATFORM.getValue(), AppConstants.KV.PLATFORM.getValue());

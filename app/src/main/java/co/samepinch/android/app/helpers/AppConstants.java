@@ -21,7 +21,6 @@ public class AppConstants {
         POSTS(BASE.getValue().concat("api/posts")),
         GROUPS(BASE.getValue().concat("api/groups")),
         CONTENT_AUTHORITY("co.samepinch.android.app");
-
         private final String value;
         API(String value) {
             this.value = value;
@@ -81,7 +80,8 @@ public class AppConstants {
         SCOPE("scope", "imsocl"),
         PLATFORM("platform", "android"),
         REQUEST_SIGNUP("REQUEST_SIGNUP", "108"),
-        REQUEST_CHOOSE_PICTURE("REQUEST_CHOOSE_PICTURE", "109")
+        REQUEST_CHOOSE_PICTURE("REQUEST_CHOOSE_PICTURE", "109"),
+        REQUEST_EDIT_PICTURE("REQUEST_EDIT_PICTURE", "110")
         ;
 
         private final String key, value;
