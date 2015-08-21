@@ -32,6 +32,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
@@ -53,6 +55,11 @@ import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
+
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PHOTO;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
 
 /**
  * TODO
@@ -76,9 +83,17 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.viewpager)
     ViewPager mViewPager;
 
+    @Bind(R.id.nav_header_switch)
+    ViewSwitcher mHeaderSwitch;
 
     @Bind(R.id.nav_header_img)
     SIMView mNavHeaderImg;
+
+    @Bind(R.id.nav_header_name)
+    TextView mNavHeaderName;
+
+    @Bind(R.id.nav_header_summary)
+    TextView mNavHeaderSummary;
 
     SPFragmentPagerAdapter adapterViewPager;
 
@@ -95,11 +110,19 @@ public class MainActivityIn extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-
         Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-        if (StringUtils.isNotBlank(userInfo.get("photo"))) {
-            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get("photo"));
+        if (StringUtils.isNotBlank(userInfo.get(KEY_PHOTO.getValue()))) {
+            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get(KEY_PHOTO.getValue()));
+        } else {
+            String fName = userInfo.get(KEY_FNAME.getValue());
+            String lName = userInfo.get(KEY_LNAME.getValue());
+            String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
+            mNavHeaderName.setText(initials);
+            mHeaderSwitch.showNext();
         }
+
+        String pinchHandle = String.format(getString(R.string.pinch_handle), userInfo.get(KEY_PINCH_HANDLE.getValue()));
+        mNavHeaderSummary.setText(pinchHandle);
 
         setupDrawerContent(mNavigationView);
         setupViewPager(mViewPager);

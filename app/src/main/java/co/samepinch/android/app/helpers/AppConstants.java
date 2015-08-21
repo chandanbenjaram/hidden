@@ -56,6 +56,8 @@ public class AppConstants {
         KEY_EMAIL("email"),
         KEY_PASSWORD("password"),
         KEY_DEVICE_TOKEN("device_token"),
+        KEY_PHOTO("photo"),
+        KEY_RPHOTO("rphoto"),
         KEY_CHECK_EMAIL_EXISTENCE("checkEmailExistence"),
         CHOOSE_PINCH_HANDLE("77")
         ;

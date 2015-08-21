@@ -12,7 +12,7 @@ http://databasefaq.com/index.php/answer/79292/android-performance-view-gif-anima
 
 
 ###COMMANDS
-adb shell ps|grep "droid.app.co.app"|awk '{print $2}'|xargs adb shell kill 
+adb shell ps|grep "co.samepinch.android.app"|awk '{print $2}'|xargs adb shell kill 
 
 
 ARM Translator - https://goo.gl/lC6GWt

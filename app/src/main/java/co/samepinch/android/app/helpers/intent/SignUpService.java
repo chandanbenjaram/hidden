@@ -68,6 +68,7 @@ public class SignUpService extends IntentService {
             req.setFname(iArgs.getString(KEY_FNAME.getValue()));
             req.setLname(iArgs.getString(KEY_LNAME.getValue()));
             req.setEmail(iArgs.getString(KEY_EMAIL.getValue()));
+
             req.setPassword(iArgs.getString(KEY_PASSWORD.getValue()));
             req.setPinchHandle(iArgs.getString(KEY_PINCH_HANDLE.getValue()));
 

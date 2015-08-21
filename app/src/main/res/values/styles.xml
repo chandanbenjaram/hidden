@@ -111,4 +111,15 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_gravity">center_vertical</item>
     </style>
+
+    <style name="SP_NAV_NAME" parent="@android:style/TextAppearance">
+        <item name="android:textColor"> @color/blue_500</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:color">@color/blue_500</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">@drawable/rounded_corners</item>
+    </style>
 </resources>
