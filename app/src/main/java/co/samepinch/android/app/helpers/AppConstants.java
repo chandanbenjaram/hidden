@@ -112,6 +112,7 @@ public class AppConstants {
         FRAGMENT_DOTWALL,
         FRAGMENT_COMMENT,
         FRAGMENT_CHOOSE_HANDLE,
+        FRAGMENT_CREATE_POST,
         KEY_TAG,
         KEY_DOT,
         Wall,

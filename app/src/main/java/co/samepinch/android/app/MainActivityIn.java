@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -49,6 +50,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.PostCreateFragment;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
@@ -205,6 +207,24 @@ public class MainActivityIn extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
+
+                        if(StringUtils.equalsIgnoreCase("post", menuItem.getTitle())){
+                            // TARGET
+                            Bundle args = new Bundle();
+                            args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CREATE_POST.name());
+
+                            // intent
+                            Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.putExtras(args);
+                            getApplicationContext().startActivity(intent);
+
+//                            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//                            ft.add(new PostCreateFragment(), "post");
+//                            ft.addToBackStack(null);
+//                            ft.commit();
+                        }
+
                         mDrawerLayout.closeDrawers();
                         return true;
                     }

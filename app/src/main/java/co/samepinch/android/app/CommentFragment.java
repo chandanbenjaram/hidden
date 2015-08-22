@@ -59,7 +59,6 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
         this.activity = (AppCompatActivity) activity;
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

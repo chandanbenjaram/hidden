@@ -2,31 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/wall"
             android:icon="@drawable/ic_dashboard"
-            android:title="Home" />
+            android:title="Home"
+            />
         <item
-            android:id="@+id/nav_messages"
+            android:id="@+id/post"
             android:icon="@drawable/ic_event"
-            android:title="Messages" />
+            android:title="Post" />
         <item
-            android:id="@+id/nav_friends"
+            android:id="@+id/settings"
             android:icon="@drawable/ic_headset"
-            android:title="Friends" />
+            android:title="Settings" />
         <item
-            android:id="@+id/nav_discussion"
+            android:id="@+id/notifications"
             android:icon="@drawable/ic_forum"
-            android:title="Discussion" />
+            android:title="Notifications" />
     </group>
 
-    <item android:title="ABOUT">
+    <item android:title="ABOUT APP">
         <menu>
-            <item android:title="SYSTEM STATUS" />
-            <item android:title="SPREAD THE LOVE" />
-            <item android:title="RATE YOUR APP" />
-            <item android:title="APP RULES" />
-            <item android:title="TERMS &amp; CONDITIONS" />
-            <item android:title="SUPPORT/FEEDBACK" />
+            <item android:title="Status" />
+            <item android:title="Spread" />
+            <item android:title="Rate It" />
+            <item android:title="Rules" />
+            <item android:title="Help" />
         </menu>
     </item>
 

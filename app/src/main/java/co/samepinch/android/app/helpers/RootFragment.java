@@ -47,6 +47,9 @@ public class RootFragment extends Fragment {
             case FRAGMENT_CHOOSE_HANDLE:
                 fragment = new ChooseHandleFragment();
                 break;
+            case FRAGMENT_CREATE_POST:
+                fragment = new PostCreateFragment();
+                break;
             default:
                 throw new IllegalArgumentException("invalid URI");
         }
