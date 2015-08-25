@@ -7,36 +7,26 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,34 +34,30 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnEditorAction;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.SignupActivity;
-import co.samepinch.android.app.helpers.intent.AuthService;
-import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
-import co.samepinch.android.app.helpers.pubsubs.Events;
-
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
 public class PostCreateFragment extends Fragment {
     public static final String TAG = "PostCreateFragment";
 
-    @Bind(R.id.post_text_id)
-    EditText mPostText;
+//    @Bind(R.id.post_text_id)
+//    EditText mPostText;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    @Bind(R.id.list)
+    ListView mListView;
+
     private static Uri outputFileUri;
 
     ProgressDialog progressDialog;
+
+    ImageOrTextViewAdapter mListViewAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,17 +77,30 @@ public class PostCreateFragment extends Fragment {
         View view = inflater.inflate(R.layout.post_create, container, false);
         ButterKnife.bind(this, view);
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity)getActivity()).onBackPressed();
+                ((AppCompatActivity) getActivity()).onBackPressed();
             }
         });
         toolbar.setTitle(StringUtils.EMPTY);
 
+        List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
+        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "A"));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "B"));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse("http://zoarchurch.co.uk/content/pages/uploaded_images/91.png"), null));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "x"));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "y"));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse("http://ufatum.com/data_images/picture/picture6.jpg"), null));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "z"));
+
+
+        mListViewAdapter
+                = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, listItems);
+        mListView.setAdapter(mListViewAdapter);
         return view;
     }
 
@@ -123,15 +122,17 @@ public class PostCreateFragment extends Fragment {
             } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
                 Uri processedImageUri = Uri.parse("file://" + intent.getData());
 
+                mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
+
                 Bundle extra = intent.getExtras();
                 if (null != extra) {
                     // image has been changed by the user?
                     boolean changed = extra.getBoolean(Constants.EXTRA_OUT_BITMAP_CHANGED);
                 }
 
-                try{
+                try {
                     InputStream imgStream = getActivity().getContentResolver().openInputStream(processedImageUri);
-                    Drawable drawable  = Drawable.createFromStream(imgStream, processedImageUri.toString());
+                    Drawable drawable = Drawable.createFromStream(imgStream, processedImageUri.toString());
                     drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
 
                     ImageSpan imgSpan = new ImageSpan(drawable, DynamicDrawableSpan.ALIGN_BASELINE);
@@ -139,15 +140,15 @@ public class PostCreateFragment extends Fragment {
 //                    SpannableStringBuilder bldr = new SpannableStringBuilder();
 //                    bldr.append(mPostText.getText())
 
-                    int start = mPostText.getEditableText().length();
+//                    int start = mPostText.getEditableText().length();
                     // S3 uploaded id
                     String imgPlaceholder = "\n" + "::dbd0aba09451143cf0e59055f7d44d99.jpg::" + "\n";
-                    mPostText.getEditableText().append(imgPlaceholder);
-                    int end = mPostText.getEditableText().length();
+//                    mPostText.getEditableText().append(imgPlaceholder);
+//                    int end = mPostText.getEditableText().length();
 
-                    mPostText.getEditableText().setSpan(imgSpan, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+//                    mPostText.getEditableText().setSpan(imgSpan, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
-                }catch(Exception e){
+                } catch (Exception e) {
                     Log.e(TAG, "error adding image.", e);
                 }
             }
