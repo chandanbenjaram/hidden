@@ -89,7 +89,7 @@ public class PostCreateFragment extends Fragment {
         toolbar.setTitle(StringUtils.EMPTY);
 
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
-        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "A"));
+//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "A"));
 //        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "B"));
 //        listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse("http://zoarchurch.co.uk/content/pages/uploaded_images/91.png"), null));
 //        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "x"));
@@ -99,7 +99,8 @@ public class PostCreateFragment extends Fragment {
 
 
         mListViewAdapter
-                = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, listItems);
+                = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, new ArrayList<ImageOrTextViewAdapter.ImageOrText>());
+        mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
         mListView.setAdapter(mListViewAdapter);
         return view;
     }
@@ -122,7 +123,15 @@ public class PostCreateFragment extends Fragment {
             } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
                 Uri processedImageUri = Uri.parse("file://" + intent.getData());
 
+                int lastIndex = mListViewAdapter.getCount() - 1;
+                ImageOrTextViewAdapter.ImageOrText lastItem = mListViewAdapter.getItem(lastIndex);
+                if (StringUtils.isBlank(lastItem.getText()) && lastItem.getImageUri() == null) {
+                    mListViewAdapter.remove(lastItem);
+
+                }
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
+                mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
+
 
                 Bundle extra = intent.getExtras();
                 if (null != extra) {

@@ -6,10 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.List;
 
@@ -20,12 +23,15 @@ import co.samepinch.android.app.R;
  */
 public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.ImageOrText> {
 
+    final List<ImageOrText> mItems;
+
     public ImageOrTextViewAdapter(Context context, int resource, List<ImageOrText> objects) {
         super(context, resource, objects);
+        this.mItems = objects;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         ImageOrText currItem = getItem(position);
 
@@ -43,6 +49,15 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
             imageView.setImageURI(currItem.getImageUri());
             vs.setDisplayedChild(1);
         }
+
+        Button removeBtn = (Button) convertView.findViewById(R.id.post_item_button);
+        removeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mItems.remove(position);
+                notifyDataSetChanged();
+            }
+        });
 
 
         return convertView;
@@ -64,6 +79,20 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
 
         public String getText() {
             return text;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return super.equals(o);
+        }
+
+        @Override
+        public int hashCode() {
+            if (imageUri != null) {
+                return new HashCodeBuilder().append(imageUri.toString()).toHashCode();
+            } else {
+                return new HashCodeBuilder().append(text).toHashCode();
+            }
         }
     }
 }
