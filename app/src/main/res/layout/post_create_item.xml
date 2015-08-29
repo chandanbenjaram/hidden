@@ -1,60 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?><!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:fresco="http://schemas.android.com/apk/res-auto"--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"--><!--android:gravity="center_vertical"--><!--android:orientation="vertical">-->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/post_create_switch"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:measureAllChildren="false">
 
-    <ViewSwitcher xmlns:fresco="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/post_create_switch"
+    <EditText
+        android:id="@+id/post_create_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical">
+        android:background="@android:color/transparent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="top|start"
+        android:hint="@string/enter_post"
+        android:imeOptions="actionDone"
+        android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
+        android:maxLines="999"
+        android:minLines="1"
+        android:scrollHorizontally="false"
+        android:textIsSelectable="true" />
 
-        <!--<EditText-->
-        <!--android:id="@+id/post_create_text"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:minHeight="?android:attr/listPreferredItemHeightSmall"-->
-        <!--android:textAppearance="?android:attr/textAppearanceListItemSmall" />-->
-        <EditText
-            android:id="@+id/post_create_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="top|left"
-            android:hint="@string/enter_post"
-            android:imeOptions="actionDone"
-            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
-            android:lines="5"
-            android:maxLines="999"
-            android:minLines="5"
-            android:scrollHorizontally="false"
-            android:textIsSelectable="true" />
+    <RelativeLayout
+        android:id="@+id/post_create_image_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <!--<com.facebook.drawee.view.SimpleDraweeView-->
-            <!--android:id="@+id/post_create_image"-->
-            <!--android:layout_width="@dimen/list_item_avatar_size"-->
-            <!--android:layout_height="@dimen/list_item_avatar_size"-->
-            <!--android:adjustViewBounds="true"-->
-            <!--android:clickable="true"-->
-            <!--fresco:placeholderImageScaleType="fitCenter"-->
-            <!--fresco:roundAsCircle="false" />-->
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/post_create_image"
             android:layout_width="match_parent"
-            android:layout_height="92dp"
-            fresco:placeholderImageScaleType="centerCrop"
-            fresco:placeholderImage="@drawable/loading"/>
-        <!--</LinearLayout>-->
-    </ViewSwitcher>
+            android:layout_height="150dp"
+            fresco:placeholderImage="@drawable/loading"
+            fresco:placeholderImageScaleType="centerCrop" />
 
-    <Button
-        android:id="@+id/post_item_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="remove" />
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/post_item_remove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:background="@android:color/transparent"
+            android:padding="5dp"
+            android:src="@drawable/rem"
+            android:contentDescription="remove"/>
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/post_item_edit"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_toLeftOf="@+id/post_item_remove"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:padding="9dp"-->
+            <!--android:src="@drawable/pencil_blue"-->
+            <!--android:contentDescription="edit"/>-->
+
+    </RelativeLayout>
+
+</ViewSwitcher>

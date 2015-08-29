@@ -89,18 +89,12 @@ public class PostCreateFragment extends Fragment {
         toolbar.setTitle(StringUtils.EMPTY);
 
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "A"));
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "B"));
+        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
 //        listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse("http://zoarchurch.co.uk/content/pages/uploaded_images/91.png"), null));
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "x"));
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "y"));
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse("http://ufatum.com/data_images/picture/picture6.jpg"), null));
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, "z"));
-
 
         mListViewAdapter
-                = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, new ArrayList<ImageOrTextViewAdapter.ImageOrText>());
-        mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
+                = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, listItems);
+//        mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
         mListView.setAdapter(mListViewAdapter);
         return view;
     }
@@ -118,7 +112,6 @@ public class PostCreateFragment extends Fragment {
                 editorIntent.putExtra(Constants.EXTRA_TOOLS_DISABLE_VIBRATION, "any");
                 editorIntent.putExtra(Constants.EXTRA_OUTPUT_FORMAT, Bitmap.CompressFormat.JPEG.name());
                 editorIntent.putExtra(Constants.EXTRA_OUTPUT_QUALITY, 55);
-//                editorIntent.putExtra( Constants.EXTRA_OUTPUT, outputFileUri);
                 startActivityForResult(editorIntent, AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue());
             } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
                 Uri processedImageUri = Uri.parse("file://" + intent.getData());
@@ -127,11 +120,10 @@ public class PostCreateFragment extends Fragment {
                 ImageOrTextViewAdapter.ImageOrText lastItem = mListViewAdapter.getItem(lastIndex);
                 if (StringUtils.isBlank(lastItem.getText()) && lastItem.getImageUri() == null) {
                     mListViewAdapter.remove(lastItem);
-
                 }
+
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
-
 
                 Bundle extra = intent.getExtras();
                 if (null != extra) {
