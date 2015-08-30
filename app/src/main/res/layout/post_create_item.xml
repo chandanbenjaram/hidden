@@ -44,7 +44,7 @@
             android:layout_alignParentTop="true"
             android:background="@android:color/transparent"
             android:padding="5dp"
-            android:src="@drawable/rem"
+            android:src="@drawable/trash_blue"
             android:contentDescription="remove"/>
 
         <!--<ImageButton-->

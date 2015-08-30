@@ -7,16 +7,8 @@ import com.google.gson.annotations.SerializedName;
  * Created by imaginationcoder on 7/1/15.
  */
 public class RespGroups extends RestBase<RespGroups.Body> {
-
     public RespGroups() {
     }
-
-    // {"command":"show","status":200,"message":"Ok","body":{
-    // "uid":"3f4ca4a9-442e-4b3a-a4a6-6012d501a241",
-    // "posts_count":9,
-    // "followers_count":61,
-    // "image":"https://asset.samepinch.co/uploads/groups/universal_group/largepicture/55608bda3335620003000000/bf9c4612982cb3c56762380e096a2255.png",
-    // "name":"#movies"}}
 
     @Override
     public Body getBody() {

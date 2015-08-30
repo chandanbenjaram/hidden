@@ -49,6 +49,9 @@
             android:name=".helpers.intent.TagsPullService"
             android:exported="false" />
         <service
+            android:name=".helpers.intent.TagDetailsService"
+            android:exported="false" />
+        <service
             android:name=".helpers.intent.PostDetailsService"
             android:exported="false" />
         <service

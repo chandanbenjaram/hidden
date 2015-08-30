@@ -17,8 +17,7 @@ public interface SchemaTags extends BaseColumns {
     String COLUMN_POSTS_COUNT = "posts_count";
     String COLUMN_FOLLOWERS_COUNT = "followers_count";
     String COLUMN_IMAGE = "image";
-
-
+    String COLUMN_USER_ID = "user_id";
 
     String TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + TABLE_NAME
@@ -28,14 +27,15 @@ public interface SchemaTags extends BaseColumns {
             + COLUMN_UID + " TEXT DEFAULT '', "
             + COLUMN_POSTS_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_FOLLOWERS_COUNT + " INTEGER DEFAULT 0, "
-            + COLUMN_IMAGE + " TEXT "
+            + COLUMN_IMAGE + " TEXT, "
+            + COLUMN_USER_ID + " TEXT "
             + ")";
 
     String TABLE_DROP = "DROP TABLE IF EXISTS "
             + TABLE_NAME;
 
     String[] TAG_COLUMNS = new String[]{
-            _ID, COLUMN_NAME, COLUMN_UID, COLUMN_POSTS_COUNT, COLUMN_FOLLOWERS_COUNT, COLUMN_IMAGE
+            _ID, COLUMN_NAME, COLUMN_UID, COLUMN_POSTS_COUNT, COLUMN_FOLLOWERS_COUNT, COLUMN_IMAGE, COLUMN_USER_ID
     };
 
     // provider related stuff

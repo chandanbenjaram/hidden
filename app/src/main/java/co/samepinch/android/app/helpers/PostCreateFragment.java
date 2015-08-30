@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -15,6 +16,9 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
@@ -22,11 +26,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
+import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,18 +40,24 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
+import co.samepinch.android.app.helpers.adapters.TagsRVAdapter;
+import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dao.SchemaPosts;
+import co.samepinch.android.data.dao.SchemaTags;
+
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class PostCreateFragment extends Fragment {
     public static final String TAG = "PostCreateFragment";
-
-//    @Bind(R.id.post_text_id)
-//    EditText mPostText;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -53,11 +65,15 @@ public class PostCreateFragment extends Fragment {
     @Bind(R.id.list)
     ListView mListView;
 
+    @Bind(R.id.holder_recyclerview)
+    FrameLayout frameLayout;
+
     private static Uri outputFileUri;
 
     ProgressDialog progressDialog;
 
     ImageOrTextViewAdapter mListViewAdapter;
+    TagsRVAdapter mTagsListAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,11 +81,6 @@ public class PostCreateFragment extends Fragment {
         // retain this fragment across configuration changes.
         setRetainInstance(true);
     }
-//
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,13 +101,69 @@ public class PostCreateFragment extends Fragment {
 
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
         listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
-//        listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse("http://zoarchurch.co.uk/content/pages/uploaded_images/91.png"), null));
 
         mListViewAdapter
                 = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, listItems);
-//        mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
         mListView.setAdapter(mListViewAdapter);
+        // recycler view
+        RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
+            @Override
+            public void scrollBy(int x, int y) {
+                try {
+                    super.scrollBy(x, y);
+                } catch (NullPointerException nlp) {
+                    // muted
+                }
+            }
+        };
+        frameLayout.addView(rv);
+        setupRecyclerView(rv);
+
+        // call for intent
+        Intent tagRefreshIntent =
+                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
+        getActivity().startService(tagRefreshIntent);
+
         return view;
+    }
+
+    private void setupRecyclerView(RecyclerView rv) {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
+        rv.setLayoutManager(gridLayoutManager);
+        rv.setHasFixedSize(true);
+
+        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+        String currUserId = userInfo.get(KEY_UID.getValue());
+
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+        TagsRVAdapter.ItemEventListener<String> listenr = new TagsRVAdapter.ItemEventListener<String>() {
+            @Override
+            public void onClick(String s) {
+                Log.d(TAG, "s..." + s);
+            }
+        };
+        mTagsListAdapter = new TagsRVAdapter(getActivity(), cursor, listenr);
+        rv.setAdapter(mTagsListAdapter);
+        rv.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    @Subscribe
+    public void onTagsRefreshedEvent(Events.TagsRefreshedEvent event) {
+        Log.d(TAG, "refreshed...");
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                    String currUserId = userInfo.get(KEY_UID.getValue());
+
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+                    mTagsListAdapter.changeCursor(cursor);
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

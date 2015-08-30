@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ViewSwitcher;
 
 import co.samepinch.android.app.PostListFragment;
 import co.samepinch.android.app.R;
@@ -53,6 +54,8 @@ public class SPFragmentPagerAdapter extends SmartFragmentStatePagerAdapter {
     //
     public static View getTabView(Context context, int position) {
         View v = LayoutInflater.from(context).inflate(R.layout.custom_tab_main, null);
+        ViewSwitcher vs = (ViewSwitcher) v.findViewById(R.id.tab_main_switch);
+        vs.setDisplayedChild(position);
         return v;
     }
 

@@ -10,10 +10,10 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menuitem_post_edit_id"
-        android:icon="@drawable/icon_edit_2x"
+        android:icon="@drawable/pencil_blue"
         android:orderInCategory="299"
         android:title="Edit"
-        app:icon="@drawable/icon_edit_2x"
+        app:icon="@drawable/pencil_blue"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menuitem_post_share_id"

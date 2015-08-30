@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
+import co.samepinch.android.app.helpers.intent.TagDetailsService;
 import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
@@ -154,7 +155,7 @@ public class TagWallFragment extends Fragment {
 
         // call for intent
         mServiceIntent =
-                new Intent(activity.getApplicationContext(), TagsPullService.class);
+                new Intent(activity.getApplicationContext(), TagDetailsService.class);
         mServiceIntent.putExtras(iArgs);
         activity.startService(mServiceIntent);
     }
