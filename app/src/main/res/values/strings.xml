@@ -33,7 +33,7 @@
     <!-- pinch handle-->
     <string name="pinch_handle">\u0040<xliff:g id="handle">%1$s</xliff:g></string>
     <string name="enter_comment">enter your comment here...</string>
-    <string name="enter_post">enter your post here....</string>
+    <string name="enter_post">enter your post here...</string>
     <string name="enter_comment_actionLabel">Submit</string>
     <string name="profile_picture_desc">Profile picture</string>
     <string name="welcome_title">Welcome to SamePinch!</string>

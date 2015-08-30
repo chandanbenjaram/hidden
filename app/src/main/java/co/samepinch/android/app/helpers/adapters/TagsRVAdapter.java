@@ -39,6 +39,7 @@ public class TagsRVAdapter extends CursorRecyclerViewAdapter<TagRVHolder> {
             viewHolder.mTagName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    viewHolder.mTagName.setChecked(!viewHolder.mTagName.isChecked());
                     itemEventListener.onClick(viewHolder.mTagName.getText());
                 }
             });

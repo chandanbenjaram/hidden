@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
-    <TextView
+
+    <CheckedTextView
         android:id="@+id/tag_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="tag"
-        android:textColor="@color/grey_500"
-        android:textSize="10dp" />
+        android:textColor="@drawable/text_select"
+        android:layout_margin="2dp"
+        android:padding="5dp"
+        android:background="@drawable/button_select"
+        android:checkMark="@null"
+        android:checked="false" />
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/tag_image"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        fresco:placeholderImage="@drawable/loading"
-        fresco:placeholderImageScaleType="centerCrop"
-        fresco:overlayImage="@drawable/tickmark"/>
+    <!--<TextView-->
+    <!--android:id="@+id/tag_name"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@drawable/button_select"-->
+    <!--android:text="tag"-->
+    <!--android:textColor="@drawable/text_select" />-->
+
+
+    <!--<Button-->
+    <!--android:id="@+id/tag_name"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Button"-->
+    <!--android:textColor="@drawable/text_select"-->
+    <!--android:background="@drawable/button_select"/>-->
+    <!--<com.facebook.drawee.view.SimpleDraweeView-->
+    <!--android:id="@+id/tag_image"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="150dp"-->
+    <!--fresco:placeholderImage="@drawable/loading"-->
+    <!--fresco:placeholderImageScaleType="centerCrop"-->
+    <!--fresco:overlayImage="@drawable/tag_select"/>-->
 
     <!--<ImageButton-->
-        <!--android:id="@+id/tag_select"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:padding="5dp"-->
-        <!--android:src="@drawable/tickmark"-->
-        <!--android:contentDescription="remove"/>-->
+    <!--android:id="@+id/tag_select"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:background="@android:color/transparent"-->
+    <!--android:padding="5dp"-->
+    <!--android:src="@drawable/tickmark"-->
+    <!--android:contentDescription="remove"/>-->
 
 </LinearLayout>

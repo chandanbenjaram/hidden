@@ -116,6 +116,7 @@ public class PostCreateFragment extends Fragment {
                 }
             }
         };
+
         frameLayout.addView(rv);
         setupRecyclerView(rv);
 
@@ -128,7 +129,7 @@ public class PostCreateFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView rv) {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
         rv.setLayoutManager(gridLayoutManager);
         rv.setHasFixedSize(true);
 
