@@ -40,7 +40,7 @@ public class TagRVHolder extends RecyclerView.ViewHolder {
 //        if (StringUtils.isNotBlank(imgStr)) {
 //            Utils.setupLoadingImageHolder(mTagImage, imgStr);
 //        }
-        mTagName.setText(cursor.getString(cursor.getColumnIndex("name")));
+        mTagName.setText(cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME)));
     }
 
 }

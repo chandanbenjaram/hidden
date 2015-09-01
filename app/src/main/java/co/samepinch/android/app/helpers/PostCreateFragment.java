@@ -137,9 +137,9 @@ public class PostCreateFragment extends Fragment {
         String currUserId = userInfo.get(KEY_UID.getValue());
 
         Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
-        TagsRVAdapter.ItemEventListener<String> listenr = new TagsRVAdapter.ItemEventListener<String>() {
+        TagsRVAdapter.ItemEventListener<String[]> listenr = new TagsRVAdapter.ItemEventListener<String[]>() {
             @Override
-            public void onClick(String s) {
+            public void onChange(String[] s) {
                 Log.d(TAG, "s..." + s);
             }
         };
