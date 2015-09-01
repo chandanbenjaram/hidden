@@ -21,18 +21,19 @@
             android:layout_height="0dp"
             android:layout_weight="0.2" />
 
-
         <TextView
+            style="@style/SP_MARKER_TEXT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TAG THIS POST WITH:"
-            android:singleLine="true"
-            android:textColor="@color/grey_500"/>
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:text="@string/select_tags" />
+
         <FrameLayout
             android:id="@+id/holder_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.1"/>
+            android:layout_weight="0.1" />
 
     </LinearLayout>
 

@@ -10,11 +10,14 @@
         android:id="@+id/post_create_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
         android:background="@null"
         android:gravity="top|start"
         android:hint="@string/enter_post"
         android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
         android:maxLines="999"
+        android:minLines="0"
         android:textIsSelectable="true" />
 
     <RelativeLayout

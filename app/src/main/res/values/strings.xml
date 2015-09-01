@@ -34,6 +34,8 @@
     <string name="pinch_handle">\u0040<xliff:g id="handle">%1$s</xliff:g></string>
     <string name="enter_comment">enter your comment here...</string>
     <string name="enter_post">enter your post here...</string>
+    <string name="select_tags">tag this post with</string>
+    <string name="enter_here">enter here...</string>
     <string name="enter_comment_actionLabel">Submit</string>
     <string name="profile_picture_desc">Profile picture</string>
     <string name="welcome_title">Welcome to SamePinch!</string>
@@ -47,7 +49,7 @@
     <string name="fb_app_id">1646195582278585</string>
     <string name="facebook_app_id">1646195582278585</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="close">Close</string>
     <string name="status_signed_out">Signed out</string>

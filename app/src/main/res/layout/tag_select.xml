@@ -14,7 +14,6 @@
         android:background="@drawable/button_select"
         android:checkMark="@null"
         android:checked="false"
-
         android:singleLine="true"
         />
 </LinearLayout>

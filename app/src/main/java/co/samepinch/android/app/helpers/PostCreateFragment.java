@@ -192,6 +192,8 @@ public class PostCreateFragment extends Fragment {
 
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
+                mListView.requestFocus();
+                mListView.setSelection(mListViewAdapter.getCount() - 1);
 
                 Bundle extra = intent.getExtras();
                 if (null != extra) {
