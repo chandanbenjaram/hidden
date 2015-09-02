@@ -161,6 +161,10 @@ public class PostDetailActivity extends AppCompatActivity {
         }
 
         mPostDetails = Utils.cursorToPostDetailsEntity(currPost);
+        if (mPostDetails == null) {
+            return;
+        }
+
         mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
         mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
         mPostDate.setText(Utils.dateToString(mPostDetails.getCreatedAt()));
@@ -318,8 +322,9 @@ public class PostDetailActivity extends AppCompatActivity {
                     // query for post comments
                     Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
                     mViewAdapter.changeCursor(new MergeCursor(new Cursor[]{currPost, currComments}));
+                    invalidateOptionsMenu();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // muted
                 }
             }
         });
