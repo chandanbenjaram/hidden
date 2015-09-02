@@ -10,13 +10,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
@@ -28,8 +26,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.style.DynamicDrawableSpan;
-import android.text.style.ImageSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,11 +36,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
-import com.bumptech.glide.util.Util;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,11 +53,10 @@ import org.springframework.http.ResponseEntity;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,34 +64,30 @@ import java.util.concurrent.ConcurrentHashMap;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import co.samepinch.android.app.ActivityFragment;
+import co.samepinch.android.app.MainActivity;
 import co.samepinch.android.app.PostDetailActivity;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.adapters.TagsRVAdapter;
-import co.samepinch.android.app.helpers.intent.FBAuthService;
 import co.samepinch.android.app.helpers.intent.MultiMediaUploadService;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
-import co.samepinch.android.app.helpers.intent.PostsPullService;
-import co.samepinch.android.app.helpers.intent.SignOutService;
 import co.samepinch.android.app.helpers.intent.TagsPullService;
-import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
-import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.app.helpers.widget.SIMView;
+import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
+import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.rest.ReqGeneric;
 import co.samepinch.android.rest.ReqPostCreate;
-import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespPostDetails;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
-public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
-    public static final String TAG = "PostCreateFragment";
+public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
+    public static final String TAG = "PostEditFragment";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -117,10 +108,9 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
     Map<String, String> imageStatusMap;
 
     String[] choosenTags;
-    boolean mPostAsAnonymous;
+    boolean postAsAnonymous;
 
     private LocalHandler mHandler;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -161,8 +151,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         popup.getMenu().add("as you");
         popup.getMenu().add("as anonymous");
 
-
-        // This activity implements OnMenuItemClickListener
+        // this activity implements OnMenuItemClickListener
         popup.setOnMenuItemClickListener(this);
         popup.show();
     }
@@ -183,14 +172,49 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                 ((AppCompatActivity) getActivity()).onBackPressed();
             }
         });
-        toolbar.setTitle("NEW");
+        toolbar.setTitle("EDIT");
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
 //        ab.setHomeAsUpIndicator(R.drawable.back_2x);
         ab.setDisplayHomeAsUpEnabled(true);
 
+
+        // get caller data        String dotUid = getArguments().getString(K.KEY_DOT.name());
+
+        String postId = getArguments().getString(AppConstants.K.POST.name());
+        // query for post details
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId}, null);
+        PostDetails post = cursor.moveToFirst() ? Utils.cursorToPostDetailsEntity(cursor) : null;
+        if (post == null) {
+            Snackbar.make(getView(), "problem opening post. try again...", Snackbar.LENGTH_SHORT).show();
+            getActivity().finish();
+        }
+
+        Map<String, String> imageKV = post.getImages();
+        for (Map.Entry<String, String> imageKVEntry : imageKV.entrySet()) {
+            imageStatusMap.put(imageKVEntry.getValue(), imageKVEntry.getKey());
+        }
+
+        List<String> imageKArr = Utils.getImageValues(post.getContent());
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
-        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
+
+        String rightContent = post.getContent();
+        for (String imgK : imageKArr) {
+            // get left of image
+            String leftContent = StringUtils.substringBefore(rightContent, imgK).replaceAll("::", "");
+
+            // grab right remaining chunk
+            rightContent = StringUtils.substringAfter(rightContent, imgK).replaceAll("::", "");
+            if (StringUtils.isNotBlank(leftContent)) {
+                listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, leftContent));
+            }
+
+            String imgUrl = imageKV.get(imgK);
+            listItems.add(new ImageOrTextViewAdapter.ImageOrText(Uri.parse(imgUrl), null));
+        }
+        if (StringUtils.isNotBlank(rightContent)) {
+            listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, rightContent));
+        }
 
         mListViewAdapter
                 = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, listItems);
@@ -208,7 +232,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         };
 
         frameLayout.addView(rv);
-        setupRecyclerView(rv);
+        setupRecyclerView(rv, post.getTags());
 
         // call for intent
         Intent tagRefreshIntent =
@@ -218,7 +242,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         return view;
     }
 
-    private void setupRecyclerView(RecyclerView rv) {
+    private void setupRecyclerView(RecyclerView rv, List<String> initTags) {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
         rv.setLayoutManager(gridLayoutManager);
         rv.setHasFixedSize(true);
@@ -233,7 +257,9 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                 choosenTags = s;
             }
         };
-        mTagsListAdapter = new TagsRVAdapter(getActivity(), cursor, listenr, null);
+
+        choosenTags = initTags.toArray(new String[]{});
+        mTagsListAdapter = new TagsRVAdapter(getActivity(), cursor, listenr, new HashSet<String>(initTags));
         rv.setAdapter(mTagsListAdapter);
         rv.setItemAnimator(new DefaultItemAnimator());
     }
@@ -269,18 +295,17 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        this.mPostAsAnonymous = !StringUtils.equals(item.toString(), "as you");
-        progressDialog.setMessage("posting...");
+        this.postAsAnonymous = !StringUtils.equals(item.toString(), "as you");
+        progressDialog.setMessage("saving...");
         progressDialog.show();
-        createPost();
+        savePost();
         return true;
     }
 
-    public void createPost() {
+    public void savePost() {
         final StringBuilder content = new StringBuilder();
         boolean hasPendingImageUploads = false;
         List<String> imgKeys = new ArrayList<>();
-
         for (final ImageOrTextViewAdapter.ImageOrText contentItem : mListViewAdapter.mItems) {
             if (contentItem.getText() != null) {
                 content.append(contentItem.getText());
@@ -313,12 +338,11 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    createPost();
+                    savePost();
                 }
             }, 999);
             return;
         } else {
-
             String errMsg = null;
             if (StringUtils.isBlank(content.toString())) {
                 errMsg = "empty posts not allowed";
@@ -332,31 +356,31 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                 return;
             }
 
-            progressDialog.setMessage("posting...");
+            progressDialog.setMessage("updating post...");
             ReqPostCreate.Body post = new ReqPostCreate.Body();
+            post.setUid(getArguments().getString(AppConstants.K.POST.name()));
             post.setContent(content.toString());
             post.setTags(Arrays.asList(choosenTags));
-            post.setAnonymous(mPostAsAnonymous ? "true" : "false");
+            post.setAnonymous(postAsAnonymous ? "true" : "false");
             if (imgKeys.size() > 0) {
                 post.setImgKeys(imgKeys);
             }
 
-            new CreatePostTask().execute(post);
+            new EditPostTask().execute(post);
         }
-
     }
 
-    private class CreatePostTask extends AsyncTask<ReqPostCreate.Body, Integer, RespPostDetails> {
+    private class EditPostTask extends AsyncTask<ReqPostCreate.Body, Integer, RespPostDetails> {
         @Override
         protected RespPostDetails doInBackground(ReqPostCreate.Body... posts) {
-            if (posts == null || posts.length < 1) {
+            if (posts == null || posts.length < 1 || StringUtils.isBlank(posts[0].getUid())) {
                 return null;
             }
 
             ReqGeneric<ReqPostCreate.Body> req = new ReqGeneric<>();
             // set base args
             req.setToken(Utils.getNonBlankAppToken());
-            req.setCmd("create");
+            req.setCmd("update");
             // just consider single post for now
             req.setBody(posts[0]);
 
@@ -365,8 +389,9 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             try {
+                String updateUrl = AppConstants.API.POSTS.getValue() + "//" + posts[0].getUid();
                 HttpEntity<ReqGeneric<ReqPostCreate.Body>> payloadEntity = new HttpEntity<>(req, headers);
-                ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPostDetails.class);
+                ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(updateUrl, HttpMethod.POST, payloadEntity, RespPostDetails.class);
                 return resp.getBody();
             } catch (Exception e) {
                 // muted
@@ -380,9 +405,9 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         protected void onPostExecute(RespPostDetails postDetails) {
             Utils.dismissSilently(progressDialog);
             if (postDetails == null || postDetails.getBody() == null) {
-                Snackbar.make(getView(), "failed to post. try again...", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), "failed to update. try again...", Snackbar.LENGTH_SHORT).show();
             } else {
-                Snackbar.make(getView(), "successfully posted.", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
                 ArrayList<ContentProviderOperation> ops = PostDetailsService.parseResponse(postDetails);
                 try {
                     ContentProviderResult[] result = getActivity().getContentResolver().
@@ -390,13 +415,15 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                 } catch (Exception e) {
                     // muted
                 }
+//
+//                Bundle iArgs = new Bundle();
+//                iArgs.putString(AppConstants.K.POST.name(), postDetails.getBody().getUid());
+//                Intent intent = new Intent(getActivity(), PostDetailActivity.class);
+//                intent.putExtras(iArgs);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
 
-                Bundle iArgs = new Bundle();
-                iArgs.putString(AppConstants.K.POST.name(), postDetails.getBody().getUid());
-                Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-                intent.putExtras(iArgs);
-                startActivity(intent);
-
+                getActivity().setResult(Activity.RESULT_OK);
                 getActivity().finish();
             }
         }
@@ -482,7 +509,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
 
 // Camera.
         final List<Intent> cameraIntents = new ArrayList<>();
-        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        final Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         final PackageManager packageManager = getActivity().getPackageManager();
         final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
         for (ResolveInfo res : listCam) {
@@ -506,10 +533,10 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
     }
 
     private static final class LocalHandler extends Handler {
-        private final WeakReference<PostCreateFragment> mActivity;
+        private final WeakReference<PostEditFragment> mActivity;
 
-        public LocalHandler(PostCreateFragment parent) {
-            mActivity = new WeakReference<PostCreateFragment>(parent);
+        public LocalHandler(PostEditFragment parent) {
+            mActivity = new WeakReference<PostEditFragment>(parent);
         }
     }
 

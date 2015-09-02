@@ -40,7 +40,8 @@ public class PostDetails {
     User owner;
     @SerializedName("anonymous_image")
     String anonymousImage;
-
+    @SerializedName("can")
+    List<String> permissions;
     List<CommentDetails> comments;
 
     public List<CommentDetails> getComments() {
@@ -131,6 +132,13 @@ public class PostDetails {
         this.createdAtStr = createdAtStr;
     }
 
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
+    }
 
     public Date getCreatedAt() {
         if (createdAt == null) {
@@ -160,12 +168,26 @@ public class PostDetails {
         this.anonymousImage = anonymousImage;
     }
 
-
     public void setTagsFromDB(String tags) {
         if (tags == null) {
             setTags(null);
         } else {
             setTags(Arrays.asList(tags.split(",")));
+        }
+    }
+
+    public String getPermissionsForDB() {
+        if (getPermissions() == null) {
+            return null;
+        }
+        return StringUtils.arrayToDelimitedString(getPermissions().toArray(), ",");
+    }
+
+    public void setPermissionsFromDB(String permissions) {
+        if (permissions == null) {
+            setPermissions(null);
+        } else {
+            setPermissions(Arrays.asList(permissions.split(",")));
         }
     }
 
@@ -175,7 +197,6 @@ public class PostDetails {
         }
         return StringUtils.arrayToDelimitedString(getTags().toArray(), ",");
     }
-
 
     public void setImagesFromDB(String imagesStr) {
         if (imagesStr == null) {

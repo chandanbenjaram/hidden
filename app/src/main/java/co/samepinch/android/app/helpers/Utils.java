@@ -208,6 +208,7 @@ public class Utils {
         int createdAtIndex;
         int commentersIndex;
         int tagsIndex;
+        int permissionsIndex;
         if ((uidIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_UID)) != -1) {
             details.setUid(cursor.getString(uidIndex));
         }
@@ -244,6 +245,10 @@ public class Utils {
 
         if ((tagsIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_TAGS)) != -1) {
             details.setTagsFromDB(cursor.getString(tagsIndex));
+        }
+
+        if ((permissionsIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_PERMISSIONS)) != -1) {
+            details.setPermissionsFromDB(cursor.getString(permissionsIndex));
         }
 //
         // dot related

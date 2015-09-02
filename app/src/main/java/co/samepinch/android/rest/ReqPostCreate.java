@@ -24,6 +24,9 @@ public class ReqPostCreate extends RestBase<ReqPostCreate.Body> {
         public Body() {
         }
 
+        @SerializedName("uid")
+        private String uid;
+
         @SerializedName("content")
         private String content;
 
@@ -36,6 +39,13 @@ public class ReqPostCreate extends RestBase<ReqPostCreate.Body> {
         @SerializedName("img_keys")
         private List<String> imgKeys;
 
+        public String getUid() {
+            return uid;
+        }
+
+        public void setUid(String uid) {
+            this.uid = uid;
+        }
 
         public String getContent() {
             return content;

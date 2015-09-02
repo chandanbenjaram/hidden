@@ -69,7 +69,7 @@ public class PostDetailsService extends IntentService {
             ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, RespPostDetails.class);
 
             ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());
-            if(ops != null){
+            if (ops != null) {
                 ContentProviderResult[] result = getContentResolver().
                         applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
                 BusProvider.INSTANCE.getBus().post(new Events.PostDetailsRefreshEvent(null));
@@ -125,11 +125,12 @@ public class PostDetailsService extends IntentService {
                 .withValue(SchemaPostDetails.COLUMN_ANONYMOUS, details.getAnonymous())
                 .withValue(SchemaPostDetails.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
                 .withValue(SchemaPostDetails.COLUMN_OWNER, (details.getAnonymous() ? dfltAnonyDot.getUid() : postOwner.getUid()))
+                .withValue(SchemaPostDetails.COLUMN_PERMISSIONS, details.getPermissionsForDB())
                 .withValue(SchemaPostDetails.COLUMN_TAGS, details.getTagsForDB()).build());
 
         // comments
-        if( details.getComments() !=null){
-            for(CommentDetails cd : details.getComments()){
+        if (details.getComments() != null) {
+            for (CommentDetails cd : details.getComments()) {
                 ops.add(ContentProviderOperation.newInsert(SchemaComments.CONTENT_URI)
                         .withValue(SchemaComments.COLUMN_UID, cd.getUid())
                         .withValue(SchemaComments.COLUMN_CREATED_AT, cd.getCreatedAt().getTime())

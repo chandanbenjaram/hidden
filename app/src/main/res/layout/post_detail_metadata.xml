@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
-    <!--<merge xmlns:android="http://schemas.android.com/apk/res/android">-->
 
     <LinearLayout
         android:id="@+id/post_dot"
@@ -23,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="name"
+            android:text="@string/loading"
             android:textColor="@color/blue_500" />
 
         <TextView
@@ -31,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="handle"
+            android:text="@string/loading"
             android:textColor="@color/grey_500" />
     </LinearLayout>
 
@@ -43,7 +42,7 @@
         android:drawableLeft="@drawable/icon_like_postview_1x"
         android:drawableStart="@drawable/icon_like_postview_1x"
         android:gravity="center"
-        android:text="likes count"
+        android:text="@string/loading"
         android:textColor="@color/grey_500"
         android:textSize="10sp" />
 
@@ -54,10 +53,9 @@
         android:drawableLeft="@drawable/icon_view_count_1x"
         android:drawableStart="@drawable/icon_view_count_1x"
         android:gravity="center"
-        android:text="#of views"
+        android:text="@string/loading"
         android:textColor="@color/grey_500"
         android:textSize="10sp" />
-
 
     <TextView
         android:id="@+id/post_date"
@@ -65,9 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/post_views_count"
         android:gravity="center"
-        android:text="date"
+        android:text="@string/loading"
         android:textColor="@color/grey_500"
         android:textSize="10sp" />
-
-    <!--</merge>-->
 </LinearLayout>

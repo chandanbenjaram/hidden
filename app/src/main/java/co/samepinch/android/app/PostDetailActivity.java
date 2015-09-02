@@ -25,6 +25,7 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -38,13 +39,14 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
+import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class PostDetailActivity extends AppCompatActivity {
     private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
-    public static final String LOG_TAG = "PostDetailActivity";
+    public static final String TAG = "PostDetailActivity";
 
     private Intent mServiceIntent;
     private PostDetailsRVAdapter mViewAdapter;
@@ -80,6 +82,8 @@ public class PostDetailActivity extends AppCompatActivity {
     @Bind(R.id.recyclerView)
     RecyclerView mRV;
 
+    PostDetails mPostDetails;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,10 +114,11 @@ public class PostDetailActivity extends AppCompatActivity {
 
         // query for post details
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
-        setUpMetadata(currPost);
-
         // query for post comments
         final Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+
+        // setup data
+        setUpMetadata(currPost);
 
         // recycler view setup
         mRV.setHasFixedSize(true);
@@ -155,26 +160,19 @@ public class PostDetailActivity extends AppCompatActivity {
             return;
         }
 
-
-        int viewsIndex;
-        if ((viewsIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_VIEWS)) != -1) {
-            mPostViewsCount.setText(Integer.toString(currPost.getInt(viewsIndex)));
-        }
-
-        int upvoteCountIndex;
-        if ((upvoteCountIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_UPVOTE_COUNT)) != -1) {
-            mPostVoteCount.setText(Integer.toString(currPost.getInt(upvoteCountIndex)));
-        }
-
-        int createdAtIndex;
-        if ((createdAtIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_CREATED_AT)) != -1) {
-            mPostDate.setText(Utils.dateToString(currPost.getLong(createdAtIndex)));
-        }
+        mPostDetails = Utils.cursorToPostDetailsEntity(currPost);
+        mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
+        mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
+        mPostDate.setText(Utils.dateToString(mPostDetails.getCreatedAt()));
 
         String ownerUid = null;
         int ownerUidIndex;
         if ((ownerUidIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_OWNER)) != -1) {
             ownerUid = currPost.getString(ownerUidIndex);
+        }
+        // blank check
+        if (StringUtils.isBlank(ownerUid)) {
+            return;
         }
         // get user info
         Cursor currDot = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{ownerUid}, null);
@@ -193,23 +191,27 @@ public class PostDetailActivity extends AppCompatActivity {
             String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
             mPostDotHandle.setText(pinchHandle);
 
-            // onclick take to dot view
-            mPostDot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // TARGET
-                    Bundle args = new Bundle();
-                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
-                    // data
-                    args.putString(AppConstants.K.KEY_DOT.name(), user.getUid());
+            if (!mPostDot.hasOnClickListeners()) {
+                // onclick take to dot view
+                mPostDot.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TARGET
+                        Bundle args = new Bundle();
+                        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
+                        // data
+                        args.putString(AppConstants.K.KEY_DOT.name(), user.getUid());
 
-                    // intent
-                    Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
-                    intent.putExtras(args);
-                    startActivity(intent);
-                }
-            });
+                        // intent
+                        Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                        intent.putExtras(args);
+                        startActivity(intent);
+                    }
+                });
+            }
         }
+
+        currDot.close();
     }
 
     @Override
@@ -237,26 +239,13 @@ public class PostDetailActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.post_detail_menu, menu);
-//        MenuItem menuItemShare = menu.findItem(R.id.menuitem_post_share_id);
-//        // Set history different from the default before getting the action
-//        // view since a call to MenuItemCompat.getActionView() calls
-//        // ActionProvider.onCreateActionView() which uses the backing file name. Omit this
-//        // line if using the default share history file is desired.
-//        mShareActionProvider.setShareHistoryFileName("custom_share_history.xml");
-//        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItemShare);
-//        doShareIt();
+        if (mPostDetails != null) {
+            List<String> permissions = mPostDetails.getPermissions();
+            menu.findItem(R.id.menuitem_post_flag_id).setVisible(permissions != null && permissions.contains("flag"));
+            menu.findItem(R.id.menuitem_post_edit_id).setVisible(permissions != null && permissions.contains("edit"));
+        }
         return true;
     }
-
-//    public void doShareIt() {
-//        Intent sendIntent = new Intent();
-//        sendIntent.setAction(Intent.ACTION_SEND);
-//        sendIntent.putExtra(Intent.EXTRA_TEXT, mPostId);
-//        sendIntent.setType("text/plain");
-//
-//        // When you want to share set the share intent.
-//        mShareActionProvider.setShareIntent(sendIntent);
-//    }
 
     public void doShareIt(MenuItem item) {
         Intent shareIntent = new Intent();
@@ -271,29 +260,36 @@ public class PostDetailActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        intentPickerSheet.setFilter(new IntentPickerSheetView.Filter() {
-//            @Override
-//            public boolean include(IntentPickerSheetView.ActivityInfo info) {
-//                return !info.componentName.getPackageName().startsWith("com.android");
-//            }
-//        });
-//// Sort activities in reverse order for no good reason
-//        intentPickerSheet.setSortMethod(new Comparator<IntentPickerSheetView.ActivityInfo>() {
-//            @Override
-//            public int compare(IntentPickerSheetView.ActivityInfo lhs, IntentPickerSheetView.ActivityInfo rhs) {
-//                return rhs.label.compareTo(lhs.label);
-//            }
-//        });
         mBottomsheet.showWithSheetView(intentPickerSheet);
     }
 
     public void doFlagIt(MenuItem item) {
         System.out.println("doFlagIt..." + item);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == AppConstants.KV.REQUEST_EDIT_POST.getIntValue()) {
+                Intent refresh = new Intent(this, PostDetailActivity.class);
+                refresh.putExtras(getIntent());
+                startActivity(refresh);
+                this.finish();
+            }
+        }
     }
 
     public void doEditIt(MenuItem item) {
-        System.out.println("doEditIt..." + item);
+        // TARGET
+        Bundle args = new Bundle();
+        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_EDIT_POST.name());
+        // data
+        args.putString(AppConstants.K.POST.name(), mPostId);
+
+        // intent
+        Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+        intent.putExtras(args);
+        startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_POST.getIntValue());
     }
 
     @Override
@@ -317,6 +313,8 @@ public class PostDetailActivity extends AppCompatActivity {
                 try {
                     // query for post details
                     Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+                    setUpMetadata(currPost);
+
                     // query for post comments
                     Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
                     mViewAdapter.changeCursor(new MergeCursor(new Cursor[]{currPost, currComments}));

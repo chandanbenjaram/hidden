@@ -50,6 +50,9 @@ public class RootFragment extends Fragment {
             case FRAGMENT_CREATE_POST:
                 fragment = new PostCreateFragment();
                 break;
+            case FRAGMENT_EDIT_POST:
+                fragment = new PostEditFragment();
+                break;
             default:
                 throw new IllegalArgumentException("invalid URI");
         }

@@ -23,6 +23,7 @@ public interface SchemaPostDetails extends BaseColumns {
     String COLUMN_ANONYMOUS = "anonymous";
     String COLUMN_CREATED_AT = "created_at";
     String COLUMN_TAGS = "tags";
+    String COLUMN_PERMISSIONS = "permissions";
     String COLUMN_OWNER = "dot_uid";
 
     String TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
@@ -40,6 +41,7 @@ public interface SchemaPostDetails extends BaseColumns {
             + COLUMN_ANONYMOUS + " INTEGER DEFAULT 0, "
             + COLUMN_CREATED_AT + " REAL, "
             + COLUMN_TAGS + " TEXT DEFAULT '', "
+            + COLUMN_PERMISSIONS + " TEXT DEFAULT '', "
             + COLUMN_OWNER + " TEXT NOT NULL, "
             + "FOREIGN KEY(dot_uid) REFERENCES dots(uid)"
             + ")";
@@ -50,7 +52,7 @@ public interface SchemaPostDetails extends BaseColumns {
     String[] POST_DETAILS_COLUMNS = new String[]{
             _ID, COLUMN_UID, COLUMN_CONTENT, COLUMN_COMMENT_COUNT,
             COLUMN_UPVOTE_COUNT, COLUMN_VIEWS, COLUMN_ANONYMOUS,
-            COLUMN_CREATED_AT, COLUMN_TAGS,
+            COLUMN_CREATED_AT, COLUMN_TAGS, COLUMN_PERMISSIONS,
             COLUMN_OWNER, COLUMN_IMAGES, COLUMN_LARGE_IMAGES,
             COLUMN_URL
     };

@@ -81,7 +81,8 @@ public class AppConstants {
         PLATFORM("platform", "android"),
         REQUEST_SIGNUP("REQUEST_SIGNUP", "108"),
         REQUEST_CHOOSE_PICTURE("REQUEST_CHOOSE_PICTURE", "109"),
-        REQUEST_EDIT_PICTURE("REQUEST_EDIT_PICTURE", "110")
+        REQUEST_EDIT_PICTURE("REQUEST_EDIT_PICTURE", "110"),
+        REQUEST_EDIT_POST("REQUEST_EDIT_POST", "111"),
         ;
 
         private final String key, value;
@@ -113,6 +114,7 @@ public class AppConstants {
         FRAGMENT_COMMENT,
         FRAGMENT_CHOOSE_HANDLE,
         FRAGMENT_CREATE_POST,
+        FRAGMENT_EDIT_POST,
         KEY_TAG,
         KEY_DOT,
         Wall,

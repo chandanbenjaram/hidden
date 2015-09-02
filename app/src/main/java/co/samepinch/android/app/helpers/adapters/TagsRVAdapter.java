@@ -24,11 +24,11 @@ public class TagsRVAdapter extends CursorRecyclerViewAdapter<TagRVHolder> {
     private final ItemEventListener itemEventListener;
     final Set<String> tagSelections;
 
-    public TagsRVAdapter(Context context, Cursor cursor, ItemEventListener itemEventListener) {
+    public TagsRVAdapter(Context context, Cursor cursor, ItemEventListener itemEventListener, Set<String> tagSelections) {
         super(context, cursor);
         this.context = context;
         this.itemEventListener = itemEventListener;
-        this.tagSelections = new HashSet<>();
+        this.tagSelections = (tagSelections == null) ? new HashSet<String>() : tagSelections;
     }
 
     @Override

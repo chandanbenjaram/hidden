@@ -29,6 +29,7 @@ import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaDots;
+import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.Post;
@@ -78,11 +79,7 @@ public class PostsPullService extends IntentService {
             try {
                 // call remote
                 payloadEntity = new HttpEntity<>(postsReq.build(), headers);
-//                resp = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
-//                ResponseEntity<String> respStr = component.provideRestTemplate().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, String.class);
-//                System.out.println("respStr...\n" + respStr.getBody());
                 resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS_WITH_FILTER.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
-
             } catch (HttpStatusCodeException e) {
                 if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                     // try resetting token?
@@ -159,6 +156,7 @@ public class PostsPullService extends IntentService {
                     .withValue(SchemaPosts.COLUMN_VIEWS, post.getViews())
                     .withValue(SchemaPosts.COLUMN_ANONYMOUS, post.getAnonymous())
                     .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
+                    .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
                     .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
                     .withValue(SchemaPosts.COLUMN_OWNER, (post.getAnonymous() ? dfltAnonyDot.getUid() : postOwner.getUid()))
                     .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB()).build());

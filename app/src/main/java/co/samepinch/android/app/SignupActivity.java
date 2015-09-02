@@ -263,7 +263,7 @@ public class SignupActivity extends AppCompatActivity {
                 if (progressDialog != null) {
                     progressDialog.dismiss();
                 }
-                setResult(RESULT_OK, null);
+                setResult(RESULT_OK);
                 finish();
             }
         });
