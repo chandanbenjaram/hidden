@@ -25,9 +25,8 @@
             style="@style/SP_MARKER_TEXT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:text="@string/select_tags" />
+            android:text="@string/select_tags"
+            android:gravity="center"/>
 
         <FrameLayout
             android:id="@+id/holder_recyclerview"

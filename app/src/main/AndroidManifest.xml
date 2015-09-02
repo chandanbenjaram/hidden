@@ -66,6 +66,9 @@
         <service
             android:name=".helpers.intent.SignUpService"
             android:exported="false" />
+        <service
+            android:name=".helpers.intent.MultiMediaUploadService"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"

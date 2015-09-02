@@ -101,4 +101,10 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class MultiMediaUploadEvent extends EventBase {
+        public MultiMediaUploadEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }

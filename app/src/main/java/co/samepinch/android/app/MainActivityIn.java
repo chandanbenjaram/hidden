@@ -121,6 +121,12 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == INTENT_LOGOUT) {
@@ -179,17 +185,12 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-
-//        SIMView imgView = new SIMView(getApplicationContext());
-//        imgView.populateImageView(userInfo.get("photo"));
-//        navigationView.addHeaderView(imgView);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
-
-                        if(StringUtils.equalsIgnoreCase("post", menuItem.getTitle())){
+                        if (StringUtils.equalsIgnoreCase("post", menuItem.getTitle())) {
                             // TARGET
                             Bundle args = new Bundle();
                             args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CREATE_POST.name());
@@ -198,14 +199,8 @@ public class MainActivityIn extends AppCompatActivity {
                             Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             intent.putExtras(args);
-                            getApplicationContext().startActivity(intent);
-
-//                            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//                            ft.add(new PostCreateFragment(), "post");
-//                            ft.addToBackStack(null);
-//                            ft.commit();
+                            startActivity(intent);
                         }
-
                         mDrawerLayout.closeDrawers();
                         return true;
                     }

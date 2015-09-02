@@ -290,7 +290,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            Intent resultIntent = new Intent();
             if (result != null) {
                 if (result.booleanValue()) {
                     mHandler.sendEmptyMessage(1);

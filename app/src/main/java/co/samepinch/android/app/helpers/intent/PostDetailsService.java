@@ -80,8 +80,7 @@ public class PostDetailsService extends IntentService {
 
     }
 
-    @NonNull
-    private ArrayList<ContentProviderOperation> parseResponse(RespPostDetails respData) {
+    public static ArrayList<ContentProviderOperation> parseResponse(RespPostDetails respData) {
         PostDetails details = respData.getBody();
         if (details == null) {
             return null;
