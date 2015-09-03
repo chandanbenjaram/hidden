@@ -275,6 +275,11 @@ public class PostDetailActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == AppConstants.KV.REQUEST_EDIT_POST.getIntValue()) {
+                if(data !=null && data.getBooleanExtra("deleted", false)){
+                    this.finish();
+                    return;
+                }
+
                 Intent refresh = new Intent(this, PostDetailActivity.class);
                 refresh.putExtras(getIntent());
                 startActivity(refresh);

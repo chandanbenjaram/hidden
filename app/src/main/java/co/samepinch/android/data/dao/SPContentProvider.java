@@ -108,7 +108,7 @@ public class SPContentProvider extends ContentProvider {
             case PATH_POSTS:
             case PATH_POSTS_ITEM:
                 qb.setTables(SchemaPosts.VIEW_CREATE_POST_WITH_DOT_NAME);
-                if(sortOrder == null){
+                if (sortOrder == null) {
                     sortOrder = SchemaPosts.COLUMN_CREATED_AT + " desc";
                 }
                 break;
@@ -215,7 +215,41 @@ public class SPContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+        int delRowsCount = 0;
+        String tableName = null;
+        switch (sUriMatcher.match(uri)) {
+            case PATH_POSTS:
+            case PATH_POSTS_ITEM:
+                tableName = SchemaPosts.TABLE_NAME;
+                break;
+            case PATH_POST_DETAILS:
+            case PATH_POST_DETAILS_ITEM:
+                tableName = SchemaPostDetails.TABLE_NAME;
+                break;
+            case PATH_DOTS:
+            case PATH_DOTS_ITEM:
+                tableName = SchemaDots.TABLE_NAME;
+                break;
+            case PATH_TAGS:
+            case PATH_TAGS_ITEM:
+                tableName = SchemaTags.TABLE_NAME;
+                break;
+            case PATH_COMMENTS:
+            case PATH_COMMENTS_ITEM:
+                tableName = SchemaComments.TABLE_NAME;
+                break;
+
+            default:
+                throw new IllegalArgumentException("un-known uri: " + uri);
+        }
+
+        delRowsCount = db.delete(tableName, selection, selectionArgs);
+        if (delRowsCount > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return delRowsCount;
     }
 
     @Override
@@ -226,7 +260,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "co.samepinch.android.app.db";
-        static final int DATABASE_VERSION = 74;
+        static final int DATABASE_VERSION = 76;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);

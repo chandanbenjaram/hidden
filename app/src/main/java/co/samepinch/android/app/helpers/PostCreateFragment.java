@@ -161,7 +161,6 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         popup.getMenu().add("as you");
         popup.getMenu().add("as anonymous");
 
-
         // This activity implements OnMenuItemClickListener
         popup.setOnMenuItemClickListener(this);
         popup.show();

@@ -77,7 +77,6 @@ public class PostDetailsService extends IntentService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public static ArrayList<ContentProviderOperation> parseResponse(RespPostDetails respData) {

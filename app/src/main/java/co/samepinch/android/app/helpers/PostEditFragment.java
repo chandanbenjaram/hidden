@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -20,6 +21,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -79,6 +81,7 @@ import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.rest.ReqGeneric;
+import co.samepinch.android.rest.ReqNoBody;
 import co.samepinch.android.rest.ReqPostCreate;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespPostDetails;
@@ -99,17 +102,13 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
     FrameLayout frameLayout;
 
     private static Uri outputFileUri;
-
-    ProgressDialog progressDialog;
-
     ImageOrTextViewAdapter mListViewAdapter;
     TagsRVAdapter mTagsListAdapter;
-
     Map<String, String> imageStatusMap;
-
     String[] choosenTags;
     boolean postAsAnonymous;
 
+    ProgressDialog progressDialog;
     private LocalHandler mHandler;
 
     @Override
@@ -129,31 +128,100 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue()) {
+                outputFileUri = (intent == null ? true : MediaStore.ACTION_IMAGE_CAPTURE.equals(intent.getAction())) ? outputFileUri : (intent == null ? null : intent.getData());
+                Intent editorIntent = new Intent(getActivity(), FeatherActivity.class);
+                editorIntent.setData(outputFileUri);
+
+                editorIntent.putExtra(Constants.EXTRA_IN_API_KEY_SECRET, "df619be610e54ffc");
+                editorIntent.putExtra(Constants.EXTRA_IN_HIRES_MEGAPIXELS, MegaPixels.Mp3.ordinal());
+                editorIntent.putExtra(Constants.EXTRA_TOOLS_DISABLE_VIBRATION, "any");
+                editorIntent.putExtra(Constants.EXTRA_OUTPUT_FORMAT, Bitmap.CompressFormat.JPEG.name());
+                editorIntent.putExtra(Constants.EXTRA_OUTPUT_QUALITY, 55);
+                startActivityForResult(editorIntent, AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue());
+            } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
+                final Uri processedImageUri = Uri.parse("file://" + intent.getData());
+
+                int lastIndex = mListViewAdapter.getCount() - 1;
+                ImageOrTextViewAdapter.ImageOrText lastItem = mListViewAdapter.getItem(lastIndex);
+                if (StringUtils.isBlank(lastItem.getText()) && lastItem.getImageUri() == null) {
+                    mListViewAdapter.remove(lastItem);
+                }
+
+                mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
+                mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
+                mListView.requestFocus();
+                mListView.setSelection(mListViewAdapter.getCount() - 1);
+
+                Bundle extra = intent.getExtras();
+                if (null != extra) {
+                    // image has been changed by the user?
+                    boolean changed = extra.getBoolean(Constants.EXTRA_OUT_BITMAP_CHANGED);
+                }
+                Runnable uploadTask = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            uploadMultiMedia(processedImageUri);
+                        } catch (Exception e) {
+                            // muted
+                        }
+                    }
+                };
+
+                uploadTask.run();
+            }
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.post_create_menu, menu);
+        inflater.inflate(R.menu.post_edit_menu, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuitem_post_create:
-                View menuItemView = getActivity().findViewById(R.id.menuitem_post_create);
-                showMenu(menuItemView);
-                return true;
+            case R.id.menuitem_post_edit:
+                // setup PopUpMenu
+                PopupMenu postAsPopUp = new PopupMenu(getActivity(), getView().findViewById(R.id.menuitem_post_edit));
+                postAsPopUp.getMenu().add("as you");
+                postAsPopUp.getMenu().add("as anonymous");
+                postAsPopUp.setOnMenuItemClickListener(this);
+                postAsPopUp.show();
+                break;
+            case R.id.menuitem_post_del:
+                deletePrompt();
+                break;
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 
-
-    public void showMenu(View v) {
-        PopupMenu popup = new PopupMenu(getActivity(), v);
-        popup.getMenu().add("as you");
-        popup.getMenu().add("as anonymous");
-
-        // this activity implements OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(this);
-        popup.show();
+    private void deletePrompt() {
+        AlertDialog.Builder delDialogBldr = new AlertDialog.Builder(
+                getActivity());
+        delDialogBldr.setTitle(R.string.post_del_pop_title);
+        // set dialog message
+        delDialogBldr
+                .setMessage(R.string.post_del_pop_desc)
+                .setCancelable(false)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        deletePost();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog delDialog = delDialogBldr.create();
+        delDialog.show();
     }
 
     @Override
@@ -264,42 +332,23 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         rv.setItemAnimator(new DefaultItemAnimator());
     }
 
-    @Subscribe
-    public void onMultiMediaUploadEvent(final Events.MultiMediaUploadEvent event) {
-        if (event.getMetaData() == null || !StringUtils.equals(TAG, event.getMetaData().get("callback"))) {
-            return;
-        }
-        Map<String, String> eData = event.getMetaData();
-        String name = eData.get("name");
-        String key = eData.get(AppConstants.APP_INTENT.KEY_KEY.getValue());
-        imageStatusMap.put(name, key);
-    }
-
-    @Subscribe
-    public void onTagsRefreshedEvent(Events.TagsRefreshedEvent event) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-                    String currUserId = userInfo.get(KEY_UID.getValue());
-
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
-                    mTagsListAdapter.changeCursor(cursor);
-                } catch (Exception e) {
-                    //e.printStackTrace();
-                }
-            }
-        });
-    }
-
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         this.postAsAnonymous = !StringUtils.equals(item.toString(), "as you");
+        Utils.dismissSilently(progressDialog);
         progressDialog.setMessage("saving...");
         progressDialog.show();
         savePost();
         return true;
+    }
+
+    public void deletePost() {
+        Utils.dismissSilently(progressDialog);
+        progressDialog.setMessage("deleting post...");
+        progressDialog.show();
+
+        String postId = getArguments().getString(AppConstants.K.POST.name());
+        new DelPostTask().execute(postId);
     }
 
     public void savePost() {
@@ -389,7 +438,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             try {
-                String updateUrl = AppConstants.API.POSTS.getValue() + "//" + posts[0].getUid();
+                String updateUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0].getUid()}, "//");
                 HttpEntity<ReqGeneric<ReqPostCreate.Body>> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(updateUrl, HttpMethod.POST, payloadEntity, RespPostDetails.class);
                 return resp.getBody();
@@ -415,65 +464,57 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 } catch (Exception e) {
                     // muted
                 }
-//
-//                Bundle iArgs = new Bundle();
-//                iArgs.putString(AppConstants.K.POST.name(), postDetails.getBody().getUid());
-//                Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-//                intent.putExtras(iArgs);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(intent);
-
                 getActivity().setResult(Activity.RESULT_OK);
                 getActivity().finish();
             }
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue()) {
-                outputFileUri = (intent == null ? true : MediaStore.ACTION_IMAGE_CAPTURE.equals(intent.getAction())) ? outputFileUri : (intent == null ? null : intent.getData());
-                Intent editorIntent = new Intent(getActivity(), FeatherActivity.class);
-                editorIntent.setData(outputFileUri);
 
-                editorIntent.putExtra(Constants.EXTRA_IN_API_KEY_SECRET, "df619be610e54ffc");
-                editorIntent.putExtra(Constants.EXTRA_IN_HIRES_MEGAPIXELS, MegaPixels.Mp3.ordinal());
-                editorIntent.putExtra(Constants.EXTRA_TOOLS_DISABLE_VIBRATION, "any");
-                editorIntent.putExtra(Constants.EXTRA_OUTPUT_FORMAT, Bitmap.CompressFormat.JPEG.name());
-                editorIntent.putExtra(Constants.EXTRA_OUTPUT_QUALITY, 55);
-                startActivityForResult(editorIntent, AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue());
-            } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
-                final Uri processedImageUri = Uri.parse("file://" + intent.getData());
+    private class DelPostTask extends AsyncTask<String, Integer, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... posts) {
+            if (posts == null || posts.length < 1 || StringUtils.isBlank(posts[0])) {
+                return null;
+            }
 
-                int lastIndex = mListViewAdapter.getCount() - 1;
-                ImageOrTextViewAdapter.ImageOrText lastItem = mListViewAdapter.getItem(lastIndex);
-                if (StringUtils.isBlank(lastItem.getText()) && lastItem.getImageUri() == null) {
-                    mListViewAdapter.remove(lastItem);
-                }
+            ReqNoBody req = new ReqNoBody();
+            // set base args
+            req.setToken(Utils.getNonBlankAppToken());
+            req.setCmd("destroy");
 
-                mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
-                mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
-                mListView.requestFocus();
-                mListView.setSelection(mListViewAdapter.getCount() - 1);
+            //headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            try {
+                String delUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0]}, "//");
+                HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(delUrl, HttpMethod.POST, payloadEntity, Resp.class);
+                return resp.getBody().getStatus() == 200;
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                Log.e(TAG, resp.getMessage(), e);
+            }
+            return Boolean.FALSE;
+        }
 
-                Bundle extra = intent.getExtras();
-                if (null != extra) {
-                    // image has been changed by the user?
-                    boolean changed = extra.getBoolean(Constants.EXTRA_OUT_BITMAP_CHANGED);
-                }
-                Runnable uploadTas = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            uploadMultiMedia(processedImageUri);
-                        } catch (Exception e) {
-                            // muted
-                        }
-                    }
-                };
+        @Override
+        protected void onPostExecute(Boolean status) {
+            Utils.dismissSilently(progressDialog);
+            if (status) {
+                String postId = getArguments().getString(AppConstants.K.POST.name());
+                int count = getActivity().getContentResolver().delete(SchemaPostDetails.CONTENT_URI, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId});
 
-                uploadTas.run();
+                Snackbar.make(getView(), "deleted successfully.", Snackbar.LENGTH_SHORT).show();
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("deleted", true);
+                getActivity().setResult(Activity.RESULT_OK, resultIntent);
+                getActivity().finish();
+
+            } else {
+                Snackbar.make(getView(), "failed to delete. try again...", Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -557,5 +598,34 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Subscribe
+    public void onMultiMediaUploadEvent(final Events.MultiMediaUploadEvent event) {
+        if (event.getMetaData() == null || !StringUtils.equals(TAG, event.getMetaData().get("callback"))) {
+            return;
+        }
+        Map<String, String> eData = event.getMetaData();
+        String name = eData.get("name");
+        String key = eData.get(AppConstants.APP_INTENT.KEY_KEY.getValue());
+        imageStatusMap.put(name, key);
+    }
+
+    @Subscribe
+    public void onTagsRefreshedEvent(Events.TagsRefreshedEvent event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                    String currUserId = userInfo.get(KEY_UID.getValue());
+
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+                    mTagsListAdapter.changeCursor(cursor);
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+            }
+        });
     }
 }
