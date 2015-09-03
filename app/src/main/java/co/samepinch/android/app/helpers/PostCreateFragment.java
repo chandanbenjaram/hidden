@@ -44,7 +44,6 @@ import android.widget.ListView;
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
-import com.bumptech.glide.util.Util;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
