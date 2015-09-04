@@ -41,6 +41,7 @@ import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
+import co.samepinch.android.app.playground.PlaygroundActivity;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
@@ -209,18 +210,23 @@ public class MainActivityIn extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onClickFAB() {
-        Bundle iArgs = new Bundle();
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
-        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey(), e.getValue());
-        }
-
-        // call for intent
-        Intent mServiceIntent =
-                new Intent(getApplicationContext(), PostsPullService.class);
-        mServiceIntent.putExtras(iArgs);
-        startService(mServiceIntent);
+//        Bundle iArgs = new Bundle();
+//        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+//        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
+//        for (Map.Entry<String, String> e : pPosts.entrySet()) {
+//            iArgs.putString(e.getKey(), e.getValue());
+//        }
+//
+//        // call for intent
+//        Intent mServiceIntent =
+//                new Intent(getApplicationContext(), PostsPullService.class);
+//        mServiceIntent.putExtras(iArgs);
+//        startService(mServiceIntent);
+        Intent intent = new Intent(this, PlaygroundActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Subscribe
