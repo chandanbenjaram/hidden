@@ -60,4 +60,7 @@
 
     <dimen name="signin_item_size">199dp</dimen>
 
+
+    <dimen name="cardview_layout_width">150dp</dimen>
+
 </resources>

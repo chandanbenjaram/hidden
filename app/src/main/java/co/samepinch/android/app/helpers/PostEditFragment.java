@@ -36,9 +36,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
@@ -66,8 +66,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import co.samepinch.android.app.MainActivity;
-import co.samepinch.android.app.PostDetailActivity;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.adapters.TagsRVAdapter;
 import co.samepinch.android.app.helpers.intent.MultiMediaUploadService;
@@ -75,9 +73,7 @@ import co.samepinch.android.app.helpers.intent.PostDetailsService;
 import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.app.helpers.widget.SIMView;
 import co.samepinch.android.data.dao.SchemaPostDetails;
-import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.rest.ReqGeneric;
@@ -310,8 +306,20 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         return view;
     }
 
-    private void setupRecyclerView(RecyclerView rv, List<String> initTags) {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
+    private void setupRecyclerView(final RecyclerView rv, List<String> initTags) {
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
+        rv.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        rv.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        int viewWidth = rv.getMeasuredWidth();
+                        float cardViewWidth = getActivity().getResources().getDimension(R.dimen.cardview_layout_width);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        gridLayoutManager.setSpanCount(newSpanCount);
+                        gridLayoutManager.requestLayout();
+                    }
+                });
         rv.setLayoutManager(gridLayoutManager);
         rv.setHasFixedSize(true);
 

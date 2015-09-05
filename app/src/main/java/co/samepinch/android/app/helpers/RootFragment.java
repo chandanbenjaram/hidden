@@ -53,8 +53,11 @@ public class RootFragment extends Fragment {
             case FRAGMENT_EDIT_POST:
                 fragment = new PostEditFragment();
                 break;
+            case FRAGMENT_MANAGE_TAGS:
+                fragment = new ManageTagsFragment();
+                break;
             default:
-                throw new IllegalArgumentException("invalid URI");
+                throw new IllegalArgumentException("un-known fragment " + targetFragment);
         }
 
         fragment.setArguments(mArgs);

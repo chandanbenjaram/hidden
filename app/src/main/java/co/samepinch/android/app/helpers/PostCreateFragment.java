@@ -10,13 +10,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
@@ -28,8 +26,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.style.DynamicDrawableSpan;
-import android.text.style.ImageSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -56,11 +53,9 @@ import org.springframework.http.ResponseEntity;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,26 +63,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.PostDetailActivity;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.adapters.TagsRVAdapter;
-import co.samepinch.android.app.helpers.intent.FBAuthService;
 import co.samepinch.android.app.helpers.intent.MultiMediaUploadService;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
-import co.samepinch.android.app.helpers.intent.PostsPullService;
-import co.samepinch.android.app.helpers.intent.SignOutService;
 import co.samepinch.android.app.helpers.intent.TagsPullService;
-import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
-import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqGeneric;
 import co.samepinch.android.rest.ReqPostCreate;
-import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespPostDetails;
 import co.samepinch.android.rest.RestClient;
@@ -216,8 +202,20 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         return view;
     }
 
-    private void setupRecyclerView(RecyclerView rv) {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
+    private void setupRecyclerView(final RecyclerView rv) {
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
+        rv.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        rv.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        int viewWidth = rv.getMeasuredWidth();
+                        float cardViewWidth = getActivity().getResources().getDimension(R.dimen.cardview_layout_width);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        gridLayoutManager.setSpanCount(newSpanCount);
+                        gridLayoutManager.requestLayout();
+                    }
+                });
         rv.setLayoutManager(gridLayoutManager);
         rv.setHasFixedSize(true);
 

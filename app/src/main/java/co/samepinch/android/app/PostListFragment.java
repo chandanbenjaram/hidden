@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package co.samepinch.android.app;
 
 import android.app.Activity;
@@ -29,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.OvershootInterpolator;
 
 import com.squareup.otto.Subscribe;
 
@@ -42,6 +28,10 @@ import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.SlideInBottomAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.SlideInLeftAnimationAdapter;
 
 public class PostListFragment extends Fragment {
     public static final String LOG_TAG = "PostListFragment";
@@ -103,14 +93,17 @@ public class PostListFragment extends Fragment {
         return rv;
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setHasFixedSize(true);
-
+    private void setupRecyclerView(RecyclerView rv) {
+        rv.setHasFixedSize(true);
         Cursor cursor = activity.getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
-        recyclerView.setAdapter(mViewAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        // ANIMATIONS
+        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
+        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
+        wrapperAdapter.setDuration(300);
+        wrapperAdapter.setFirstOnly(Boolean.FALSE);
+        rv.setAdapter(wrapperAdapter);
     }
 
     private void callForRemotePosts() {

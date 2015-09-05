@@ -209,18 +209,14 @@ public class MainActivityIn extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onClickFAB() {
-        Bundle iArgs = new Bundle();
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
-        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey(), e.getValue());
-        }
+        Bundle args = new Bundle();
+        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_TAGS.name());
 
-        // call for intent
-        Intent mServiceIntent =
-                new Intent(getApplicationContext(), PostsPullService.class);
-        mServiceIntent.putExtras(iArgs);
-        startService(mServiceIntent);
+        // intent
+        Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtras(args);
+        startActivity(intent);
     }
 
     @Subscribe

@@ -11,6 +11,10 @@
             android:icon="@drawable/ic_event"
             android:title="Post" />
         <item
+            android:id="@+id/tags"
+            android:icon="@drawable/ic_event"
+            android:title="Manage Tags" />
+        <item
             android:id="@+id/settings"
             android:icon="@drawable/ic_headset"
             android:title="Settings" />

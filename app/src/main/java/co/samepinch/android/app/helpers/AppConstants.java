@@ -115,6 +115,7 @@ public class AppConstants {
         FRAGMENT_CHOOSE_HANDLE,
         FRAGMENT_CREATE_POST,
         FRAGMENT_EDIT_POST,
+        FRAGMENT_MANAGE_TAGS,
         KEY_TAG,
         KEY_DOT,
         Wall,
