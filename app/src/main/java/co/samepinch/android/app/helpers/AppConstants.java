@@ -61,6 +61,10 @@ public class AppConstants {
         KEY_TAG("tag"),
         KEY_RPHOTO("rphoto"),
         KEY_CHECK_EMAIL_EXISTENCE("checkEmailExistence"),
+        KEY_TAGS_PULL_TYPE("type"),
+        KEY_TAGS_PULL_ALL("all"),
+        KEY_TAGS_PULL_FAV("favourites"),
+        KEY_TAGS_PULL_RECOMMENDED("recommended"),
         CHOOSE_PINCH_HANDLE("77"),;
 
         private final String value;

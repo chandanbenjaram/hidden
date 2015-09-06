@@ -130,7 +130,8 @@ public class ManageTagsFragment extends Fragment {
         Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
         String currUserId = userInfo.get(KEY_UID.getValue());
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+        //Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, null);
         TagsToManageRVAdapter.ItemEventListener itemEventListener = new TagsToManageRVAdapter.ItemEventListener<String>() {
             @Override
             public void onClick(String tag) {
@@ -166,7 +167,8 @@ public class ManageTagsFragment extends Fragment {
                     Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
                     String currUserId = userInfo.get(KEY_UID.getValue());
 
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+                    //Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, null);
                     mTagsToManageRVAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     //e.printStackTrace();
