@@ -10,12 +10,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Map;
-
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
-import co.samepinch.android.app.helpers.widget.SIMView;
 import co.samepinch.android.data.dao.SchemaTags;
 
 public class TagToManagerRVHolder extends RecyclerView.ViewHolder {

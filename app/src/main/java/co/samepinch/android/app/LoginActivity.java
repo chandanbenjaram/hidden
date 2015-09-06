@@ -1,6 +1,5 @@
 package co.samepinch.android.app;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -455,7 +454,6 @@ public class LoginActivity extends AppCompatActivity implements
         private final WeakReference<LoginActivity> mActivity;
         public LocalHandler(LoginActivity parent) {
             mActivity = new WeakReference<LoginActivity>(parent);
-
         }
 
         @Override

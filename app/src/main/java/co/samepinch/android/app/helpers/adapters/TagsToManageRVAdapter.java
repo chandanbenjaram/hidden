@@ -18,12 +18,11 @@ public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManage
     ItemEventListener mItemEventListener;
     final String mCurrUserId;
 
-    public TagsToManageRVAdapter(Context context, Cursor cursor, ItemEventListener eventListener) {
+    public TagsToManageRVAdapter(Context context, Cursor cursor, ItemEventListener eventListener, String currUserId) {
         super(context, cursor);
         this.mContext = context;
         this.mItemEventListener = eventListener;
-        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-        mCurrUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
+        this.mCurrUserId = currUserId;
     }
 
     @Override

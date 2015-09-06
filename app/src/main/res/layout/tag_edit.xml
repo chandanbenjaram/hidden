@@ -60,7 +60,7 @@
                 app:base_press_color="@color/blue_100"
                 app:base_release_color="@color/grey_200"
                 app:icon_press="@drawable/tickmark"
-                app:icon_release="@drawable/x_mark" />
+                app:icon_release="@drawable/x_mark"/>
         </LinearLayout>
 
     </android.support.v7.widget.CardView>

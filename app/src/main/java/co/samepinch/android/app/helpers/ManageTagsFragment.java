@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +34,6 @@ import co.samepinch.android.data.dao.SchemaTags;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
-
 public class ManageTagsFragment extends Fragment {
     public static final String TAG = "ManageTagsFragment";
 
@@ -48,6 +45,8 @@ public class ManageTagsFragment extends Fragment {
 
     ProgressDialog progressDialog;
     TagsToManageRVAdapter mTagsToManageRVAdapter;
+
+    String mCurrUserId;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -64,6 +63,10 @@ public class ManageTagsFragment extends Fragment {
         progressDialog = new ProgressDialog(getActivity(),
                 R.style.Theme_AppCompat_Dialog);
         progressDialog.setCancelable(Boolean.FALSE);
+
+        // keep current logged in user id
+        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+        mCurrUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
     }
 
     @Override
@@ -128,12 +131,13 @@ public class ManageTagsFragment extends Fragment {
                     }
                 });
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_USER_ID + " IS NULL");
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
         TagsToManageRVAdapter.ItemEventListener itemEventListener = new TagsToManageRVAdapter.ItemEventListener<String>() {
             @Override
             public void onClick(String tag) {
                 Bundle args = new Bundle();
                 args.putString(AppConstants.APP_INTENT.KEY_TAG.getValue(), tag);
+                args.putString(AppConstants.APP_INTENT.KEY_UID.getValue(), mCurrUserId);
                 // target
                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_A_TAG.name());
 
@@ -144,7 +148,8 @@ public class ManageTagsFragment extends Fragment {
             }
         };
 
-        mTagsToManageRVAdapter = new TagsToManageRVAdapter(getActivity(), cursor, itemEventListener);
+        // adapter
+        mTagsToManageRVAdapter = new TagsToManageRVAdapter(getActivity(), cursor, itemEventListener, mCurrUserId);
 
         // ANIMATIONS
         ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mTagsToManageRVAdapter));
@@ -160,7 +165,7 @@ public class ManageTagsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_USER_ID + " IS NULL");
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
                     mTagsToManageRVAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     //e.printStackTrace();

@@ -496,7 +496,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             try {
-                String delUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0]}, "//");
+                String delUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0]}, "/");
                 HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(delUrl, HttpMethod.POST, payloadEntity, Resp.class);
                 return resp.getBody().getStatus() == 200;
