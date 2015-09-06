@@ -6,16 +6,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Map;
+
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.data.dao.SchemaTags;
 
 public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManagerRVHolder> {
     private final Context mContext;
     ItemEventListener mItemEventListener;
+    final String mCurrUserId;
+
     public TagsToManageRVAdapter(Context context, Cursor cursor, ItemEventListener eventListener) {
         super(context, cursor);
         this.mContext = context;
         this.mItemEventListener = eventListener;
+        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+        mCurrUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
     }
 
     @Override
@@ -29,12 +37,10 @@ public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManage
     @Override
     public void onBindViewHolder(final TagToManagerRVHolder viewHolder, Cursor cursor) {
         final String tagId = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME));
-
-        viewHolder.onBindViewHolderImpl(cursor);
+        viewHolder.onBindViewHolderImpl(mCurrUserId, cursor);
         viewHolder.mTagImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mItemEventListener.onClick(tagId);
             }
         });

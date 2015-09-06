@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -127,15 +128,10 @@ public class ManageTagsFragment extends Fragment {
                     }
                 });
 
-        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-        String currUserId = userInfo.get(KEY_UID.getValue());
-
-        //Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_USER_ID + " IS NULL");
         TagsToManageRVAdapter.ItemEventListener itemEventListener = new TagsToManageRVAdapter.ItemEventListener<String>() {
             @Override
             public void onClick(String tag) {
-                Log.d(TAG, "clicked...");
                 Bundle args = new Bundle();
                 args.putString(AppConstants.APP_INTENT.KEY_TAG.getValue(), tag);
                 // target
@@ -164,15 +160,21 @@ public class ManageTagsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-                    String currUserId = userInfo.get(KEY_UID.getValue());
-
-                    //Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_USER_ID + " IS NULL");
                     mTagsToManageRVAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    @Subscribe
+    public void onTagsRefreshFailEvent(final Events.TagsRefreshFailEvent event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Snackbar.make(getView(), event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
             }
         });
     }

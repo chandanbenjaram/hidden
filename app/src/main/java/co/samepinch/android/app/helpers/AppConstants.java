@@ -65,7 +65,8 @@ public class AppConstants {
         KEY_TAGS_PULL_ALL("all"),
         KEY_TAGS_PULL_FAV("favourites"),
         KEY_TAGS_PULL_RECOMMENDED("recommended"),
-        CHOOSE_PINCH_HANDLE("77"),;
+        KEY_MSG_GENERIC_ERR("something went wrong. try again..."),
+        CHOOSE_PINCH_HANDLE("77");
 
         private final String value;
 

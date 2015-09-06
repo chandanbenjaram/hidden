@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import co.samepinch.android.app.helpers.AppConstants;
@@ -34,6 +35,7 @@ import co.samepinch.android.rest.RestClient;
 import static co.samepinch.android.app.helpers.AppConstants.API.GROUPS;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_CHECK_EMAIL_EXISTENCE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_ALL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_FAV;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_RECOMMENDED;
@@ -92,9 +94,17 @@ public class TagsPullService extends IntentService {
                 BusProvider.INSTANCE.getBus().post(new Events.TagsRefreshedEvent(null));
             }
         } catch (Exception e) {
+            String errMsg;
             Resp resp = Utils.parseAsRespSilently(e);
             if (resp != null) {
+                errMsg = resp.getMessage();
+            } else {
+                errMsg = KEY_MSG_GENERIC_ERR.getValue();
             }
+
+            Map<String, String> cause = new HashMap<>();
+            cause.put(AppConstants.K.MESSAGE.name(), errMsg);
+            BusProvider.INSTANCE.getBus().post(new Events.TagsRefreshFailEvent(cause));
         }
 
     }

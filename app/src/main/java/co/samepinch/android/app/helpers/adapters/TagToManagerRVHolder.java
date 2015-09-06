@@ -10,7 +10,10 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
+
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.widget.SIMView;
 import co.samepinch.android.data.dao.SchemaTags;
@@ -27,16 +30,16 @@ public class TagToManagerRVHolder extends RecyclerView.ViewHolder {
         setIsRecyclable(true);
     }
 
-    void onBindViewHolderImpl(Cursor cursor) {
+    void onBindViewHolderImpl(String currUserId, Cursor cursor) {
         int imgIdx = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE);
         String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
         if (StringUtils.isNotBlank(imgStr)) {
-//            Utils.setupLoadingImageHolder(tagImg, imgStr);
-            //mTagImg.populateImageView(imgStr);
             Utils.setupLoadingImageHolder(mTagImg, imgStr);
-//            mTagImg.populateImageView("https://media.giphy.com/media/5xaOcLrSwNvUQmuasA8/giphy.gif");
         }
         mTagName.setText(cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME)));
-        // https://media.giphy.com/media/5xaOcLrSwNvUQmuasA8/giphy.gif
+
+        // checked state
+        String tagUserId = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_USER_ID));
+        mTagName.setChecked(currUserId != null ? StringUtils.equals(currUserId, tagUserId) : false);
     }
 }
