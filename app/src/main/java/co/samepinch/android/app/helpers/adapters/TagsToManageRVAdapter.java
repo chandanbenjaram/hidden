@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import co.samepinch.android.app.R;
+import co.samepinch.android.data.dao.SchemaTags;
 
 public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManagerRVHolder> {
     private final Context mContext;
@@ -27,11 +28,14 @@ public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManage
 
     @Override
     public void onBindViewHolder(final TagToManagerRVHolder viewHolder, Cursor cursor) {
+        final String tagId = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME));
+
         viewHolder.onBindViewHolderImpl(cursor);
         viewHolder.mTagImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mItemEventListener.onClick(viewHolder);
+
+                mItemEventListener.onClick(tagId);
             }
         });
     }

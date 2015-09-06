@@ -36,6 +36,9 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    maven {
+        url "http://dl.bintray.com/glomadrian/maven"
+    }
 }
 
 configurations.all {
@@ -70,6 +73,8 @@ dependencies {
     compile 'org.glassfish:javax.annotation:10.0-b28'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'jp.wasabeef:recyclerview-animators:1.2.2'
+    compile 'com.github.glomadrian:MaterialAnimatedSwitch:1.1@aar'
+//    compile 'com.leaking.slideswitch:app:1.0.0'
 //    compile 'com.facebook.rebound:rebound:0.3.8'
     // compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
 

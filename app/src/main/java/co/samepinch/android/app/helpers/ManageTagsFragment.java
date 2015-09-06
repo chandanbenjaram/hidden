@@ -1,89 +1,38 @@
 package co.samepinch.android.app.helpers;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Parcelable;
-import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 
-import com.aviary.android.feather.headless.utils.MegaPixels;
-import com.aviary.android.feather.library.Constants;
-import com.aviary.android.feather.sdk.FeatherActivity;
 import com.squareup.otto.Subscribe;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import co.samepinch.android.app.PostDetailActivity;
+import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.adapters.TagsRVAdapter;
 import co.samepinch.android.app.helpers.adapters.TagsToManageRVAdapter;
-import co.samepinch.android.app.helpers.intent.MultiMediaUploadService;
-import co.samepinch.android.app.helpers.intent.PostDetailsService;
 import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaTags;
-import co.samepinch.android.rest.ReqGeneric;
-import co.samepinch.android.rest.ReqPostCreate;
-import co.samepinch.android.rest.Resp;
-import co.samepinch.android.rest.RespPostDetails;
-import co.samepinch.android.rest.RestClient;
-import jp.wasabeef.recyclerview.animators.ScaleInLeftAnimator;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.SlideInBottomAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
@@ -98,6 +47,11 @@ public class ManageTagsFragment extends Fragment {
 
     ProgressDialog progressDialog;
     TagsToManageRVAdapter mTagsToManageRVAdapter;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -146,6 +100,12 @@ public class ManageTagsFragment extends Fragment {
 
         frameLayout.addView(rv);
         setupRecyclerView(rv);
+
+        // call for intent
+        Intent tagRefreshIntent =
+                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
+        getActivity().startService(tagRefreshIntent);
+
         return view;
     }
 
@@ -171,10 +131,19 @@ public class ManageTagsFragment extends Fragment {
         String currUserId = userInfo.get(KEY_UID.getValue());
 
         Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_USER_ID + "=?", new String[]{currUserId}, null);
-        TagsToManageRVAdapter.ItemEventListener itemEventListener = new TagsToManageRVAdapter.ItemEventListener() {
+        TagsToManageRVAdapter.ItemEventListener itemEventListener = new TagsToManageRVAdapter.ItemEventListener<String>() {
             @Override
-            public void onClick(Object o) {
+            public void onClick(String tag) {
                 Log.d(TAG, "clicked...");
+                Bundle args = new Bundle();
+                args.putString(AppConstants.APP_INTENT.KEY_TAG.getValue(), tag);
+                // target
+                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_A_TAG.name());
+
+                // intent
+                Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+                intent.putExtras(args);
+                startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_TAG.getIntValue());
             }
         };
 

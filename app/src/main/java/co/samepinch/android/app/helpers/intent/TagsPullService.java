@@ -4,10 +4,8 @@ import android.app.IntentService;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,13 +22,11 @@ import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqGroups;
+import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespArrGroups;
-import co.samepinch.android.rest.RespGroups;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.GROUPS;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_NAME;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PHOTO;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 
@@ -46,12 +42,12 @@ public class TagsPullService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
-        ReqGroups req = new ReqGroups();
-        req.setToken(Utils.getAppToken(false));
-        req.setCmd("recommendations");
-
         try {
+            ReqGroups req = new ReqGroups();
+            req.setToken(Utils.getNonBlankAppToken());
+            //TODO conditionally enable all
+//            req.setCmd("recommendations");
+            req.setCmd("recommendations");
 
             //headers
             HttpHeaders headers = new HttpHeaders();
@@ -68,7 +64,9 @@ public class TagsPullService extends IntentService {
                 BusProvider.INSTANCE.getBus().post(new Events.TagsRefreshedEvent(null));
             }
         } catch (Exception e) {
-
+            Resp resp = Utils.parseAsRespSilently(e);
+            if(resp !=null){
+            }
         }
 
     }
@@ -76,7 +74,7 @@ public class TagsPullService extends IntentService {
     @NonNull
     private ArrayList<ContentProviderOperation> parseResponse(RespArrGroups respData) {
         RespArrGroups.Body body = respData.getBody();
-        if (body == null) {
+        if (body == null || body.getGroups() == null) {
             return null;
         }
 

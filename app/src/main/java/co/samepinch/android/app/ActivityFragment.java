@@ -27,7 +27,7 @@ import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 
 public class ActivityFragment extends AppCompatActivity {
 
-    public static final String EXTRA_NAME = "ActivityFragment";
+    public static final String TAG = "ActivityFragment";
 
     ViewPager mPager;
     Adapter mPagerAdapter;

@@ -40,7 +40,6 @@ import org.apache.commons.lang3.StringUtils;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.TagDetailsService;
-import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;

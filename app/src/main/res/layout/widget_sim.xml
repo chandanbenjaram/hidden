@@ -7,7 +7,7 @@
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/sim_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         fresco:placeholderImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/loading"/>
 </FrameLayout>

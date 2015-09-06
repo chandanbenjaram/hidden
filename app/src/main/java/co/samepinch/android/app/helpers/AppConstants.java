@@ -22,9 +22,11 @@ public class AppConstants {
         GROUPS(BASE.getValue().concat("api/groups")),
         CONTENT_AUTHORITY("co.samepinch.android.app");
         private final String value;
+
         API(String value) {
             this.value = value;
         }
+
         public String getValue() {
             return value;
         }
@@ -56,10 +58,10 @@ public class AppConstants {
         KEY_PASSWORD("password"),
         KEY_DEVICE_TOKEN("device_token"),
         KEY_PHOTO("photo"),
+        KEY_TAG("tag"),
         KEY_RPHOTO("rphoto"),
         KEY_CHECK_EMAIL_EXISTENCE("checkEmailExistence"),
-        CHOOSE_PINCH_HANDLE("77")
-        ;
+        CHOOSE_PINCH_HANDLE("77"),;
 
         private final String value;
 
@@ -83,7 +85,7 @@ public class AppConstants {
         REQUEST_CHOOSE_PICTURE("REQUEST_CHOOSE_PICTURE", "109"),
         REQUEST_EDIT_PICTURE("REQUEST_EDIT_PICTURE", "110"),
         REQUEST_EDIT_POST("REQUEST_EDIT_POST", "111"),
-        ;
+        REQUEST_EDIT_TAG("REQUEST_EDIT_TAG", "222"),;
 
         private final String key, value;
 
@@ -116,6 +118,7 @@ public class AppConstants {
         FRAGMENT_CREATE_POST,
         FRAGMENT_EDIT_POST,
         FRAGMENT_MANAGE_TAGS,
+        FRAGMENT_MANAGE_A_TAG,
         KEY_TAG,
         KEY_DOT,
         Wall,

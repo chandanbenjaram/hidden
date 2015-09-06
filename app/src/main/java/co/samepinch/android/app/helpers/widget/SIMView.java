@@ -14,6 +14,7 @@ import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
@@ -96,11 +97,10 @@ public class SIMView extends RelativeLayout {
         mSIMView.setController(controller);
     }
 
-    public void populateImageViewWithAdjustedAspect(String imgUri) {
+    public void populateImageViewWithAdjustedAspect(String imgUri, Integer... resizeDimensions) {
         if (StringUtils.isBlank(imgUri)) {
             return;
         }
-
         // aspect adjust
         ControllerListener listener = new BaseControllerListener<ImageInfo>() {
             @Override
@@ -108,9 +108,13 @@ public class SIMView extends RelativeLayout {
                 mSIMView.setAspectRatio((float) imageInfo.getWidth() / imageInfo.getHeight());
             }
         };
-
-        ImageRequest fImageReq =
-                ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri)).build();
+        ImageRequestBuilder imgReqBldr = ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri));
+        if (resizeDimensions != null && resizeDimensions.length > 1) {
+            int width = resizeDimensions[0];
+            int height = resizeDimensions[1];
+            imgReqBldr.setResizeOptions(new ResizeOptions(width, height));
+        }
+        ImageRequest fImageReq = imgReqBldr.build();
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(fImageReq)
                 .setOldController(mSIMView.getController())
