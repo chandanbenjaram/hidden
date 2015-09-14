@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/wall"
+            android:id="@+id/nav_wall"
             android:icon="@drawable/ic_dashboard"
             android:title="Home"
             />
         <item
-            android:id="@+id/post"
+            android:id="@+id/nav_post"
             android:icon="@drawable/ic_event"
             android:title="Post" />
         <item
-            android:id="@+id/tags"
+            android:id="@+id/nav_tags"
             android:icon="@drawable/ic_event"
-            android:title="Manage Tags" />
+            android:title="Tags" />
         <item
-            android:id="@+id/settings"
+            android:id="@+id/nav_settings"
             android:icon="@drawable/ic_headset"
             android:title="Settings" />
         <item
-            android:id="@+id/notifications"
+            android:id="@+id/nav_notifications"
             android:icon="@drawable/ic_forum"
             android:title="Notifications" />
     </group>

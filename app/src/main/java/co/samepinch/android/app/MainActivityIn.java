@@ -190,11 +190,19 @@ public class MainActivityIn extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
-                        if (StringUtils.equalsIgnoreCase("post", menuItem.getTitle())) {
-                            // TARGET
-                            Bundle args = new Bundle();
-                            args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CREATE_POST.name());
-
+                        Bundle args = new Bundle();
+                        switch (menuItem.getItemId()) {
+                            case R.id.nav_post:
+                                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CREATE_POST.name());
+                                break;
+                            case R.id.nav_tags:
+                                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_TAGS.name());
+                                break;
+                            default:
+                                Log.d(TAG, "do not know how to launch + " + menuItem.getTitle());
+                                break;
+                        }
+                        if (!args.isEmpty()) {
                             // intent
                             Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -210,7 +218,7 @@ public class MainActivityIn extends AppCompatActivity {
     @OnClick(R.id.fab)
     public void onClickFAB() {
         Bundle args = new Bundle();
-        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_TAGS.name());
+        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CREATE_POST.name());
 
         // intent
         Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
