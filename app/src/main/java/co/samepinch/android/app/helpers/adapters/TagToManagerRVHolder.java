@@ -3,6 +3,7 @@ package co.samepinch.android.app.helpers.adapters;
 
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckedTextView;
 
@@ -15,6 +16,7 @@ import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.data.dao.SchemaTags;
 
 public class TagToManagerRVHolder extends RecyclerView.ViewHolder {
+    public static final String TAG = "TagToManagerRVHolder";
 
     SimpleDraweeView mTagImg;
     CheckedTextView mTagName;
@@ -23,7 +25,6 @@ public class TagToManagerRVHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mTagImg = (SimpleDraweeView) itemView.findViewById(R.id.tag_image);
         mTagName = (CheckedTextView) itemView.findViewById(R.id.tag_id);
-        setIsRecyclable(true);
     }
 
     void onBindViewHolderImpl(String currUserId, Cursor cursor) {
@@ -31,6 +32,9 @@ public class TagToManagerRVHolder extends RecyclerView.ViewHolder {
         String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
         if (StringUtils.isNotBlank(imgStr)) {
             Utils.setupLoadingImageHolder(mTagImg, imgStr);
+        } else {
+            Log.d(TAG, "image not loaded for..." + cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME)));
+            // fetching tag details. may be first time!
         }
         mTagName.setText(cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME)));
 

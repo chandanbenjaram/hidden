@@ -6,11 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Map;
-
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.AppConstants;
-import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.data.dao.SchemaTags;
 
 public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManagerRVHolder> {

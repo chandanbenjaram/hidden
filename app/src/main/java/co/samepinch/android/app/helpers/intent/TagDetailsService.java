@@ -58,7 +58,6 @@ public class TagDetailsService extends IntentService {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
             HttpEntity<ReqGroups> reqEntity = new HttpEntity<>(req, headers);
-            //ResponseEntity<String> resp = RestClient.INSTANCE.handle().exchange(GROUPS.getValue(), HttpMethod.POST, reqEntity, String.class);
             ResponseEntity<RespGroups> resp = RestClient.INSTANCE.handle().exchange(GROUPS.getValue(), HttpMethod.POST, reqEntity, RespGroups.class);
 
             ArrayList<ContentProviderOperation> ops = parseResponse(resp.getBody());

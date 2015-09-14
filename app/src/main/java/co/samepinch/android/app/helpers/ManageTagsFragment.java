@@ -1,5 +1,6 @@
 package co.samepinch.android.app.helpers;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +20,8 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.FrameLayout;
 
 import com.squareup.otto.Subscribe;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -51,6 +54,14 @@ public class ManageTagsFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AppConstants.KV.REQUEST_EDIT_TAG.getIntValue()) {
+            if (resultCode == Activity.RESULT_OK) {
+                Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
+                mTagsToManageRVAdapter.changeCursor(cursor);
+                mTagsToManageRVAdapter.notifyDataSetChanged();
+                return;
+            }
+        }
     }
 
     @Override

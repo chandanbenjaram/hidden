@@ -33,6 +33,7 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
+import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
@@ -48,6 +49,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.intent.TagDetailsService;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaTags;
@@ -55,8 +59,12 @@ import co.samepinch.android.rest.ReqNoBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_NAME;
+
 public class TagEditFragment extends Fragment {
     public static final String TAG = "TagEditFragment";
+
+    View mView;
 
     @Bind(R.id.bg_container)
     FrameLayout mBGContainer;
@@ -94,8 +102,8 @@ public class TagEditFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tag_edit, container, false);
-        ButterKnife.bind(this, view);
+        this.mView = inflater.inflate(R.layout.tag_edit, container, false);
+        ButterKnife.bind(this, this.mView);
 
         String tagId = getArguments().getString(AppConstants.APP_INTENT.KEY_TAG.getValue());
         Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tagId}, null);
@@ -126,7 +134,8 @@ public class TagEditFragment extends Fragment {
 
         // fill image as background
         String imgUrl = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE));
-        if (StringUtils.isNotBlank(imgUrl)) {
+        if (StringUtils.isBlank(imgUrl)) {
+        } else {
             // get window HW
             Point size = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
@@ -137,9 +146,48 @@ public class TagEditFragment extends Fragment {
             mBGContainer.addView(tagImgView);
         }
 
-        return view;
+        callForRemoteTagData(mTagName);
+        return this.mView;
     }
 
+    private void callForRemoteTagData(String tag) {
+        // construct context from preferences if any?
+        Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_NAME.getValue(), tag);
+
+        // call for intent
+        Intent intent =
+                new Intent(getActivity().getApplicationContext(), TagDetailsService.class);
+        intent.putExtras(iArgs);
+        getActivity().startService(intent);
+    }
+
+    @Subscribe
+    public void onTagRefreshedEvent(Events.TagRefreshedEvent event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // update preferences metadata
+                Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTagName}, null);
+                if (!cursor.moveToFirst()) {
+                    return;
+                }
+                String imgUrl = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE));
+                if (StringUtils.isNotBlank(imgUrl)) {
+                    // get window HW
+                    Point size = new Point();
+                    getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+
+                    // load background view
+                    SIMView tagImgView = new SIMView(getActivity().getApplicationContext());
+                    tagImgView.populateImageViewWithAdjustedAspect(imgUrl, new Integer[]{size.x, size.y});
+
+                    mBGContainer.removeAllViewsInLayout();
+                    mBGContainer.addView(tagImgView);
+                }
+            }
+        });
+    }
 
     @OnClick(R.id.tag_edit_save)
     public void onSaveEvent() {
@@ -156,11 +204,11 @@ public class TagEditFragment extends Fragment {
         }
         if (aSubscriptionSwitch.isChecked()) {
             // changed
-            progressDialog.setMessage(StringUtils.join("subscribing to", mTagName, " "));
+            progressDialog.setMessage(StringUtils.join("subscribing to ", mTagName, " "));
             progressDialog.show();
             new FollowTagTask().execute(mTagUID);
         } else {
-            progressDialog.setMessage(StringUtils.join("subscribing to", mTagName, " "));
+            progressDialog.setMessage(StringUtils.join("un-subscribing from ", mTagName, " "));
             progressDialog.show();
             new UnFollowTagTask().execute(mTagUID);
         }
@@ -196,26 +244,23 @@ public class TagEditFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean status) {
+            if(isRemoving()){
+                return;
+            }
             Utils.dismissSilently(progressDialog);
             mTagEditSaveBtn.setEnabled(true);
             mTagEditCancelBtn.setEnabled(true);
-            if (status) {
-                Snackbar.make(getView(), "successful.", Snackbar.LENGTH_SHORT).show();
-//                String postId = getArguments().getString(AppConstants.K.POST.name());
-//                int count = getActivity().getContentResolver().delete(SchemaPostDetails.CONTENT_URI, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId});
-//
-//                Snackbar.make(getView(), "deleted successfully.", Snackbar.LENGTH_SHORT).show();
-//                Intent resultIntent = new Intent();
-//                resultIntent.putExtra("deleted", true);
-//                getActivity().setResult(Activity.RESULT_OK, resultIntent);
-//                getActivity().finish();
+            if (status != null && status) {
+                Snackbar.make(mView, "successful.", Snackbar.LENGTH_SHORT).show();
+                Intent resultIntent = new Intent();
+                getActivity().setResult(Activity.RESULT_OK, resultIntent);
+                getActivity().finish();
             } else {
                 // prevent further clicks
-                Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
             }
         }
     }
-
 
     private class UnFollowTagTask extends AsyncTask<String, Integer, Boolean> {
         @Override
@@ -246,13 +291,19 @@ public class TagEditFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean status) {
+            if(isRemoving()){
+               return;
+            }
             Utils.dismissSilently(progressDialog);
             mTagEditSaveBtn.setEnabled(true);
             mTagEditCancelBtn.setEnabled(true);
-            if (status) {
-                Snackbar.make(getView(), "successful.", Snackbar.LENGTH_SHORT).show();
+            if (status !=null && status) {
+                Snackbar.make(mView, "successful.", Snackbar.LENGTH_SHORT).show();
+                Intent resultIntent = new Intent();
+                getActivity().setResult(Activity.RESULT_OK, resultIntent);
+                getActivity().finish();
             } else {
-                Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -268,5 +319,19 @@ public class TagEditFragment extends Fragment {
         public LocalHandler(TagEditFragment parent) {
             mActivity = new WeakReference<TagEditFragment>(parent);
         }
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 }

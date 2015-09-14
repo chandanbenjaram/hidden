@@ -545,8 +545,13 @@ public class Utils {
     }
 
     public static void dismissSilently(ProgressDialog dialog) {
-        if (dialog != null && dialog.isShowing()) {
-            dialog.dismiss();
+        try {
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+        } catch (Exception e) {
+
         }
     }
 
