@@ -139,6 +139,7 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     }
 
     private void fetchUserInfo() {
+        Utils.dismissSilently(progressDialog);
         if (AccessToken.getCurrentAccessToken() == null) {
             return;
         }
@@ -231,6 +232,8 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         if (accessTokenTracker.isTracking()) {
             accessTokenTracker.stopTracking();
         }
+
+        Utils.dismissSilently(progressDialog);
     }
 
     @Override

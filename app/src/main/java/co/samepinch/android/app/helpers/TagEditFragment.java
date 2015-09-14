@@ -2,36 +2,22 @@ package co.samepinch.android.app.helpers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.ContentProviderOperation;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
-import com.facebook.imagepipeline.common.ResizeOptions;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 import com.squareup.otto.Subscribe;
 
@@ -43,7 +29,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -53,13 +41,13 @@ import co.samepinch.android.app.helpers.intent.TagDetailsService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
-import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqNoBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_NAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class TagEditFragment extends Fragment {
     public static final String TAG = "TagEditFragment";
@@ -201,8 +189,7 @@ public class TagEditFragment extends Fragment {
         if (initSwitchAsChecked == aSubscriptionSwitch.isChecked()) {
             // nothing has change...
             getActivity().finish();
-        }
-        if (aSubscriptionSwitch.isChecked()) {
+        } else if (aSubscriptionSwitch.isChecked()) {
             // changed
             progressDialog.setMessage(StringUtils.join("subscribing to ", mTagName, " "));
             progressDialog.show();
@@ -244,22 +231,52 @@ public class TagEditFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean status) {
-            if(isRemoving()){
+            if (isRemoving()) {
                 return;
             }
             Utils.dismissSilently(progressDialog);
             mTagEditSaveBtn.setEnabled(true);
             mTagEditCancelBtn.setEnabled(true);
             if (status != null && status) {
-                Snackbar.make(mView, "successful.", Snackbar.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
-                getActivity().setResult(Activity.RESULT_OK, resultIntent);
-                getActivity().finish();
+                Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                String currUserId = userInfo.get(KEY_UID.getValue());
+
+                ContentValues values = new ContentValues();
+                values.put(SchemaTags.COLUMN_USER_ID, currUserId);
+                int result = getActivity().getContentResolver().update(SchemaTags.CONTENT_URI, values, SchemaTags.COLUMN_UID + "=?", new String[]{mTagUID});
+                if (result > 0) {
+                    Snackbar.make(mView, "successful.", Snackbar.LENGTH_SHORT).show();
+                    Intent resultIntent = new Intent();
+                    getActivity().setResult(Activity.RESULT_OK, resultIntent);
+                    getActivity().finish();
+                } else {
+                    Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
+                }
             } else {
                 // prevent further clicks
                 Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private ArrayList<ContentProviderOperation> updateSubscription(boolean subscribe) {
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+        if (subscribe) {
+            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+            String currUserId = userInfo.get(KEY_UID.getValue());
+
+            ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
+                    .withValue(SchemaTags.COLUMN_UID, mTagUID)
+                    .withValue(SchemaTags.COLUMN_USER_ID, currUserId)
+                    .build());
+        } else {
+            ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
+                    .withSelection(SchemaTags.COLUMN_UID + "= ?", new String[]{mTagUID})
+                    .withValue(SchemaTags.COLUMN_USER_ID, null)
+                    .build());
+        }
+
+        return ops;
     }
 
     private class UnFollowTagTask extends AsyncTask<String, Integer, Boolean> {
@@ -291,17 +308,22 @@ public class TagEditFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean status) {
-            if(isRemoving()){
-               return;
+            if (isRemoving()) {
+                return;
             }
             Utils.dismissSilently(progressDialog);
             mTagEditSaveBtn.setEnabled(true);
             mTagEditCancelBtn.setEnabled(true);
-            if (status !=null && status) {
-                Snackbar.make(mView, "successful.", Snackbar.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
-                getActivity().setResult(Activity.RESULT_OK, resultIntent);
-                getActivity().finish();
+            if (status != null && status) {
+                ContentValues values = new ContentValues();
+                values.putNull(SchemaTags.COLUMN_USER_ID);
+                int result = getActivity().getContentResolver().update(SchemaTags.CONTENT_URI, values, SchemaTags.COLUMN_UID + "=?", new String[]{mTagUID});
+                if (result > 0) {
+                    Snackbar.make(mView, "successful.", Snackbar.LENGTH_SHORT).show();
+                    Intent resultIntent = new Intent();
+                    getActivity().setResult(Activity.RESULT_OK, resultIntent);
+                    getActivity().finish();
+                }
             } else {
                 Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
             }

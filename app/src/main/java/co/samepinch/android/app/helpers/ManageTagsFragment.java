@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -20,8 +21,6 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.FrameLayout;
 
 import com.squareup.otto.Subscribe;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -56,12 +55,15 @@ public class ManageTagsFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AppConstants.KV.REQUEST_EDIT_TAG.getIntValue()) {
             if (resultCode == Activity.RESULT_OK) {
-                Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
-                mTagsToManageRVAdapter.changeCursor(cursor);
-                mTagsToManageRVAdapter.notifyDataSetChanged();
-                return;
+                dataSetChanged();
             }
         }
+    }
+
+    @UiThread
+    protected void dataSetChanged() {
+        // setup recyler view
+        setupRecyclerView();
     }
 
     @Override
@@ -101,8 +103,22 @@ public class ManageTagsFragment extends Fragment {
 //        ab.setHomeAsUpIndicator(R.drawable.back_2x);
         ab.setDisplayHomeAsUpEnabled(true);
 
+
+        // setup recyler view
+        setupRecyclerView();
+
+        // call for intent
+        Intent tagRefreshIntent =
+                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
+        getActivity().startService(tagRefreshIntent);
+
+        return view;
+    }
+
+    private void setupRecyclerView() {
+        frameLayout.removeAllViews();
         // recycler view
-        RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
+        final RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
             @Override
             public void scrollBy(int x, int y) {
                 try {
@@ -114,17 +130,7 @@ public class ManageTagsFragment extends Fragment {
         };
 
         frameLayout.addView(rv);
-        setupRecyclerView(rv);
 
-        // call for intent
-        Intent tagRefreshIntent =
-                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
-        getActivity().startService(tagRefreshIntent);
-
-        return view;
-    }
-
-    private void setupRecyclerView(final RecyclerView rv) {
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
         rv.setLayoutManager(gridLayoutManager);
         rv.setHasFixedSize(true);
@@ -176,8 +182,9 @@ public class ManageTagsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
-                    mTagsToManageRVAdapter.changeCursor(cursor);
+//                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
+//                    mTagsToManageRVAdapter.changeCursor(cursor);
+                    dataSetChanged();
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }
