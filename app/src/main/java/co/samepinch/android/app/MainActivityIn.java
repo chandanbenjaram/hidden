@@ -199,7 +199,7 @@ public class MainActivityIn extends AppCompatActivity {
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_TAGS.name());
                                 break;
                             default:
-                                Log.d(TAG, "do not know how to launch + " + menuItem.getTitle());
+                                Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
                                 break;
                         }
                         if (!args.isEmpty()) {
