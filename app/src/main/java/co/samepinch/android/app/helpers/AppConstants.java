@@ -19,6 +19,7 @@ public class AppConstants {
         USERS(BASE.getValue().concat("api/users")),
         USERS_EXT(BASE.getValue().concat("api/v2/users")),
         POSTS(BASE.getValue().concat("api/posts")),
+        COMMENTS(BASE.getValue().concat("api/comments")),
         GROUPS(BASE.getValue().concat("api/groups")),
         CONTENT_AUTHORITY("co.samepinch.android.app");
         private final String value;
@@ -90,8 +91,8 @@ public class AppConstants {
         REQUEST_CHOOSE_PICTURE("REQUEST_CHOOSE_PICTURE", "109"),
         REQUEST_EDIT_PICTURE("REQUEST_EDIT_PICTURE", "110"),
         REQUEST_EDIT_POST("REQUEST_EDIT_POST", "111"),
-        REQUEST_EDIT_TAG("REQUEST_EDIT_TAG", "222"),;
-
+        REQUEST_EDIT_TAG("REQUEST_EDIT_TAG", "222"),
+        REQUEST_ADD_COMMENT("REQUEST_ADD_COMMENT", "333");
         private final String key, value;
 
         KV(String key, String value) {

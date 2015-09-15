@@ -170,7 +170,6 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         toolbar.setTitle("NEW");
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.back_2x);
         ab.setDisplayHomeAsUpEnabled(true);
 
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
@@ -293,6 +292,8 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                                 uploadMultiMedia(contentItem.getImageUri());
                             } catch (Exception e) {
                                 Log.e(TAG, "err uploading: " + contentItem.getImageUri(), e);
+                                Utils.dismissSilently(progressDialog);
+                                Snackbar.make(getView(), "error uploading images. try again...", Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     });

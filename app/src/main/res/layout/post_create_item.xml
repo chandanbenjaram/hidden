@@ -44,17 +44,6 @@
             android:contentDescription="remove"
             android:padding="5dp"
             android:src="@drawable/trash_blue" />
-
-        <!--<ImageButton-->
-        <!--android:id="@+id/post_item_edit"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_toLeftOf="@+id/post_item_remove"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:padding="9dp"-->
-        <!--android:src="@drawable/pencil_blue"-->
-        <!--android:contentDescription="edit"/>-->
-
     </RelativeLayout>
 
 </ViewSwitcher>

@@ -18,13 +18,13 @@
             android:id="@+id/comment_text_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom|left"
+            android:gravity="top|left"
             android:hint="@string/enter_comment"
-            android:imeOptions="actionDone"
+            android:imeOptions="actionNone"
             android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:lines="5"
             android:maxLines="999"
-            android:minLines="5"
+            android:minLines="1"
             android:scrollHorizontally="false"></EditText>
     </LinearLayout>
 

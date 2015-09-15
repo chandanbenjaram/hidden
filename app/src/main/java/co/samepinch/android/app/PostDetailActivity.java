@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +25,6 @@ import com.squareup.otto.Subscribe;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -45,15 +43,7 @@ import co.samepinch.android.data.dto.User;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class PostDetailActivity extends AppCompatActivity {
-    private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
     public static final String TAG = "PostDetailActivity";
-
-    private Intent mServiceIntent;
-    private PostDetailsRVAdapter mViewAdapter;
-    private LinearLayoutManager mLayoutManager;
-    private String mPostId;
-
-    private ShareActionProvider mShareActionProvider;
 
     @Bind(R.id.bottomsheet)
     BottomSheetLayout mBottomsheet;
@@ -82,7 +72,34 @@ public class PostDetailActivity extends AppCompatActivity {
     @Bind(R.id.recyclerView)
     RecyclerView mRV;
 
-    PostDetails mPostDetails;
+    private String mPostId;
+    private PostDetails mPostDetails;
+    private PostDetailsRVAdapter mViewAdapter;
+    private LinearLayoutManager mLayoutManager;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == AppConstants.KV.REQUEST_EDIT_POST.getIntValue()) {
+                if (data != null && data.getBooleanExtra("deleted", false)) {
+                    this.finish();
+                    return;
+                }
+
+                Intent refresh = new Intent(this, PostDetailActivity.class);
+                refresh.putExtras(getIntent());
+                startActivity(refresh);
+                this.finish();
+            } else if (requestCode == AppConstants.KV.REQUEST_ADD_COMMENT.getIntValue()) {
+                Intent intent = getIntent();
+                intent.putExtra("isScrollDown", true);
+                Intent refresh = new Intent(this, PostDetailActivity.class);
+                refresh.putExtras(intent);
+                startActivity(refresh);
+                this.finish();
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,7 +132,8 @@ public class PostDetailActivity extends AppCompatActivity {
         // query for post details
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
         // query for post comments
-        final Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+        Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
+        final MergeCursor mergeCursor = new MergeCursor(new Cursor[]{currPost, currComments});
 
         // setup data
         setUpMetadata(currPost);
@@ -124,19 +142,22 @@ public class PostDetailActivity extends AppCompatActivity {
         mRV.setHasFixedSize(true);
         mRV.setLayoutManager(mLayoutManager);
 
-        mViewAdapter = new PostDetailsRVAdapter(this, new MergeCursor(new Cursor[]{currPost, currComments}));
+        mViewAdapter = new PostDetailsRVAdapter(this, mergeCursor);
         mRV.setAdapter(mViewAdapter);
         mRV.setItemAnimator(new DefaultItemAnimator());
+//        if (iArgs.getBoolean("isScrollDown", false)) {
+//            mRV.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//                @Override
+//                public void onGlobalLayout() {
+//                    mRV.smoothScrollToPosition(mergeCursor.getCount() - 1);
+//                }
+//            });
+//        }
+
 
         // prepare to refresh post details
         Bundle iServiceArgs = new Bundle();
         iServiceArgs.putString(KEY_UID.getValue(), mPostId);
-
-        // call for intent
-        mServiceIntent =
-                new Intent(getApplicationContext(), PostDetailsService.class);
-        mServiceIntent.putExtras(iArgs);
-        startService(mServiceIntent);
 
         mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,9 +171,15 @@ public class PostDetailActivity extends AppCompatActivity {
                 // intent
                 Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
                 intent.putExtras(args);
-                startActivity(intent);
+                startActivityForResult(intent, AppConstants.KV.REQUEST_ADD_COMMENT.getIntValue());
             }
         });
+
+        // call for intent
+        Intent detailsIntent =
+                new Intent(getApplicationContext(), PostDetailsService.class);
+        detailsIntent.putExtras(iArgs);
+        startService(detailsIntent);
     }
 
     private void setUpMetadata(Cursor currPost) {
@@ -269,23 +296,6 @@ public class PostDetailActivity extends AppCompatActivity {
 
     public void doFlagIt(MenuItem item) {
         System.out.println("doFlagIt..." + item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            if (requestCode == AppConstants.KV.REQUEST_EDIT_POST.getIntValue()) {
-                if(data !=null && data.getBooleanExtra("deleted", false)){
-                    this.finish();
-                    return;
-                }
-
-                Intent refresh = new Intent(this, PostDetailActivity.class);
-                refresh.putExtras(getIntent());
-                startActivity(refresh);
-                this.finish();
-            }
-        }
     }
 
     public void doEditIt(MenuItem item) {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +55,8 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
             String rightContent = details.getContent();
 
             Map<String, String> imageKV = details.getImages();
+            LinearLayout.LayoutParams imageWHParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
             for (String imgK : imageKArr) {
                 // get left of image
                 String leftContent = StringUtils.substringBefore(rightContent, imgK).replaceAll("::", "");
@@ -73,8 +76,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
                 }
 
                 SIMView imgView = new SIMView(mView.getContext());
-//                imgView.populateImageView("https://i.imgflip.com/ohr0t.gif");
-//                imgView.populateImageView("http://www.targeticse.co.in/wp-content/uploads/2010/03/biology.gif");
+                imgView.setLayoutParams(imageWHParams);
                 imgView.populateImageView(imageKV.get(imgK));
                 addToView(imgView);
             }
@@ -91,7 +93,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
             String tags = details.getTagsForDB();
             if (StringUtils.isNotBlank(tags)) {
                 Utils.markTags(mView.getContext(), mTagsView, tags.split(","));
-            }else{
+            } else {
                 // still hold space
                 mView.setVisibility(View.INVISIBLE);
             }
