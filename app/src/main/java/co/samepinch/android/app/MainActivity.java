@@ -27,13 +27,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.BaseAdapter;
-import android.widget.HeaderViewListAdapter;
-import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
 
@@ -74,9 +69,24 @@ public class MainActivity extends AppCompatActivity {
     SPFragmentPagerAdapter adapterViewPager;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (Utils.isLoggedIn()) {
+            Intent intent = new Intent(this, MainActivityIn.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                    Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            if (!this.isFinishing()) {
+                finish();
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue())) {
+        if (Utils.isLoggedIn()) {
             Intent intent = new Intent(this, MainActivityIn.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |

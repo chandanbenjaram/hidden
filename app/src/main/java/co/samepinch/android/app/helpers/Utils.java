@@ -566,4 +566,8 @@ public class Utils {
         }
         return byteBuffer.toByteArray();
     }
+
+    public static boolean isLoggedIn() {
+        return Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue());
+    }
 }

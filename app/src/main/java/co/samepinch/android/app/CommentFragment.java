@@ -103,8 +103,6 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.add_comment_menu, menu);
-
-
     }
 
     @Override
@@ -143,9 +141,12 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.add_comment_selection_menu, popup.getMenu());
-        MenuItem commentUser = popup.getMenu().findItem(R.id.menuitem_comment_as_user);
-        commentUser.setTitle("as " + System.currentTimeMillis());
-        commentUser.setIcon(R.drawable.icon_more_1x);
+//        MenuItem commentUser = popup.getMenu().findItem(R.id.menuitem_comment_as_user);
+//        commentUser.setTitle("as " + System.currentTimeMillis());
+//        popup.getMenu().add("as you");
+//        popup.getMenu().add("as anonymous");
+//
+//        commentUser.setIcon(R.drawable.common_signin_btn_icon_disabled_dark);
         popup.setOnMenuItemClickListener(this);
         popup.show();
     }

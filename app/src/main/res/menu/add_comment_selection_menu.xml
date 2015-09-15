@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menuitem_comment_as_anonymous"
+        android:id="@+id/menuitem_comment_as_user"
         android:orderInCategory="199"
-        android:title="as anonymous"
+        android:title="as you"
         app:showAsAction="always" />
     <item
-        android:id="@+id/menuitem_comment_as_user"
+        android:id="@+id/menuitem_comment_as_anonymous"
         android:orderInCategory="399"
-        android:title="as XYZ"
+        android:title="as anonymous"
         app:showAsAction="always" />
 </menu>
