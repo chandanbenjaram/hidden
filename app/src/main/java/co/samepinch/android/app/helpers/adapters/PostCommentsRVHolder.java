@@ -1,7 +1,8 @@
 package co.samepinch.android.app.helpers.adapters;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.text.TextUtils;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,10 +15,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.Commenter;
+import co.samepinch.android.data.dto.User;
 
 /**
  * Created by imaginationcoder on 7/27/15.
@@ -45,6 +51,9 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
     @Bind(R.id.comment_menu)
     ImageView commentMenu;
 
+    boolean mAnonymous;
+    String mCommenterUID;
+
     public PostCommentsRVHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
@@ -52,26 +61,62 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
     void onBindViewHolderImpl(Cursor cursor) {
         CommentDetails commentDetails = Utils.cursorToCommentDetails(cursor);
-        Commenter commenter = commentDetails.getCommenter();
-        if (TextUtils.isEmpty(commenter.getPhoto())) {
+        String fName, lName, photo, handle;
+        mAnonymous = commentDetails.getAnonymous();
+        View.OnClickListener dotClick = null;
+        if (mAnonymous) {
+            StorageComponent component = DaggerStorageComponent.create();
+            User anonyOwner = component.provideAnonymousDot();
+            fName = anonyOwner.getFname();
+            lName = anonyOwner.getLname();
+            photo = anonyOwner.getPhoto();
+            handle = anonyOwner.getPinchHandle();
+        } else {
+            final Commenter commenter = commentDetails.getCommenter();
+            fName = commenter.getFname();
+            lName = commenter.getLname();
+            photo = commenter.getPhoto();
+            handle = commenter.getPinchHandle();
+            dotClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TARGET
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
+                    // data
+                    args.putString(AppConstants.K.KEY_DOT.name(), commenter.getUid());
+
+                    // intent
+                    Intent intent = new Intent(mView.getContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+
+                    mView.getContext().startActivity(intent);
+                }
+            };
+        }
+
+        if (StringUtils.isBlank(photo)) {
             mAvatarName.setVisibility(View.VISIBLE);
             mAvatar.setVisibility(View.INVISIBLE);
 
-            String name = StringUtils.join(StringUtils.substring(commenter.getFname(), 0, 1), StringUtils.substring(commenter.getLname(), 0, 1));
+            String name = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
             mAvatarName.setText(name);
-//            vh.mAvatarName.setOnClickListener(dotClick);
+            if (dotClick != null) {
+                mAvatarName.setOnClickListener(dotClick);
+            }
+
         } else {
             mAvatar.setVisibility(View.VISIBLE);
             mAvatarName.setVisibility(View.GONE);
+            Utils.setupLoadingImageHolder(mAvatar, photo);
 
-            // set image
-//            Utils.setupLoadingImageHolder(vh.mAvatarView, commenter.getPhoto());
-//            vh.mAvatarView.setOnClickListener(dotClick);
-            Utils.setupLoadingImageHolder(mAvatar, commenter.getPhoto());
+            if (dotClick != null) {
+                mAvatar.setOnClickListener(dotClick);
+            }
         }
 
         // setup handle
-        String pinchHandle = String.format(mView.getContext().getString(R.string.pinch_handle), commenter.getPinchHandle());
+        String pinchHandle = String.format(mView.getContext().getString(R.string.pinch_handle), handle);
         mAvatarHandle.setText(pinchHandle);
 
         // setup counts

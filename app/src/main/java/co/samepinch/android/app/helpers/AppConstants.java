@@ -11,6 +11,7 @@ public class AppConstants {
         PREF_AUTH_USER("auth.user"),
         PREF_AUTH_PROVIDER("auth.provider"),
         PREF_POSTS_LIST("posts.lists"),
+        PREF_ANONYMOUS_IMG("anonymous.image"),
         DEFAULT_DATE_FORMAT("MM/dd/yyyy hh:mma"),
 
         BASE("https://msocl.herokuapp.com/"),

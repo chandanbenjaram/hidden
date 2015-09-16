@@ -217,7 +217,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
             } catch (Exception e) {
                 // muted
                 Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp == null ? "" : resp.getMessage(), e);
+                Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
             }
             return Boolean.FALSE;
         }

@@ -32,8 +32,6 @@ public class CommentsFragment extends ListFragment {
         View rootView = inflater.inflate(R.layout.comments_fragment,
                 container, false);
         mListView = (ListView) rootView.findViewById(android.R.id.list);
-//        TextView tView = new TextView(getActivity());
-//        mListView.addHeaderView(tView);
         if (getMHeaderView() != null) {
             mListView.addHeaderView(getMHeaderView());
         }

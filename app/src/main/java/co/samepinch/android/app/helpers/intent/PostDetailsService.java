@@ -85,10 +85,13 @@ public class PostDetailsService extends IntentService {
             return null;
         }
 
+        if (StringUtils.isNotBlank(details.getAnonymousImage())) {
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_ANONYMOUS_IMG.getValue(), details.getAnonymousImage());
+        }
+
         // anonymous dot construction
         StorageComponent component = DaggerStorageComponent.create();
         User anonyOwner = component.provideAnonymousDot();
-        anonyOwner.setPhoto(details.getAnonymousImage());
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         // DOT
@@ -108,38 +111,24 @@ public class PostDetailsService extends IntentService {
         return ops;
     }
 
-    private static void appendCommentsOps(PostDetails details, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
-        // comments
-        if (details.getComments() == null) {
-            return;
-        }
-        ContentProviderOperation.Builder opsBldr;
-        Commenter commenter;
-        for (CommentDetails comments : details.getComments()) {
-            boolean isAnony = comments.getAnonymous();
-            opsBldr = ContentProviderOperation.newInsert(SchemaComments.CONTENT_URI)
-                    .withValue(SchemaComments.COLUMN_UID, comments.getUid())
-                    .withValue(SchemaComments.COLUMN_CREATED_AT, comments.getCreatedAt().getTime())
-                    .withValue(SchemaComments.COLUMN_ANONYMOUS, isAnony)
-                    .withValue(SchemaComments.COLUMN_TEXT, comments.getText())
-                    .withValue(SchemaComments.COLUMN_UPVOTE_COUNT, comments.getUpvoteCount())
-                    .withValue(SchemaComments.COLUMN_POST_DETAILS, details.getUid());
-
-            if (isAnony) {
-                opsBldr.withValue(SchemaComments.COLUMN_DOT_UID, anonyOwner.getUid())
-                        .withValue(SchemaComments.COLUMN_DOT_FNAME, anonyOwner.getFname())
-                        .withValue(SchemaComments.COLUMN_DOT_LNAME, anonyOwner.getLname())
-                        .withValue(SchemaComments.COLUMN_DOT_PINCH_HANDLE, anonyOwner.getPinchHandle())
-                        .withValue(SchemaComments.COLUMN_DOT_PHOTO_URL, anonyOwner.getPhoto());
-            } else {
-                commenter = comments.getCommenter();
-                opsBldr.withValue(SchemaComments.COLUMN_DOT_UID, commenter.getUid())
-                        .withValue(SchemaComments.COLUMN_DOT_FNAME, commenter.getFname())
-                        .withValue(SchemaComments.COLUMN_DOT_LNAME, commenter.getLname())
-                        .withValue(SchemaComments.COLUMN_DOT_PINCH_HANDLE, commenter.getPinchHandle())
-                        .withValue(SchemaComments.COLUMN_DOT_PHOTO_URL, commenter.getPhoto());
-            }
-            ops.add(opsBldr.build());
+    private static void appendDOTOps(PostDetails details, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
+        final User postOwner = details.getOwner();
+        if (details.getAnonymous()) {
+            ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
+                    .withValue(SchemaDots.COLUMN_UID, anonyOwner.getUid())
+                    .withValue(SchemaDots.COLUMN_FNAME, anonyOwner.getFname())
+                    .withValue(SchemaDots.COLUMN_LNAME, anonyOwner.getLname())
+                    .withValue(SchemaDots.COLUMN_PREF_NAME, anonyOwner.getPrefName())
+                    .withValue(SchemaDots.COLUMN_PINCH_HANDLE, anonyOwner.getPinchHandle())
+                    .withValue(SchemaDots.COLUMN_PHOTO_URL, anonyOwner.getPhoto()).build());
+        } else {
+            ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
+                    .withValue(SchemaDots.COLUMN_UID, postOwner.getUid())
+                    .withValue(SchemaDots.COLUMN_FNAME, postOwner.getFname())
+                    .withValue(SchemaDots.COLUMN_LNAME, postOwner.getLname())
+                    .withValue(SchemaDots.COLUMN_PREF_NAME, postOwner.getPrefName())
+                    .withValue(SchemaDots.COLUMN_PINCH_HANDLE, postOwner.getPinchHandle())
+                    .withValue(SchemaDots.COLUMN_PHOTO_URL, postOwner.getPhoto()).build());
         }
     }
 
@@ -161,24 +150,33 @@ public class PostDetailsService extends IntentService {
                 .withValue(SchemaPostDetails.COLUMN_TAGS, details.getTagsForDB()).build());
     }
 
-    private static void appendDOTOps(PostDetails details, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
-        final User postOwner = details.getOwner();
-        if (details.getAnonymous()) {
-            ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
-                    .withValue(SchemaDots.COLUMN_UID, anonyOwner.getUid())
-                    .withValue(SchemaDots.COLUMN_FNAME, anonyOwner.getFname())
-                    .withValue(SchemaDots.COLUMN_LNAME, anonyOwner.getLname())
-                    .withValue(SchemaDots.COLUMN_PREF_NAME, anonyOwner.getPrefName())
-                    .withValue(SchemaDots.COLUMN_PINCH_HANDLE, anonyOwner.getPinchHandle())
-                    .withValue(SchemaDots.COLUMN_PHOTO_URL, anonyOwner.getPhoto()).build());
-        } else {
-            ops.add(ContentProviderOperation.newInsert(SchemaDots.CONTENT_URI)
-                    .withValue(SchemaDots.COLUMN_UID, postOwner.getUid())
-                    .withValue(SchemaDots.COLUMN_FNAME, postOwner.getFname())
-                    .withValue(SchemaDots.COLUMN_LNAME, postOwner.getLname())
-                    .withValue(SchemaDots.COLUMN_PREF_NAME, postOwner.getPrefName())
-                    .withValue(SchemaDots.COLUMN_PINCH_HANDLE, postOwner.getPinchHandle())
-                    .withValue(SchemaDots.COLUMN_PHOTO_URL, postOwner.getPhoto()).build());
+    private static void appendCommentsOps(PostDetails details, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
+        // comments
+        if (details.getComments() == null) {
+            return;
+        }
+        ContentProviderOperation.Builder opsBldr;
+        Commenter commenter;
+        for (CommentDetails comments : details.getComments()) {
+            //grab comment
+            opsBldr = ContentProviderOperation.newInsert(SchemaComments.CONTENT_URI)
+                    .withValue(SchemaComments.COLUMN_UID, comments.getUid())
+                    .withValue(SchemaComments.COLUMN_CREATED_AT, comments.getCreatedAt().getTime())
+                    .withValue(SchemaComments.COLUMN_ANONYMOUS, comments.getAnonymous())
+                    .withValue(SchemaComments.COLUMN_TEXT, comments.getText())
+                    .withValue(SchemaComments.COLUMN_UPVOTE_COUNT, comments.getUpvoteCount())
+                    .withValue(SchemaComments.COLUMN_POST_DETAILS, details.getUid());
+
+            //grab commenter info
+            commenter = comments.getCommenter();
+            if (commenter != null) {
+                opsBldr.withValue(SchemaComments.COLUMN_DOT_UID, commenter.getUid())
+                        .withValue(SchemaComments.COLUMN_DOT_FNAME, commenter.getFname())
+                        .withValue(SchemaComments.COLUMN_DOT_LNAME, commenter.getLname())
+                        .withValue(SchemaComments.COLUMN_DOT_PINCH_HANDLE, commenter.getPinchHandle())
+                        .withValue(SchemaComments.COLUMN_DOT_PHOTO_URL, commenter.getPhoto());
+            }
+            ops.add(opsBldr.build());
         }
     }
 }

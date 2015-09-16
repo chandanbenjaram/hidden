@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.inject.Singleton;
 
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqLogin;
 import co.samepinch.android.rest.ReqPosts;
@@ -30,11 +31,15 @@ public class DataModule {
     User provideAnonymousDot() {
         String anonymousStr = "anonymous";
         User anonymous = new User();
-        anonymous.setUid(String.valueOf(0));
+        anonymous.setUid(Integer.toString(0));
         anonymous.setFname(anonymousStr);
         anonymous.setLname(StringUtils.EMPTY);
         anonymous.setPrefName(anonymousStr);
         anonymous.setPinchHandle(anonymousStr);
+
+        String anonyImg = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_ANONYMOUS_IMG.getValue());
+        anonymous.setPhoto(anonyImg);
+
         return anonymous;
     }
 
