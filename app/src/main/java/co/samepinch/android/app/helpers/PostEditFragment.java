@@ -446,7 +446,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             try {
-                String updateUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0].getUid()}, "//");
+                String updateUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0].getUid()}, "/");
                 HttpEntity<ReqGeneric<ReqPostCreate.Body>> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(updateUrl, HttpMethod.POST, payloadEntity, RespPostDetails.class);
                 return resp.getBody();

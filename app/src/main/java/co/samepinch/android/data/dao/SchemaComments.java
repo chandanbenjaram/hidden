@@ -16,7 +16,9 @@ public interface SchemaComments extends BaseColumns {
     String COLUMN_TEXT = "text";
     String COLUMN_CREATED_AT = "created_at";
     String COLUMN_ANONYMOUS = "anonymous";
+    String COLUMN_UPVOTED = "upvoted";
     String COLUMN_UPVOTE_COUNT = "upvote_count";
+    String COLUMN_PERMISSIONS = "permissions";
 
     String COLUMN_DOT_UID = "dot_uid";
     String COLUMN_DOT_FNAME = "dot_first_name";
@@ -36,7 +38,9 @@ public interface SchemaComments extends BaseColumns {
             + COLUMN_TEXT + " TEXT DEFAULT '', "
             + COLUMN_CREATED_AT + " REAL, "
             + COLUMN_ANONYMOUS + " INTEGER DEFAULT 0, "
+            + COLUMN_UPVOTED + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "
+            + COLUMN_PERMISSIONS + " TEXT DEFAULT '', "
             + COLUMN_DOT_UID + " TEXT NOT NULL, "
             + COLUMN_DOT_FNAME + " TEXT DEFAULT '', "
             + COLUMN_DOT_LNAME + " TEXT DEFAULT '', "
@@ -52,9 +56,9 @@ public interface SchemaComments extends BaseColumns {
             + TABLE_NAME;
 
     String[] TAG_COLUMNS = new String[]{
-            _ID, COLUMN_UID, COLUMN_TEXT, COLUMN_CREATED_AT, COLUMN_ANONYMOUS, COLUMN_UPVOTE_COUNT,
+            _ID, COLUMN_UID, COLUMN_TEXT, COLUMN_CREATED_AT, COLUMN_ANONYMOUS, COLUMN_UPVOTED, COLUMN_UPVOTE_COUNT,
             COLUMN_DOT_UID, COLUMN_DOT_FNAME, COLUMN_DOT_LNAME, COLUMN_DOT_PREF_NAME,  COLUMN_DOT_PHOTO_URL,
-            COLUMN_POST_DETAILS, COLUMN_DOT_PINCH_HANDLE
+            COLUMN_POST_DETAILS, COLUMN_DOT_PINCH_HANDLE, COLUMN_PERMISSIONS
     };
 
     // provider related stuff

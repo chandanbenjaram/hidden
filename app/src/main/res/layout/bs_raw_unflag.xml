@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:drawableLeft="@drawable/icon_flag_24x24"
+    android:drawablePadding="32dp"
+    android:duplicateParentState="true"
+    android:ellipsize="marquee"
+    android:fadingEdge="horizontal"
+    android:gravity="center_vertical"
+    android:singleLine="true"
+    android:text="un-flag"
+    android:textAppearance="?attr/textAppearanceLargePopupMenu"
+    android:textColor="@color/grey_500"
+    android:textSize="24sp" />

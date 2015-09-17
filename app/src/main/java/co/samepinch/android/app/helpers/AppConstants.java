@@ -130,6 +130,8 @@ public class AppConstants {
         KEY_DOT,
         Wall,
         POST,
+        COMMENT,
+        COMMAND,
         facebook,
         google,
         via_email_password,

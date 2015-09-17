@@ -18,6 +18,7 @@ public interface SchemaPostDetails extends BaseColumns {
     String COLUMN_LARGE_IMAGES = "large_images";
     String COLUMN_COMMENT_COUNT = "comment_count";
     String COLUMN_UPVOTE_COUNT = "upvote_count";
+    String COLUMN_UPVOTED = "upvoted";
     String COLUMN_VIEWS = "views";
     String COLUMN_URL = "url";
     String COLUMN_ANONYMOUS = "anonymous";
@@ -36,6 +37,7 @@ public interface SchemaPostDetails extends BaseColumns {
             + COLUMN_LARGE_IMAGES + " TEXT DEFAULT '', "
             + COLUMN_COMMENT_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "
+            + COLUMN_UPVOTED + " INTEGER DEFAULT 0, "
             + COLUMN_VIEWS + " INTEGER DEFAULT 0, "
             + COLUMN_URL + " TEXT DEFAULT '', "
             + COLUMN_ANONYMOUS + " INTEGER DEFAULT 0, "
@@ -51,7 +53,7 @@ public interface SchemaPostDetails extends BaseColumns {
 
     String[] POST_DETAILS_COLUMNS = new String[]{
             _ID, COLUMN_UID, COLUMN_CONTENT, COLUMN_COMMENT_COUNT,
-            COLUMN_UPVOTE_COUNT, COLUMN_VIEWS, COLUMN_ANONYMOUS,
+            COLUMN_UPVOTE_COUNT, COLUMN_UPVOTED, COLUMN_VIEWS, COLUMN_ANONYMOUS,
             COLUMN_CREATED_AT, COLUMN_TAGS, COLUMN_PERMISSIONS,
             COLUMN_OWNER, COLUMN_IMAGES, COLUMN_LARGE_IMAGES,
             COLUMN_URL

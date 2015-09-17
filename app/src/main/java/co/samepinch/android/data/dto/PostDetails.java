@@ -29,6 +29,7 @@ public class PostDetails {
     Integer commentCount;
     @SerializedName("upvote_count")
     Integer upvoteCount;
+    Boolean upvoted;
     Integer views;
     List<String> tags;
     Boolean anonymous;
@@ -241,5 +242,11 @@ public class PostDetails {
         return g.toJson(getLargeImages());
     }
 
+    public Boolean getUpvoted() {
+        return upvoted;
+    }
 
+    public void setUpvoted(Boolean upvoted) {
+        this.upvoted = upvoted;
+    }
 }

@@ -2,7 +2,11 @@ package co.samepinch.android.data.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.springframework.util.StringUtils;
+
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import co.samepinch.android.app.helpers.Utils;
 
@@ -17,21 +21,16 @@ public class CommentDetails {
     Boolean anonymous;
     @SerializedName("upvote_count")
     Integer upvoteCount;
-    Commenter commenter;
-
+    Boolean upvoted;
+    @SerializedName("can")
+    List<String> permissions;
     @SerializedName("createdAtDB")
     Date createdAt;
 
+    Commenter commenter;
+
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Commenter getCommenter() {
-        return commenter;
-    }
-
-    public void setCommenter(Commenter commenter) {
-        this.commenter = commenter;
     }
 
     public String getUid() {
@@ -80,5 +79,44 @@ public class CommentDetails {
 
     public void setUpvoteCount(Integer upvoteCount) {
         this.upvoteCount = upvoteCount;
+    }
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    public String getPermissionsForDB() {
+        if (getPermissions() == null) {
+            return org.apache.commons.lang3.StringUtils.EMPTY;
+        }
+        return StringUtils.arrayToDelimitedString(getPermissions().toArray(), ",");
+    }
+
+    public void setPermissionsFromDB(String permissions) {
+        if (permissions == null) {
+            setPermissions(null);
+        } else {
+            setPermissions(Arrays.asList(permissions.split(",")));
+        }
+    }
+
+    public Boolean getUpvoted() {
+        return upvoted;
+    }
+
+    public void setUpvoted(Boolean upvoted) {
+        this.upvoted = upvoted;
+    }
+
+    public Commenter getCommenter() {
+        return commenter;
+    }
+
+    public void setCommenter(Commenter commenter) {
+        this.commenter = commenter;
     }
 }
