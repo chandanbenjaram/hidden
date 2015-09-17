@@ -12,10 +12,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.flipboard.bottomsheet.BottomSheetLayout;
@@ -31,6 +33,7 @@ import butterknife.ButterKnife;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostDetailsRVAdapter;
+import co.samepinch.android.app.helpers.intent.CommentUpdateService;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
@@ -259,12 +262,12 @@ public class PostDetailActivity extends AppCompatActivity {
                 doEditIt(item);
                 return true;
 
-            case R.id.menuitem_post_flag_id:
-                doFlagIt(item);
-                return true;
-
             case R.id.menuitem_post_share_id:
                 doShareIt(item);
+                return true;
+
+            case R.id.menuitem_post_menu_id:
+                handleMenuSelection(item);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -278,13 +281,6 @@ public class PostDetailActivity extends AppCompatActivity {
             if (permissions.contains("edit")) {
                 // self
                 menu.findItem(R.id.menuitem_post_edit_id).setVisible(Boolean.TRUE);
-            } else {
-                menu.findItem(R.id.menuitem_post_flag_id).setVisible(Boolean.TRUE);
-            }
-            if (mPostDetails.getUpvoted() == null || !mPostDetails.getUpvoted()) {
-                menu.findItem(R.id.menuitem_post_like_id).setVisible(Boolean.TRUE);
-            } else {
-                menu.findItem(R.id.menuitem_post_dislike_id).setVisible(Boolean.TRUE);
             }
         }
         return true;
@@ -306,8 +302,32 @@ public class PostDetailActivity extends AppCompatActivity {
         mBottomsheet.showWithSheetView(intentPickerSheet);
     }
 
-    public void doFlagIt(MenuItem item) {
-        System.out.println("doFlagIt..." + item);
+    public void handleMenuSelection(MenuItem item) {
+        final BottomSheetLayout bs = (BottomSheetLayout) findViewById(R.id.bottomsheet);
+        // prepare menu options
+        View menu = LayoutInflater.from(bs.getContext()).inflate(R.layout.bs_menu, bs, false);
+        LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
+        boolean addDiv = false;
+        if (mPostDetails.getUpvoted() != null && mPostDetails.getUpvoted()) {
+            if (addDiv) {
+//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
+//                        layout.addView(divider);
+            }
+
+            TextView downVoteView = (TextView) LayoutInflater.from(bs.getContext()).inflate(R.layout.bs_raw_downvote, null);
+            layout.addView(downVoteView);
+            addDiv = true;
+        } else {
+            if (addDiv) {
+//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
+//                        layout.addView(divider);
+            }
+
+            TextView voteView = (TextView) LayoutInflater.from(bs.getContext()).inflate(R.layout.bs_raw_upvote, null);
+            layout.addView(voteView);
+            addDiv = true;
+        }
+        bs.showWithSheetView(menu);
     }
 
     public void doEditIt(MenuItem item) {
@@ -390,5 +410,34 @@ public class PostDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private static class MenuItemClickListener implements View.OnClickListener {
+        private final View view;
+        private final String command;
+        private final String postUID;
+        private final BottomSheetLayout bottomSheet;
+
+        public MenuItemClickListener(View source, String command, String commentUID, BottomSheetLayout bs) {
+            this.command = command;
+            this.postUID = postUID;
+            this.view = source;
+            this.bottomSheet = bs;
+            this.view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            bottomSheet.dismissSheet();
+            Bundle iArgs = new Bundle();
+            iArgs.putString(AppConstants.K.POST.name(), postUID);
+            iArgs.putString(AppConstants.K.COMMAND.name(), command);
+
+            // call for intent
+            Intent intent =
+                    new Intent(view.getContext(), CommentUpdateService.class);
+            intent.putExtras(iArgs);
+            view.getContext().startService(intent);
+        }
     }
 }

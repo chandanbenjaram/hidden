@@ -5,41 +5,26 @@
     <item
         android:id="@+id/menuitem_post_edit_id"
         android:icon="@drawable/pencil_blue"
-        android:orderInCategory="299"
+        android:orderInCategory="1"
         android:title="Edit"
         android:visible="false"
         app:icon="@drawable/pencil_blue"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/menuitem_post_like_id"
-        android:icon="@drawable/icon_like_postview_2x"
-        android:orderInCategory="99"
-        android:title="Like"
-        android:visible="false"
-        app:icon="@drawable/icon_flag_24x24"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/menuitem_post_dislike_id"
-        android:icon="@drawable/icon_like_postview_active_2x"
-        android:orderInCategory="99"
-        android:title="Dislike"
-        android:visible="false"
-        app:icon="@drawable/icon_flag_24x24"
-        app:showAsAction="always" />
 
-    <item
-        android:id="@+id/menuitem_post_flag_id"
-        android:icon="@drawable/icon_flag_24x24"
-        android:orderInCategory="99"
-        android:title="Flag"
-        android:visible="false"
-        app:icon="@drawable/icon_flag_24x24"
-        app:showAsAction="always" />
     <item
         android:id="@+id/menuitem_post_share_id"
         android:icon="@drawable/icon_share_2x"
-        android:orderInCategory="399"
+        android:orderInCategory="2"
         android:title="Share"
         app:icon="@drawable/icon_share_2x"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/menuitem_post_menu_id"
+        android:icon="@drawable/icon_more_2x"
+        android:orderInCategory="3"
+        android:title="Menu"
+        app:icon="@drawable/icon_more_2x"
+        app:showAsAction="always" />
 </menu>

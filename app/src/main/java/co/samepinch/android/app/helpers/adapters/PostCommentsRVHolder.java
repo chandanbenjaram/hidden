@@ -150,8 +150,8 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
             public void onClick(View v) {
                 final BottomSheetLayout bs = (BottomSheetLayout) mView.getRootView().findViewById(R.id.bottomsheet);
                 // prepare menu options
-                View menu = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_comment_menu, bs, false);
-                LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_comment_menu);
+                View menu = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_menu, bs, false);
+                LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
                 boolean addDiv = false;
                 if (commentDetails.getUpvoted() != null && commentDetails.getUpvoted()) {
                     if (addDiv) {
