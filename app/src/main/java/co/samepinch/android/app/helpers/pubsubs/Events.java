@@ -113,4 +113,16 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class CommentDetailsRefreshEvent extends EventBase {
+        public CommentDetailsRefreshEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
+    public static class CommentDetailsEditEvent extends EventBase {
+        public CommentDetailsEditEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }

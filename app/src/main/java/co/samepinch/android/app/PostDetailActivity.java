@@ -90,7 +90,8 @@ public class PostDetailActivity extends AppCompatActivity {
                 refresh.putExtras(getIntent());
                 startActivity(refresh);
                 this.finish();
-            } else if (requestCode == AppConstants.KV.REQUEST_ADD_COMMENT.getIntValue()) {
+            } else if (requestCode == AppConstants.KV.REQUEST_ADD_COMMENT.getIntValue()
+                    || requestCode == AppConstants.KV.REQUEST_EDIT_COMMENT.getIntValue()) {
                 Intent intent = getIntent();
                 intent.putExtra("isScrollDown", true);
                 Intent refresh = new Intent(this, PostDetailActivity.class);
@@ -330,14 +331,49 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    // query for post details
-                    Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
-                    setUpMetadata(currPost);
+                    ((MergeCursor) mViewAdapter.getCursor()).requery();
+                    mViewAdapter.notifyDataSetChanged();
+                    //                     invalidateOptionsMenu();
+                } catch (Exception e) {
+                    // muted
+                }
+            }
+        });
+    }
 
-                    // query for post comments
-                    Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
-                    mViewAdapter.changeCursor(new MergeCursor(new Cursor[]{currPost, currComments}));
-                    invalidateOptionsMenu();
+    @Subscribe
+    public void onCommentDetailsRefreshEvent(Events.CommentDetailsRefreshEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ((MergeCursor) mViewAdapter.getCursor()).requery();
+                    mViewAdapter.notifyDataSetChanged();
+                } catch (Exception e) {
+                    // muted
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void onCommentDetailsEditEvent(final Events.CommentDetailsEditEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // TARGET
+                    Bundle args = new Bundle();
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_COMMENT.name());
+                    // data
+                    args.putString(AppConstants.K.POST.name(), mPostId);
+                    args.putString(AppConstants.K.COMMENT.name(), event.getMetaData().get(AppConstants.K.COMMENT.name()));
+
+
+                    // intent
+                    Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+                    startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_COMMENT.getIntValue());
                 } catch (Exception e) {
                     // muted
                 }

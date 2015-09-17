@@ -44,12 +44,9 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
     }
 
     void onBindViewHolderImpl(Cursor cursor) {
+        mViewGroup.removeAllViews();
         // do nothing in base
-        PostDetails details = null;
-        if (cursor.moveToFirst()) {
-            details = Utils.cursorToPostDetailsEntity(cursor);
-        }
-
+        PostDetails details = Utils.cursorToPostDetailsEntity(cursor);
         if (details != null) {
             List<String> imageKArr = Utils.getImageValues(details.getContent());
             String rightContent = details.getContent();

@@ -95,6 +95,10 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
         // retrieve post from args
         this.mPostId = getArguments().getString(AppConstants.K.POST.name());
+        String commentUId = getArguments().getString(AppConstants.K.COMMENT.name(), StringUtils.EMPTY);
+        if (StringUtils.isNotBlank(commentUId)) {
+            commentTxt.setText("editing...");
+        }
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -162,7 +166,6 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
 
     private void doLogin() {
-        //TODO login implementation
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

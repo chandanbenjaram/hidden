@@ -293,6 +293,11 @@ public class Utils {
             dto.setUpvoteCount(cursor.getInt(upvoteCountIndex));
         }
 
+        int upvotedIndex;
+        if ((upvotedIndex = cursor.getColumnIndex(SchemaComments.COLUMN_UPVOTED)) != -1) {
+            dto.setUpvoted(cursor.getInt(upvotedIndex) == 1);
+        }
+
         int permissionsIndex;
         if ((permissionsIndex = cursor.getColumnIndex(SchemaComments.COLUMN_PERMISSIONS)) != -1) {
             dto.setPermissionsFromDB(cursor.getString(permissionsIndex));

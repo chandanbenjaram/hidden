@@ -1,12 +1,9 @@
 package co.samepinch.android.app.helpers.adapters;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,18 +32,16 @@ import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.intent.CommentUpdateService;
-import co.samepinch.android.app.helpers.intent.PostDetailsService;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.Commenter;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqNoBody;
-import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
-
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 /**
  * Created by imaginationcoder on 7/27/15.
@@ -74,9 +69,6 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
     @Bind(R.id.comment_menu)
     ImageView commentMenu;
 
-    boolean mAnonymous;
-    String mCommenterUID;
-
     public PostCommentsRVHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
@@ -85,9 +77,8 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
     void onBindViewHolderImpl(Cursor cursor) {
         final CommentDetails commentDetails = Utils.cursorToCommentDetails(cursor);
         String fName, lName, photo, handle;
-        mAnonymous = commentDetails.getAnonymous();
         View.OnClickListener dotClick = null;
-        if (mAnonymous) {
+        if (commentDetails.getAnonymous()) {
             StorageComponent component = DaggerStorageComponent.create();
             User anonyOwner = component.provideAnonymousDot();
             fName = anonyOwner.getFname();
@@ -146,22 +137,18 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
         // setup counts
         mCommentUpvote.setText(StringUtils.defaultString(Integer.toString(commentDetails.getUpvoteCount()), "0"));
 
-        // setup counts
+        // setup date
         mCommentDate.setText(Utils.dateToString(commentDetails.getCreatedAt()));
 
         // setup comment
         mComment.setText(commentDetails.getText());
-//        View menuLayoutView = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_comment_menu, null);
-//        LinearLayout linearLayout = (LinearLayout) menuLayoutView.findViewById(R.id.layout_comment_menu);
 
-        // flag view
-//        TextView flagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_flag, null);
-//        linearLayout.addView(flagView);
         final List<String> permissions = commentDetails.getPermissions();
+        final String commentUID = commentDetails.getUid();
         commentMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BottomSheetLayout bs = (BottomSheetLayout) mView.getRootView().findViewById(R.id.bottomsheet);
+                final BottomSheetLayout bs = (BottomSheetLayout) mView.getRootView().findViewById(R.id.bottomsheet);
                 // prepare menu options
                 View menu = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_comment_menu, bs, false);
                 LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_comment_menu);
@@ -172,8 +159,9 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 //                        layout.addView(divider);
                     }
 
-                    TextView downVoteVite = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_downvote, null);
-                    layout.addView(downVoteVite);
+                    TextView downVoteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_downvote, null);
+                    layout.addView(downVoteView);
+                    new MenuItemClickListener(downVoteView, "undoVoting", commentUID, bs);
                     addDiv = true;
                 } else {
                     if (addDiv) {
@@ -181,22 +169,9 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 //                        layout.addView(divider);
                     }
 
-                    TextView voteVite = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_upvote, null);
-                    layout.addView(voteVite);
-                    voteVite.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Bundle iArgs = new Bundle();
-                            iArgs.putString(AppConstants.K.COMMENT.name(), commentDetails.getUid());
-                            iArgs.putString(AppConstants.K.COMMAND.name(), "upvote");
-
-                            // call for intent
-                            Intent intent =
-                                    new Intent(mView.getContext(), CommentUpdateService.class);
-                            intent.putExtras(iArgs);
-                            mView.getContext().startService(intent);
-                        }
-                    });
+                    TextView voteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_upvote, null);
+                    layout.addView(voteView);
+                    new MenuItemClickListener(voteView, "upvote", commentUID, bs);
                     addDiv = true;
                 }
 
@@ -206,7 +181,16 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 //                        layout.addView(divider);
                     }
 
-                    TextView editView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_edit, null);
+                    final TextView editView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_edit, null);
+                    editView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Map<String, String> metaData = new HashMap<>();
+                            metaData.put(AppConstants.K.COMMENT.name(), commentDetails.getUid());
+                            BusProvider.INSTANCE.getBus().post(new Events.CommentDetailsEditEvent(metaData));
+                            bs.dismissSheet();
+                        }
+                    });
                     layout.addView(editView);
                     addDiv = true;
                 }
@@ -219,6 +203,7 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
                     TextView flagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_flag, null);
                     layout.addView(flagView);
+                    new MenuItemClickListener(flagView, "flag", commentUID, bs);
                     addDiv = true;
                 }
 
@@ -281,6 +266,34 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 //                Snackbar.make(getView(), "error commenting. try again...", Snackbar.LENGTH_SHORT).show();
 //            }
         }
+    }
 
+    private static class MenuItemClickListener implements View.OnClickListener {
+        private final View view;
+        private final String command;
+        private final String commentUID;
+        private final BottomSheetLayout bottomSheet;
+
+        public MenuItemClickListener(View source, String command, String commentUID, BottomSheetLayout bs) {
+            this.command = command;
+            this.commentUID = commentUID;
+            this.view = source;
+            this.bottomSheet = bs;
+            this.view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            bottomSheet.dismissSheet();
+            Bundle iArgs = new Bundle();
+            iArgs.putString(AppConstants.K.COMMENT.name(), commentUID);
+            iArgs.putString(AppConstants.K.COMMAND.name(), command);
+
+            // call for intent
+            Intent intent =
+                    new Intent(view.getContext(), CommentUpdateService.class);
+            intent.putExtras(iArgs);
+            view.getContext().startService(intent);
+        }
     }
 }

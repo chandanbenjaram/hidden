@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 
 import co.samepinch.android.app.R;
 
-/**
- * Created by imaginationcoder on 7/27/15.
- */
 public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsRVHolder> {
     private final Context context;
 
