@@ -136,7 +136,7 @@ public class PostDetailActivity extends AppCompatActivity {
         Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
         // query for post comments
         Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
-        final MergeCursor mergeCursor = new MergeCursor(new Cursor[]{currPost, currComments});
+        MergeCursor mergeCursor = new MergeCursor(new Cursor[]{currPost, currComments});
 
         // setup data
         setUpMetadata(currPost);
@@ -225,7 +225,8 @@ public class PostDetailActivity extends AppCompatActivity {
             String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
             mPostDotHandle.setText(pinchHandle);
 
-            if (!mPostDot.hasOnClickListeners()) {
+            mPostDot.setOnClickListener(null);
+            if (mPostDetails.getAnonymous() == null || !mPostDetails.getAnonymous())
                 // onclick take to dot view
                 mPostDot.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -242,7 +243,6 @@ public class PostDetailActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-            }
         }
 
         currDot.close();
@@ -275,8 +275,17 @@ public class PostDetailActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.post_detail_menu, menu);
         if (mPostDetails != null) {
             List<String> permissions = mPostDetails.getPermissions();
-            menu.findItem(R.id.menuitem_post_flag_id).setVisible(permissions != null && permissions.contains("flag"));
-            menu.findItem(R.id.menuitem_post_edit_id).setVisible(permissions != null && permissions.contains("edit"));
+            if (permissions.contains("edit")) {
+                // self
+                menu.findItem(R.id.menuitem_post_edit_id).setVisible(Boolean.TRUE);
+            } else {
+                menu.findItem(R.id.menuitem_post_flag_id).setVisible(Boolean.TRUE);
+            }
+            if (mPostDetails.getUpvoted() == null || !mPostDetails.getUpvoted()) {
+                menu.findItem(R.id.menuitem_post_like_id).setVisible(Boolean.TRUE);
+            } else {
+                menu.findItem(R.id.menuitem_post_dislike_id).setVisible(Boolean.TRUE);
+            }
         }
         return true;
     }
