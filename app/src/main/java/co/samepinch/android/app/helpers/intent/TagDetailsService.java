@@ -49,9 +49,7 @@ public class TagDetailsService extends IntentService {
         req.setToken(Utils.getAppToken(false));
         req.setCmd("show");
         req.setName(iArgs.getString(KEY_NAME.getValue()));
-
         try {
-
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

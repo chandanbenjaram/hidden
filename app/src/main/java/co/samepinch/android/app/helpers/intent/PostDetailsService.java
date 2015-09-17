@@ -136,6 +136,7 @@ public class PostDetailsService extends IntentService {
         // POST DETAILS
         ops.add(ContentProviderOperation.newInsert(SchemaPostDetails.CONTENT_URI)
                 .withValue(SchemaPostDetails.COLUMN_UID, details.getUid())
+                .withValue(SchemaPostDetails.COLUMN_URL, details.getUrl())
                 .withValue(SchemaPostDetails.COLUMN_CONTENT, details.getContent())
                 .withValue(SchemaPostDetails.COLUMN_IMAGES, details.getImagesForDB())
                 .withValue(SchemaPostDetails.COLUMN_LARGE_IMAGES, details.getImagesForDB())

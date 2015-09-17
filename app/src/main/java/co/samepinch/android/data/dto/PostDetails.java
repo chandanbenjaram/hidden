@@ -21,6 +21,7 @@ import co.samepinch.android.app.helpers.Utils;
 public class PostDetails {
     @SerializedName("uid")
     String uid;
+    String url;
     String content;
     Map<String, String> images;
     @SerializedName("large_images")
@@ -248,5 +249,13 @@ public class PostDetails {
 
     public void setUpvoted(Boolean upvoted) {
         this.upvoted = upvoted;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

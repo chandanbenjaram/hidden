@@ -198,6 +198,7 @@ public class Utils {
 
         PostDetails details = new PostDetails();
         int uidIndex;
+        int urlIndex;
         int contentIndex;
         int imagesIndex;
         int largeImagesIndex;
@@ -213,12 +214,18 @@ public class Utils {
             details.setUid(cursor.getString(uidIndex));
         }
 
+        if ((urlIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_URL)) != -1) {
+            details.setUrl(cursor.getString(urlIndex));
+        }
+
         if ((contentIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_CONTENT)) != -1) {
             details.setContent(cursor.getString(contentIndex));
         }
+
         if ((imagesIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_IMAGES)) != -1) {
             details.setImagesFromDB(cursor.getString(imagesIndex));
         }
+
         if ((largeImagesIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_LARGE_IMAGES)) != -1) {
             details.setLargeImagesFromDB(cursor.getString(largeImagesIndex));
         }
@@ -249,6 +256,11 @@ public class Utils {
 
         if ((permissionsIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_PERMISSIONS)) != -1) {
             details.setPermissionsFromDB(cursor.getString(permissionsIndex));
+        }
+
+        int upvotedIndex;
+        if ((upvotedIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_UPVOTED)) != -1) {
+            details.setUpvoted(cursor.getInt(upvotedIndex) == 1);
         }
 //
         // dot related

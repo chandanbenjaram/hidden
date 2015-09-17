@@ -1,17 +1,22 @@
 package co.samepinch.android.app;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MergeCursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,8 +30,16 @@ import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -35,14 +48,23 @@ import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostDetailsRVAdapter;
 import co.samepinch.android.app.helpers.intent.CommentUpdateService;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
+import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
+import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RespCommentDetails;
+import co.samepinch.android.rest.RestClient;
 
+import static co.samepinch.android.app.helpers.AppConstants.API.COMMENTS;
+import static co.samepinch.android.app.helpers.AppConstants.API.POSTS;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class PostDetailActivity extends AppCompatActivity {
@@ -287,11 +309,15 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     public void doShareIt(MenuItem item) {
+        if (StringUtils.isBlank(mPostDetails.getUrl())) {
+            //TODO may be ask user to file a bug?
+            return;
+        }
+
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mPostId);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mPostDetails.getUrl());
         shareIntent.setType("text/plain");
-
         IntentPickerSheetView intentPickerSheet = new IntentPickerSheetView(PostDetailActivity.this, shareIntent, "Share with...", new IntentPickerSheetView.OnIntentPickedListener() {
             @Override
             public void onIntentPicked(Intent intent) {
@@ -299,13 +325,18 @@ public class PostDetailActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        intentPickerSheet.setFilter(new IntentPickerSheetView.Filter() {
+            @Override
+            public boolean include(IntentPickerSheetView.ActivityInfo info) {
+                return !info.componentName.getPackageName().startsWith("com.android");
+            }
+        });
         mBottomsheet.showWithSheetView(intentPickerSheet);
     }
 
     public void handleMenuSelection(MenuItem item) {
-        final BottomSheetLayout bs = (BottomSheetLayout) findViewById(R.id.bottomsheet);
         // prepare menu options
-        View menu = LayoutInflater.from(bs.getContext()).inflate(R.layout.bs_menu, bs, false);
+        View menu = LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
         LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
         boolean addDiv = false;
         if (mPostDetails.getUpvoted() != null && mPostDetails.getUpvoted()) {
@@ -314,7 +345,13 @@ public class PostDetailActivity extends AppCompatActivity {
 //                        layout.addView(divider);
             }
 
-            TextView downVoteView = (TextView) LayoutInflater.from(bs.getContext()).inflate(R.layout.bs_raw_downvote, null);
+            TextView downVoteView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_downvote, null);
+            downVoteView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new PostUpNDownVoteTask().execute(new String[]{mPostId, "undoVoting"});
+                }
+            });
             layout.addView(downVoteView);
             addDiv = true;
         } else {
@@ -323,11 +360,17 @@ public class PostDetailActivity extends AppCompatActivity {
 //                        layout.addView(divider);
             }
 
-            TextView voteView = (TextView) LayoutInflater.from(bs.getContext()).inflate(R.layout.bs_raw_upvote, null);
+            TextView voteView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_upvote, null);
             layout.addView(voteView);
+            voteView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new PostUpNDownVoteTask().execute(new String[]{mPostId, "upvote"});
+                }
+            });
             addDiv = true;
         }
-        bs.showWithSheetView(menu);
+        mBottomsheet.showWithSheetView(menu);
     }
 
     public void doEditIt(MenuItem item) {
@@ -364,7 +407,11 @@ public class PostDetailActivity extends AppCompatActivity {
                 try {
                     ((MergeCursor) mViewAdapter.getCursor()).requery();
                     mViewAdapter.notifyDataSetChanged();
-                    //                     invalidateOptionsMenu();
+
+                    // meta-data update
+                    Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+                    setUpMetadata(currPost);
+                    currPost.close();
                 } catch (Exception e) {
                     // muted
                 }
@@ -400,7 +447,6 @@ public class PostDetailActivity extends AppCompatActivity {
                     args.putString(AppConstants.K.POST.name(), mPostId);
                     args.putString(AppConstants.K.COMMENT.name(), event.getMetaData().get(AppConstants.K.COMMENT.name()));
 
-
                     // intent
                     Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
                     intent.putExtras(args);
@@ -412,32 +458,51 @@ public class PostDetailActivity extends AppCompatActivity {
         });
     }
 
-    private static class MenuItemClickListener implements View.OnClickListener {
-        private final View view;
-        private final String command;
-        private final String postUID;
-        private final BottomSheetLayout bottomSheet;
+    private class PostUpNDownVoteTask extends AsyncTask<String, Integer, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... args) {
+            if (args == null || args.length < 2) {
+                return Boolean.FALSE;
+            }
 
-        public MenuItemClickListener(View source, String command, String commentUID, BottomSheetLayout bs) {
-            this.command = command;
-            this.postUID = postUID;
-            this.view = source;
-            this.bottomSheet = bs;
-            this.view.setOnClickListener(this);
+            try {
+                StorageComponent component = DaggerStorageComponent.create();
+                ReqSetBody req = component.provideReqSetBody();
+                // set base args
+                req.setToken(Utils.getNonBlankAppToken());
+                req.setCmd(args[1]);
+
+                String postUID = args[0];
+
+                //headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+
+                String postUri = StringUtils.join(new String[]{POSTS.getValue(), postUID}, "/");
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp.getBody() != null) {
+                    return resp.getBody().getStatus() == 200;
+                }
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
+            }
+            return Boolean.FALSE;
         }
 
         @Override
-        public void onClick(View v) {
-            bottomSheet.dismissSheet();
-            Bundle iArgs = new Bundle();
-            iArgs.putString(AppConstants.K.POST.name(), postUID);
-            iArgs.putString(AppConstants.K.COMMAND.name(), command);
-
-            // call for intent
-            Intent intent =
-                    new Intent(view.getContext(), CommentUpdateService.class);
-            intent.putExtras(iArgs);
-            view.getContext().startService(intent);
+        protected void onPostExecute(Boolean result) {
+            // call refresh
+            Intent detailsIntent =
+                    new Intent(getApplicationContext(), PostDetailsService.class);
+            detailsIntent.putExtras(getIntent().getExtras());
+            startService(detailsIntent);
+            if (mBottomsheet.isSheetShowing()) {
+                mBottomsheet.dismissSheet();
+            }
         }
     }
 }
