@@ -90,14 +90,16 @@ public class PostDetailActivity extends AppCompatActivity {
                 refresh.putExtras(getIntent());
                 startActivity(refresh);
                 this.finish();
-            } else if (requestCode == AppConstants.KV.REQUEST_ADD_COMMENT.getIntValue()
-                    || requestCode == AppConstants.KV.REQUEST_EDIT_COMMENT.getIntValue()) {
+            } else if (requestCode == AppConstants.KV.REQUEST_ADD_COMMENT.getIntValue()) {
                 Intent intent = getIntent();
                 intent.putExtra("isScrollDown", true);
                 Intent refresh = new Intent(this, PostDetailActivity.class);
                 refresh.putExtras(intent);
                 startActivity(refresh);
                 this.finish();
+            } else if (requestCode == AppConstants.KV.REQUEST_EDIT_COMMENT.getIntValue()) {
+                ((MergeCursor) mViewAdapter.getCursor()).requery();
+                mViewAdapter.notifyDataSetChanged();
             }
         }
     }
