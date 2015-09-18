@@ -1,7 +1,5 @@
 package co.samepinch.android.app;
 
-import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MergeCursor;
@@ -9,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -37,16 +34,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostDetailsRVAdapter;
-import co.samepinch.android.app.helpers.intent.CommentUpdateService;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
@@ -55,15 +49,12 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
-import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
-import co.samepinch.android.rest.RespCommentDetails;
 import co.samepinch.android.rest.RestClient;
 
-import static co.samepinch.android.app.helpers.AppConstants.API.COMMENTS;
 import static co.samepinch.android.app.helpers.AppConstants.API.POSTS;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 

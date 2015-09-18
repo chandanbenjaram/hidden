@@ -25,3 +25,6 @@ Gapps for v5(Lollipop) - http://goo.gl/0zOqQq
 
 
 https://github.com/sourcey/materiallogindemo/blob/master/app/src/main/java/com/sourcey/materiallogindemo/LoginActivity.java
+
+
+http://antonioleiva.com/collapsing-toolbar-layout/

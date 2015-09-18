@@ -15,16 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal">
-
-        <!--<com.facebook.drawee.view.SimpleDraweeView-->
-        <!--android:id="@+id/nav_header_img"-->
-        <!--android:background="#ffffff"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_weight="1"-->
-        <!--android:layout_height="192dp"-->
-        <!--fresco:actualImageScaleType="focusCrop"-->
-        <!--fresco:placeholderImageScaleType="fitCenter"/>-->
-
         <ViewSwitcher
             android:id="@+id/nav_header_switch"
             android:layout_width="match_parent"
@@ -42,16 +32,6 @@
                 android:layout_gravity="center_horizontal|center"
                 style="@style/SP_NAV_NAME" />
         </ViewSwitcher>
-        <!--<TextView-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignLeft="@+id/nav_header_img"-->
-        <!--android:layout_alignRight="@+id/nav_header_img"-->
-        <!--android:layout_alignTop="@+id/nav_header_img"-->
-        <!--android:gravity="center_horizontal|top"-->
-        <!--android:text="header..."-->
-        <!--android:background="@drawable/bground_gradient_asc"/>-->
-
         <TextView
             android:id="@+id/nav_header_summary"
             android:layout_width="0dp"
