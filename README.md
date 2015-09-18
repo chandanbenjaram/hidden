@@ -28,3 +28,5 @@ https://github.com/sourcey/materiallogindemo/blob/master/app/src/main/java/com/s
 
 
 http://antonioleiva.com/collapsing-toolbar-layout/
+
+https://plus.google.com/+Miros%C5%82awStanek/posts (very cool)
