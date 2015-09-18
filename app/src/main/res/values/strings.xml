@@ -63,4 +63,5 @@
     <string name="signin_with_google">Sign in with Google</string>
     <string name="signin_with_fb">Sign in with Facebook</string>
     <string name="loading">-</string>
+    <string name="empty"></string>
 </resources>

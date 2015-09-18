@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -17,15 +18,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.Postprocessor;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -59,6 +63,21 @@ public class DotWallFragment extends Fragment {
 
     @Bind(R.id.dot_wall_handle)
     TextView mDotHandle;
+
+    @Bind(R.id.dot_wall_about)
+    TextView mDotAbout;
+
+    @Bind(R.id.dot_wall_followers_count)
+    TextView mDotFollowersCnt;
+
+    @Bind(R.id.dot_wall_posts_count)
+    TextView mDotPostsCnt;
+
+    @Bind(R.id.dot_wall_blog)
+    ImageView mDotBlog;
+
+    @Bind(R.id.dot_wall_backdrop)
+    ImageView mDotBackdrop;
 
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -112,6 +131,8 @@ public class DotWallFragment extends Fragment {
             }
         });
 
+        mCollapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.TransparentText);
+
         // about user
         setUpMetaData(user);
 
@@ -144,7 +165,9 @@ public class DotWallFragment extends Fragment {
     }
 
     private void setUpMetaData(User user) {
-        mCollapsingToolbarLayout.setTitle(user.getPinchHandle());
+        String pinchHandle = String.format(getActivity().getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
+
+        mCollapsingToolbarLayout.setTitle(pinchHandle);
 
         String fName = user.getFname();
         String lName = user.getLname();
@@ -165,6 +188,7 @@ public class DotWallFragment extends Fragment {
                 @Override
                 public void process(Bitmap bitmap) {
 
+
                     Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                         public void onGenerated(Palette palette) {
                             applyPalette(palette);
@@ -177,7 +201,34 @@ public class DotWallFragment extends Fragment {
         }
 
         mDotName.setText(StringUtils.join(new String[]{fName, lName}, " "));
-        mDotHandle.setText(user.getPinchHandle());
+        mDotHandle.setText(pinchHandle);
+        if (user.getFollowersCount() != null) {
+            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+        }
+
+        if (user.getFollowersCount() != null) {
+            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+        }
+
+        if (user.getPostsCount() != null) {
+            mDotPostsCnt.setText(user.getPostsCount() + "");
+        }
+
+        if (user.getBlog() != null) {
+            mDotBlog.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(getView(), "blog clicked", Snackbar.LENGTH_LONG).show();
+                }
+            });
+            mDotBlog.setVisibility(View.VISIBLE);
+        }
+
+        // conditional show about user section
+        if (StringUtils.isNotBlank(user.getSummary())) {
+            mDotAbout.setVisibility(View.VISIBLE);
+            mDotAbout.setText(user.getSummary());
+        }
 
     }
 

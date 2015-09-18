@@ -295,4 +295,6 @@
 
     <color name="primary">#00BCD4</color>
     <color name="primary_dark">#0097A7</color>
+    <color name="transparent_blue">#BE90caf9</color>
+    <color name="transparent">#00000000</color>
 </resources>
