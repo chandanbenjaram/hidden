@@ -1,61 +1,68 @@
 package co.samepinch.android.data.dto;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by imaginationcoder on 7/1/15.
  */
-public class User implements Parcelable {
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
+public class User {
     String uid;
     String fname;
     String lname;
     String photo;
     String prefName;
-
     @SerializedName("pinch_handle")
     String pinchHandle;
+    @SerializedName("posts_count")
+    Long postsCount;
+    @SerializedName("followers_count")
+    Long followersCount;
+    String summary;
+    String blog;
+    Boolean follow;
+
+    public Long getPostsCount() {
+        return postsCount;
+    }
+
+    public void setPostsCount(Long postsCount) {
+        this.postsCount = postsCount;
+    }
+
+    public Long getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(Long followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getBlog() {
+        return blog;
+    }
+
+    public void setBlog(String blog) {
+        this.blog = blog;
+    }
+
+    public Boolean getFollow() {
+        return follow;
+    }
+
+    public void setFollow(Boolean follow) {
+        this.follow = follow;
+    }
 
     public User() {
-    }
 
-    protected User(Parcel in) {
-        uid = in.readString();
-        fname = in.readString();
-        lname = in.readString();
-        photo = in.readString();
-        prefName = in.readString();
-        pinchHandle = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
-        dest.writeString(fname);
-        dest.writeString(lname);
-        dest.writeString(photo);
-        dest.writeString(prefName);
-        dest.writeString(pinchHandle);
     }
 
     public String getPinchHandle() {

@@ -4,8 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+
     <application
         android:name=".SPApplication"
         android:allowBackup="true"
@@ -72,6 +73,9 @@
         <service
             android:name=".helpers.intent.CommentUpdateService"
             android:exported="false" />
+        <service
+            android:name=".helpers.intent.DotDetailsService"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -98,12 +102,12 @@
 
         <!-- CDS Content Service -->
         <service
-            android:process=":aviarycds"
             android:name="com.aviary.android.feather.cds.AviaryCdsService"
-            android:exported="false">
+            android:exported="false"
+            android:process=":aviarycds">
             <intent-filter>
-                <action android:name="aviary.intent.action.CDS_DOWNLOAD_START"/>
-                <action android:name="aviary.intent.action.CDS_RESTORE_USER_ITEMS"/>
+                <action android:name="aviary.intent.action.CDS_DOWNLOAD_START" />
+                <action android:name="aviary.intent.action.CDS_RESTORE_USER_ITEMS" />
             </intent-filter>
         </service>
 
@@ -113,13 +117,13 @@
         <provider
             android:name="com.aviary.android.feather.cds.AviaryCdsProvider"
             android:authorities="co.samepinch.android.app.AviaryCdsProvider"
-            android:process=":aviarycds"
             android:exported="false"
+            android:process=":aviarycds"
             android:syncable="true" />
         <!-- CDS Download Receiver -->
         <receiver
             android:name="com.aviary.android.feather.cds.AviaryCdsReceiver"
-            android:process=":aviarycds" >
+            android:process=":aviarycds">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>

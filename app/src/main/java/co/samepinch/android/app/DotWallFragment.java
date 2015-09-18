@@ -1,12 +1,15 @@
 package co.samepinch.android.app;
 
-import android.app.Activity;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,20 +21,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.BasePostprocessor;
+import com.facebook.imagepipeline.request.Postprocessor;
+import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Text;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
+import co.samepinch.android.app.helpers.intent.DotDetailsService;
+import co.samepinch.android.app.helpers.pubsubs.BusProvider;
+import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dto.User;
 
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
 import static co.samepinch.android.app.helpers.AppConstants.K;
 
 public class DotWallFragment extends Fragment {
@@ -40,17 +48,60 @@ public class DotWallFragment extends Fragment {
     PostCursorRecyclerViewAdapter mViewAdapter;
     LinearLayoutManager mLayoutManager;
 
+    @Bind(R.id.dot_wall_image)
+    SIMView mDotImage;
+
+    @Bind(R.id.dot_wall_image_txt)
+    TextView mDotImageText;
+
+    @Bind(R.id.dot_wall_name)
+    TextView mDotName;
+
+    @Bind(R.id.dot_wall_handle)
+    TextView mDotHandle;
+
+    @Bind(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbarLayout;
+
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
+
+    @Bind(R.id.dot_wall_switch)
+    ViewSwitcher mVS;
+
+    @Bind(R.id.holder_recyclerview)
+    LinearLayout mRVHolder;
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // rendering
         View view = inflater.inflate(R.layout.dot_wall, container, false);
+        ButterKnife.bind(this, view);
 
-        final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        // grab user
+        String dotUid = getArguments().getString(K.KEY_DOT.name());
+        Cursor cursor = getActivity().getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
+        if (!cursor.moveToFirst()) {
+            getActivity().finish();
+        }
+        User user = Utils.cursorToUserEntity(cursor);
+        cursor.close();
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -60,38 +111,12 @@ public class DotWallFragment extends Fragment {
                 ((AppCompatActivity) getActivity()).onBackPressed();
             }
         });
-        CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) view.findViewById(R.id.collapsing_toolbar);
 
-        // dot uid
-        String dotUid = getArguments().getString(K.KEY_DOT.name());
+        // about user
+        setUpMetaData(user);
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
-        if (!cursor.moveToFirst()) {
-            getActivity().finish();
-        }
-        int photoUrlIndex;
-        final User user = Utils.cursorToUserEntity(cursor);
-        collapsingToolbar.setTitle(user.getPinchHandle());
-
-        ViewSwitcher vs = (ViewSwitcher) view.findViewById(R.id.dot_wall_switch);
-        // tag map
-        if (StringUtils.isBlank(user.getPhoto())) {
-            vs.setDisplayedChild(1);
-            TextView name = (TextView) view.findViewById(R.id.dot_wall_avatar_name);
-            String fName = user.getFname();
-            String lName = user.getLname();
-            String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
-            name.setText(initials);
-        } else {
-            vs.setDisplayedChild(0);
-            SIMView avatar = (SIMView) view.findViewById(R.id.dot_wall_avatar);
-            avatar.populateImageView(user.getPhoto());
-        }
-
-        TextView handle = (TextView) view.findViewById(R.id.dot_wall_avatar_handle);
-        handle.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
-
+        // user posts
+        mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         // custom recycler
         RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
             @Override
@@ -103,22 +128,102 @@ public class DotWallFragment extends Fragment {
                 }
             }
         };
-
-        LinearLayout rvHolder = (LinearLayout) view.findViewById(R.id.holder_recyclerview);
-        rvHolder.addView(rv);
-
-        mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         rv.setLayoutManager(mLayoutManager);
-        setupRecyclerView(new String[]{dotUid}, rv);
+        mRVHolder.addView(rv);
+        setupRecyclerView(rv);
+
+        //update user details
+        Bundle iArgs = new Bundle();
+        iArgs.putString(AppConstants.K.DOT.name(), dotUid);
+        Intent intent =
+                new Intent(view.getContext(), DotDetailsService.class);
+        intent.putExtras(iArgs);
+        getActivity().startService(intent);
 
         return view;
     }
 
-    private void setupRecyclerView(String[] args0, RecyclerView recyclerView) {
-        recyclerView.setHasFixedSize(true);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", args0, null);
+    private void setUpMetaData(User user) {
+        mCollapsingToolbarLayout.setTitle(user.getPinchHandle());
+
+        String fName = user.getFname();
+        String lName = user.getLname();
+        // tag map
+        if (StringUtils.isBlank(user.getPhoto())) {
+            mVS.setDisplayedChild(1);
+            String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
+            mDotImageText.setText(initials);
+        } else {
+            mVS.setDisplayedChild(0);
+
+            Postprocessor postprocessor = new BasePostprocessor() {
+                @Override
+                public String getName() {
+                    return "redMeshPostprocessor";
+                }
+
+                @Override
+                public void process(Bitmap bitmap) {
+
+                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                        public void onGenerated(Palette palette) {
+                            applyPalette(palette);
+                        }
+                    });
+                }
+            };
+
+            mDotImage.populateImageViewWithAdjustedAspect(user.getPhoto(), postprocessor);
+        }
+
+        mDotName.setText(StringUtils.join(new String[]{fName, lName}, " "));
+        mDotHandle.setText(user.getPinchHandle());
+
+    }
+
+    private void setupRecyclerView(RecyclerView rv) {
+        String dotUid = getArguments().getString(K.KEY_DOT.name());
+        rv.setHasFixedSize(true);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
-        recyclerView.setAdapter(mViewAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        rv.setAdapter(mViewAdapter);
+        rv.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    private void applyPalette(Palette palette) {
+        int primaryDark = getResources().getColor(R.color.primary_dark);
+        int primary = getResources().getColor(R.color.primary);
+        mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
+        mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
+        updateBackground(palette);
+    }
+
+    private void updateBackground(Palette palette) {
+        int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
+        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.red_400));
+
+        mFab.setRippleColor(lightVibrantColor);
+        mFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
+    }
+
+    @Subscribe
+    public void onDotDetailsRefreshEvent(final Events.DotDetailsRefreshEvent event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String dotUid = getArguments().getString(K.KEY_DOT.name());
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
+                    if (!cursor.moveToFirst()) {
+                        getActivity().finish();
+                    }
+                    final User user = Utils.cursorToUserEntity(cursor);
+                    cursor.close();
+                    setUpMetaData(user);
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+            }
+        });
     }
 }

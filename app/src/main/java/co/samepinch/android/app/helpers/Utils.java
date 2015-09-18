@@ -94,7 +94,30 @@ public class Utils {
         if ((pinchHandleIndex = cursor.getColumnIndex(SchemaDots.COLUMN_PINCH_HANDLE)) != -1) {
             user.setPinchHandle(cursor.getString(pinchHandleIndex));
         }
-
+        int photoIndex;
+        if ((photoIndex = cursor.getColumnIndex(SchemaDots.COLUMN_PHOTO_URL)) != -1) {
+            user.setPhoto(cursor.getString(photoIndex));
+        }
+        int postsCountIndex;
+        if ((postsCountIndex = cursor.getColumnIndex(SchemaDots.COLUMN_POSTS_COUNT)) != -1) {
+            user.setPostsCount(cursor.getLong(postsCountIndex));
+        }
+        int followersCountIndex;
+        if ((followersCountIndex = cursor.getColumnIndex(SchemaDots.COLUMN_FOLLOWERS_COUNT)) != -1) {
+            user.setFollowersCount(cursor.getLong(followersCountIndex));
+        }
+        int summaryIndex;
+        if ((summaryIndex = cursor.getColumnIndex(SchemaDots.COLUMN_SUMMARY)) != -1) {
+            user.setSummary(cursor.getString(summaryIndex));
+        }
+        int blogIndex;
+        if ((blogIndex = cursor.getColumnIndex(SchemaDots.COLUMN_BLOG)) != -1) {
+            user.setBlog(cursor.getString(blogIndex));
+        }
+        int followIndex;
+        if ((followIndex = cursor.getColumnIndex(SchemaDots.COLUMN_FOLLOW)) != -1) {
+            user.setFollow(cursor.getInt(followIndex) == 1);
+        }
         return user;
     }
 

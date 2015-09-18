@@ -125,4 +125,10 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class DotDetailsRefreshEvent extends EventBase {
+        public DotDetailsRefreshEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }

@@ -5,19 +5,18 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
-import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.facebook.imagepipeline.request.Postprocessor;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -83,21 +82,14 @@ public class SIMView extends RelativeLayout {
     }
 
     public void populateImageView(String imgUri) {
-        if (StringUtils.isBlank(imgUri)) {
-            return;
-        }
-        mSIMView.setAspectRatio(1.33f);
-        ImageRequest fImageReq =
-                ImageRequestBuilder.newBuilderWithSource(Uri.parse(imgUri)).build();
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(fImageReq)
-                .setOldController(mSIMView.getController())
-                .setAutoPlayAnimations(true)
-                .build();
-        mSIMView.setController(controller);
+        populateImageViewWithAdjustedAspect(imgUri, null);
     }
 
     public void populateImageViewWithAdjustedAspect(String imgUri, Integer... resizeDimensions) {
+        populateImageViewWithAdjustedAspect(imgUri, null, resizeDimensions);
+    }
+
+    public void populateImageViewWithAdjustedAspect(String imgUri, Postprocessor postprocessor, Integer... resizeDimensions) {
         if (StringUtils.isBlank(imgUri)) {
             return;
         }
@@ -114,6 +106,12 @@ public class SIMView extends RelativeLayout {
             int height = resizeDimensions[1];
             imgReqBldr.setResizeOptions(new ResizeOptions(width, height));
         }
+
+        // user call back
+        if (postprocessor != null) {
+            imgReqBldr.setPostprocessor(postprocessor);
+        }
+
         ImageRequest fImageReq = imgReqBldr.build();
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(fImageReq)
@@ -122,5 +120,7 @@ public class SIMView extends RelativeLayout {
                 .setControllerListener(listener)
                 .build();
         mSIMView.setController(controller);
+        mSIMView.setDrawingCacheEnabled(true);
+        mSIMView.buildDrawingCache(true);
     }
 }

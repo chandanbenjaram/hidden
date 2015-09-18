@@ -32,7 +32,6 @@ public interface SchemaPostDetails extends BaseColumns {
             + " ("
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_UID + " TEXT NOT NULL UNIQUE, "
-            + COLUMN_URL + " TEXT DEFAULT '', "
             + COLUMN_CONTENT + " TEXT DEFAULT '', "
             + COLUMN_IMAGES + " TEXT DEFAULT '', "
             + COLUMN_LARGE_IMAGES + " TEXT DEFAULT '', "

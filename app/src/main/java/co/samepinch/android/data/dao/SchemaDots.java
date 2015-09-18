@@ -18,6 +18,11 @@ public interface SchemaDots extends BaseColumns {
     String COLUMN_PREF_NAME = "pref_name";
     String COLUMN_PINCH_HANDLE = "pinch_handle";
     String COLUMN_PHOTO_URL = "photo_url";
+    String COLUMN_POSTS_COUNT = "posts_count";
+    String COLUMN_FOLLOWERS_COUNT = "followers_count";
+    String COLUMN_SUMMARY = "summary";
+    String COLUMN_BLOG = "blog";
+    String COLUMN_FOLLOW = "follow";
 
     String TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + TABLE_NAME
@@ -28,14 +33,21 @@ public interface SchemaDots extends BaseColumns {
             + COLUMN_LNAME + " TEXT DEFAULT '', "
             + COLUMN_PREF_NAME + " TEXT DEFAULT '', "
             + COLUMN_PINCH_HANDLE + " TEXT DEFAULT '', "
-            + COLUMN_PHOTO_URL + " TEXT"
+            + COLUMN_PHOTO_URL + " TEXT, "
+            + COLUMN_POSTS_COUNT + " INTEGER, "
+            + COLUMN_FOLLOWERS_COUNT + " INTEGER, "
+            + COLUMN_SUMMARY + " TEXT, "
+            + COLUMN_BLOG + " TEXT, "
+            + COLUMN_FOLLOW + " INTEGER DEFAULT 0"
             + ")";
     String TABLE_DROP = "DROP TABLE IF EXISTS "
             + TABLE_NAME;
 
     String[] DOTS_COLUMNS = new String[]{
             _ID, COLUMN_UID, COLUMN_FNAME, COLUMN_LNAME,
-            COLUMN_PREF_NAME, COLUMN_PINCH_HANDLE, COLUMN_PHOTO_URL
+            COLUMN_PREF_NAME, COLUMN_PINCH_HANDLE, COLUMN_PHOTO_URL,
+            COLUMN_POSTS_COUNT, COLUMN_FOLLOWERS_COUNT, COLUMN_SUMMARY,
+            COLUMN_BLOG, COLUMN_FOLLOW
     };
 
     // provider related stuff

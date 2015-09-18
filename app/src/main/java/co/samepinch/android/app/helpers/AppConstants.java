@@ -131,6 +131,7 @@ public class AppConstants {
         KEY_DOT,
         Wall,
         POST,
+        DOT,
         COMMENT,
         COMMAND,
         facebook,
