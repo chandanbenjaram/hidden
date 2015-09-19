@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -254,6 +255,15 @@ public class DotWallFragment extends Fragment {
             mDotAbout.setText(user.getSummary());
         }
 
+        if (user.getFollow()) {
+            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),
+                    R.drawable.icon_like_postview_active_2x);
+            mFab.setImageBitmap(bitmap);
+        } else {
+            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),
+                    R.drawable.icon_like_postview_2x);
+            mFab.setImageBitmap(bitmap);
+        }
     }
 
     private void setupRecyclerView(RecyclerView rv) {
@@ -275,17 +285,17 @@ public class DotWallFragment extends Fragment {
         } else {
             mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
             mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
-            updateBackground(palette);
+//            updateBackground(palette);
         }
     }
 
-    private void updateBackground(Palette palette) {
-        int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
-        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.white));
-
-        mFab.setRippleColor(lightVibrantColor);
-        mFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
-    }
+//    private void updateBackground(Palette palette) {
+//        int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
+//        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.white));
+//
+//        mFab.setRippleColor(lightVibrantColor);
+//        mFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
+//    }
 
     @Subscribe
     public void onDotDetailsRefreshEvent(final Events.DotDetailsRefreshEvent event) {
