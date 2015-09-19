@@ -10,6 +10,7 @@ https://github.com/facebook/fresco/issues/259
 
 http://databasefaq.com/index.php/answer/79292/android-performance-view-gif-animated-gif-best-practice-of-showing-gif-in-android
 
+https://guides.codepath.com/android/Must-Have-Libraries (cool)
 
 ###COMMANDS
 adb shell ps|grep "co.samepinch.android.app"|awk '{print $2}'|xargs adb shell kill 
@@ -25,8 +26,3 @@ Gapps for v5(Lollipop) - http://goo.gl/0zOqQq
 
 
 https://github.com/sourcey/materiallogindemo/blob/master/app/src/main/java/com/sourcey/materiallogindemo/LoginActivity.java
-
-
-http://antonioleiva.com/collapsing-toolbar-layout/
-
-https://plus.google.com/+Miros%C5%82awStanek/posts (very cool)

@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
@@ -87,6 +88,10 @@ public class SIMView extends RelativeLayout {
 
     public void populateImageViewWithAdjustedAspect(String imgUri, Integer... resizeDimensions) {
         populateImageViewWithAdjustedAspect(imgUri, null, resizeDimensions);
+    }
+
+    public void setRoundingParams(RoundingParams roundingParams) {
+        mSIMView.getHierarchy().setRoundingParams(roundingParams);
     }
 
     public void populateImageViewWithAdjustedAspect(String imgUri, Postprocessor postprocessor, Integer... resizeDimensions) {

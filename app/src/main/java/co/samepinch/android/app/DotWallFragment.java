@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,17 +24,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.Postprocessor;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+
+import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.ImageUtils;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.DotDetailsService;
@@ -76,8 +79,8 @@ public class DotWallFragment extends Fragment {
     @Bind(R.id.dot_wall_blog)
     ImageView mDotBlog;
 
-    @Bind(R.id.dot_wall_backdrop)
-    ImageView mDotBackdrop;
+    @Bind(R.id.backdrop)
+    ImageView mBackdrop;
 
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -90,6 +93,14 @@ public class DotWallFragment extends Fragment {
 
     @Bind(R.id.holder_recyclerview)
     LinearLayout mRVHolder;
+
+    private LocalHandler mHandler;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHandler = new LocalHandler(this);
+    }
 
     @Override
     public void onResume() {
@@ -176,8 +187,10 @@ public class DotWallFragment extends Fragment {
             mVS.setDisplayedChild(1);
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
             mDotImageText.setText(initials);
+            applyPalette(null);
         } else {
             mVS.setDisplayedChild(0);
+
 
             Postprocessor postprocessor = new BasePostprocessor() {
                 @Override
@@ -186,17 +199,28 @@ public class DotWallFragment extends Fragment {
                 }
 
                 @Override
-                public void process(Bitmap bitmap) {
+                public void process(final Bitmap bitmap) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Bitmap blurredBitmap = ImageUtils.blur(getActivity().getApplicationContext(), bitmap);
+                            mBackdrop.setImageBitmap(blurredBitmap);
 
-
-                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                        public void onGenerated(Palette palette) {
-                            applyPalette(palette);
+                            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                public void onGenerated(Palette palette) {
+                                    applyPalette(palette);
+                                }
+                            });
                         }
                     });
+
                 }
             };
 
+            RoundingParams roundingParams = RoundingParams.asCircle();
+            roundingParams.setBorder(R.color.light_blue_500, 1.0f);
+
+            mDotImage.setRoundingParams(roundingParams);
             mDotImage.populateImageViewWithAdjustedAspect(user.getPhoto(), postprocessor);
         }
 
@@ -242,16 +266,22 @@ public class DotWallFragment extends Fragment {
     }
 
     private void applyPalette(Palette palette) {
-        int primaryDark = getResources().getColor(R.color.primary_dark);
-        int primary = getResources().getColor(R.color.primary);
-        mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
-        mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
-        updateBackground(palette);
+        int primary = getResources().getColor(R.color.colorPrimary);
+        int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+
+        if (palette == null) {
+            mCollapsingToolbarLayout.setContentScrimColor(primary);
+            mCollapsingToolbarLayout.setStatusBarScrimColor(primaryDark);
+        } else {
+            mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
+            mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
+            updateBackground(palette);
+        }
     }
 
     private void updateBackground(Palette palette) {
         int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
-        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.red_400));
+        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.white));
 
         mFab.setRippleColor(lightVibrantColor);
         mFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
@@ -276,5 +306,13 @@ public class DotWallFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private static final class LocalHandler extends Handler {
+        private final WeakReference<DotWallFragment> mActivity;
+
+        public LocalHandler(DotWallFragment parent) {
+            mActivity = new WeakReference<DotWallFragment>(parent);
+        }
     }
 }

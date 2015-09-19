@@ -18,22 +18,24 @@
             android:layout_height="256dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <ImageView
+                android:id="@+id/backdrop"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:orientation="vertical"
-                android:paddingTop="32dp"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7">
+                android:paddingTop="35dp"
+                android:paddingBottom="9dp"
 
-                <ImageView
-                    android:id="@+id/dot_wall_backdrop"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clickable="true"
-                    android:src="@drawable/semi_transparent_2x" />
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.1">
 
                 <ViewSwitcher
                     android:id="@+id/dot_wall_switch"
@@ -42,13 +44,14 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
+                    android:layout_marginStart="25dp"
                     android:layout_marginLeft="25dp">
 
                     <co.samepinch.android.app.helpers.widget.SIMView
                         android:id="@+id/dot_wall_image"
                         android:layout_width="@dimen/signup_avatar_size"
                         android:layout_height="@dimen/signup_avatar_size"
-                        app:elevation="@dimen/default_elevation" />
+                         />
 
                     <TextView
                         android:id="@+id/dot_wall_image_txt"
@@ -63,7 +66,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:background="@color/transparent_blue"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -91,7 +93,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
-                    android:background="@color/transparent_blue"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal">
 
@@ -156,7 +157,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:elevation="@dimen/elevation_high"
                 app:layout_collapseMode="pin"
-                app:layout_collapseParallaxMultiplier="0.1"
+                app:layout_collapseParallaxMultiplier="0.9"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
