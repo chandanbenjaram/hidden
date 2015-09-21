@@ -1,15 +1,15 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -31,8 +31,14 @@ import com.facebook.imagepipeline.request.Postprocessor;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -47,6 +53,9 @@ import co.samepinch.android.app.helpers.widget.SIMView;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dto.User;
+import co.samepinch.android.rest.ReqNoBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.K;
 
@@ -176,7 +185,7 @@ public class DotWallFragment extends Fragment {
         return view;
     }
 
-    private void setUpMetaData(User user) {
+    private void setUpMetaData(final User user) {
         String pinchHandle = String.format(getActivity().getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
 
         mCollapsingToolbarLayout.setTitle(pinchHandle);
@@ -243,7 +252,8 @@ public class DotWallFragment extends Fragment {
             mDotBlog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar.make(getView(), "blog clicked", Snackbar.LENGTH_LONG).show();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(user.getBlog()));
+                    startActivity(intent);
                 }
             });
             mDotBlog.setVisibility(View.VISIBLE);
@@ -264,6 +274,13 @@ public class DotWallFragment extends Fragment {
                     R.drawable.icon_like_postview_2x);
             mFab.setImageBitmap(bitmap);
         }
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String command = user.getFollow() == null || !user.getFollow() ? "follow" : "unfollow";
+                new FollowActionTask().execute(new String[]{user.getUid(), command});
+            }
+        });
     }
 
     private void setupRecyclerView(RecyclerView rv) {
@@ -285,17 +302,8 @@ public class DotWallFragment extends Fragment {
         } else {
             mCollapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
             mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
-//            updateBackground(palette);
         }
     }
-
-//    private void updateBackground(Palette palette) {
-//        int lightVibrantColor = palette.getLightVibrantColor(getResources().getColor(android.R.color.white));
-//        int vibrantColor = palette.getVibrantColor(getResources().getColor(R.color.white));
-//
-//        mFab.setRippleColor(lightVibrantColor);
-//        mFab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
-//    }
 
     @Subscribe
     public void onDotDetailsRefreshEvent(final Events.DotDetailsRefreshEvent event) {
@@ -308,7 +316,7 @@ public class DotWallFragment extends Fragment {
                     if (!cursor.moveToFirst()) {
                         getActivity().finish();
                     }
-                    final User user = Utils.cursorToUserEntity(cursor);
+                    User user = Utils.cursorToUserEntity(cursor);
                     cursor.close();
                     setUpMetaData(user);
                 } catch (Exception e) {
@@ -323,6 +331,53 @@ public class DotWallFragment extends Fragment {
 
         public LocalHandler(DotWallFragment parent) {
             mActivity = new WeakReference<DotWallFragment>(parent);
+        }
+    }
+
+    private class FollowActionTask extends AsyncTask<String, Integer, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... args) {
+            if (args == null || args.length < 2) {
+                return Boolean.FALSE;
+            }
+
+            try {
+                ReqNoBody req = new ReqNoBody();
+                req.setToken(Utils.getNonBlankAppToken());
+                req.setCmd(args[1]);
+
+                //headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+                HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);
+                String userUrl = StringUtils.join(new String[]{AppConstants.API.USERS.getValue(), args[0]}, "/");
+
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(userUrl, HttpMethod.POST, payloadEntity, Resp.class);
+                return resp.getBody().getStatus() == 200;
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+            }
+            return Boolean.FALSE;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            mFab.setEnabled(true);
+
+            // refresh call
+            if (result) {
+                //update user details
+                Bundle iArgs = new Bundle();
+                String dotUid = getArguments().getString(K.KEY_DOT.name());
+                iArgs.putString(AppConstants.K.DOT.name(), dotUid);
+                Intent intent =
+                        new Intent(getActivity(), DotDetailsService.class);
+                intent.putExtras(iArgs);
+                getActivity().startService(intent);
+            }
         }
     }
 }
