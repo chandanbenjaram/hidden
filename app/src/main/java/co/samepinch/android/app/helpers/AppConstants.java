@@ -91,10 +91,12 @@ public class AppConstants {
         REQUEST_SIGNUP("REQUEST_SIGNUP", "108"),
         REQUEST_CHOOSE_PICTURE("REQUEST_CHOOSE_PICTURE", "109"),
         REQUEST_EDIT_PICTURE("REQUEST_EDIT_PICTURE", "110"),
-        REQUEST_EDIT_POST("REQUEST_EDIT_POST", "111"),
+        REQUEST_EDIT_DOT("REQUEST_EDIT_DOT", "111"),
+        REQUEST_EDIT_POST("REQUEST_EDIT_POST", "408"),
         REQUEST_EDIT_TAG("REQUEST_EDIT_TAG", "222"),
         REQUEST_ADD_COMMENT("REQUEST_ADD_COMMENT", "333"),
         REQUEST_EDIT_COMMENT("REQUEST_EDIT_COMMENT", "334");
+
         private final String key, value;
 
         KV(String key, String value) {
@@ -127,6 +129,7 @@ public class AppConstants {
         FRAGMENT_EDIT_POST,
         FRAGMENT_MANAGE_TAGS,
         FRAGMENT_MANAGE_A_TAG,
+        FRAGMENT_DOTEDIT,
         KEY_TAG,
         KEY_DOT,
         Wall,

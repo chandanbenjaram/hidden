@@ -60,11 +60,6 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
     EditText commentTxt;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);

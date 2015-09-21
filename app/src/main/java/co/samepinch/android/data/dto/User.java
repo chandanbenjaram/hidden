@@ -10,6 +10,7 @@ public class User {
     String fname;
     String lname;
     String photo;
+    String email;
     String prefName;
     @SerializedName("pinch_handle")
     String pinchHandle;
@@ -111,5 +112,14 @@ public class User {
 
     public void setPrefName(String prefName) {
         this.prefName = prefName;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:fresco="http://schemas.android.com/apk/res-auto"--><!--android:id="@+id/nav_header_switch"--><!--android:layout_width="match_parent"--><!--android:layout_height="192dp"--><!--android:background="?attr/colorPrimaryDark"--><!--android:padding="16dp"--><!--android:theme="@style/ThemeOverlay.AppCompat.Light"--><!--android:orientation="vertical"--><!--android:gravity="bottom">-->
-
-<!--<com.facebook.drawee.view.SimpleDraweeView--><!--android:id="@+id/nav_header_img"--><!--android:layout_width="@dimen/list_item_avatar_size"--><!--android:layout_height="@dimen/list_item_avatar_size"--><!--android:adjustViewBounds="true"--><!--android:clickable="true"--><!--fresco:placeholderImageScaleType="fitCenter"--><!--fresco:roundAsCircle="false"--><!--android:background="@drawable/avatar_border" />--><!--</FrameLayout>-->
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_header_wrapper"

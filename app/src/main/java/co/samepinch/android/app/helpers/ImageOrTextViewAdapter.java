@@ -21,9 +21,6 @@ import java.util.List;
 
 import co.samepinch.android.app.R;
 
-/**
- * Created by imaginationcoder on 8/25/15.
- */
 public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.ImageOrText> {
 
     final List<ImageOrText> mItems;

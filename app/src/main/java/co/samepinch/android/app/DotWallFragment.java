@@ -1,5 +1,6 @@
 package co.samepinch.android.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -127,6 +128,22 @@ public class DotWallFragment extends Fragment {
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == AppConstants.KV.REQUEST_EDIT_DOT.getIntValue()) {
+                String dotUid = getArguments().getString(K.KEY_DOT.name());
+                //update user details
+                Bundle iArgs = new Bundle();
+                iArgs.putString(AppConstants.K.DOT.name(), dotUid);
+                Intent serviceIntent =
+                        new Intent(getActivity(), DotDetailsService.class);
+                serviceIntent.putExtras(iArgs);
+                getActivity().startService(serviceIntent);
+            }
+        }
     }
 
     @Override
@@ -272,8 +289,14 @@ public class DotWallFragment extends Fragment {
                 mDotEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(user.getBlog()));
-                        startActivity(intent);
+                        Bundle args = new Bundle();
+                        // target
+                        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), K.FRAGMENT_DOTEDIT.name());
+
+                        // intent
+                        Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+                        intent.putExtras(args);
+                        startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
                     }
                 });
             }
