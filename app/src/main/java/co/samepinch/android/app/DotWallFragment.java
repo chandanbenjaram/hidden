@@ -39,6 +39,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -88,6 +89,9 @@ public class DotWallFragment extends Fragment {
 
     @Bind(R.id.dot_wall_blog)
     ImageView mDotBlog;
+
+    @Bind(R.id.dot_wall_edit)
+    ImageView mDotEdit;
 
     @Bind(R.id.backdrop)
     ImageView mBackdrop;
@@ -187,7 +191,6 @@ public class DotWallFragment extends Fragment {
 
     private void setUpMetaData(final User user) {
         String pinchHandle = String.format(getActivity().getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
-
         mCollapsingToolbarLayout.setTitle(pinchHandle);
 
         String fName = user.getFname();
@@ -249,6 +252,8 @@ public class DotWallFragment extends Fragment {
         }
 
         if (user.getBlog() != null) {
+            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+
             mDotBlog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -257,6 +262,21 @@ public class DotWallFragment extends Fragment {
                 }
             });
             mDotBlog.setVisibility(View.VISIBLE);
+        }
+
+        if (Utils.isLoggedIn()) {
+            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+            String uidOfCurrUser = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
+            if (StringUtils.equals(uidOfCurrUser, user.getUid())) {
+                mDotEdit.setVisibility(View.VISIBLE);
+                mDotEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(user.getBlog()));
+                        startActivity(intent);
+                    }
+                });
+            }
         }
 
         // conditional show about user section
