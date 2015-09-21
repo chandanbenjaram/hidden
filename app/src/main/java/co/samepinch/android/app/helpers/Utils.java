@@ -31,6 +31,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -613,5 +614,18 @@ public class Utils {
 
     public static boolean isLoggedIn() {
         return Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue());
+    }
+
+    public static boolean isValidUri(String arg0) {
+        try {
+            new URL(arg0);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidEmail(String arg0){
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(arg0).matches();
     }
 }

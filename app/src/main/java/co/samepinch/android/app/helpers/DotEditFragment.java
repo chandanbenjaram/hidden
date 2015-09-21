@@ -16,9 +16,14 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -65,6 +70,9 @@ public class DotEditFragment extends Fragment {
     public static final String TAG = "DotEditFragment";
     private static Uri outputFileUri;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
     @Bind(R.id.view_avatar)
     SimpleDraweeView mAvatarView;
 
@@ -74,14 +82,14 @@ public class DotEditFragment extends Fragment {
     @Bind(R.id.input_lname)
     EditText mLNameText;
 
-    @Bind(R.id.input_pinchHandle)
-    EditText mPinchHandle;
-
     @Bind(R.id.input_email)
     EditText mEmailText;
 
-    @Bind(R.id.input_password)
-    EditText mPasswordText;
+    @Bind(R.id.input_pinchHandle)
+    EditText mPinchHandle;
+//
+//    @Bind(R.id.input_password)
+//    EditText mPasswordText;
 
     @Bind(R.id.input_aboutMe)
     EditText mAboutMe;
@@ -98,6 +106,7 @@ public class DotEditFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         // progress dialog properties
         progressDialog = new ProgressDialog(getActivity(),
@@ -158,6 +167,9 @@ public class DotEditFragment extends Fragment {
         View view = inflater.inflate(R.layout.dot_edit, container, false);
         ButterKnife.bind(this, view);
 
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         try {
             Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
             Gson gson = new Gson();
@@ -170,7 +182,36 @@ public class DotEditFragment extends Fragment {
 
         setupData(mUser);
 
+
+        toolbar.setTitle(StringUtils.EMPTY);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // hack to get click working
+                (getActivity()).onBackPressed();
+            }
+        });
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.dot_edit_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                (getActivity()).onBackPressed();
+                return true;
+
+            case R.id.menuitem_update:
+                saveAction(299);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupData(User user) {
@@ -201,12 +242,10 @@ public class DotEditFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.btn_update)
-    public void onUpdateEvent() {
-        saveAction(0);
-    }
-
-    public void saveAction(int delay) {
+    public void saveAction(final int delay) {
+        if (!validate()) {
+            return;
+        }
         User user = new User();
         boolean hasChanges = false;
         String fName = mFNameText.getText().toString();
@@ -246,13 +285,13 @@ public class DotEditFragment extends Fragment {
                 imgVal = entry.getValue();
                 break;
             }
-            if (imgVal == null) {
+            if (imgVal == null && delay > 1) {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        saveAction(0);
+                        saveAction((int) delay / 2);
                     }
-                }, 500);
+                }, delay);
             } else {
                 user.setImageKey(imgVal);
             }
@@ -261,6 +300,7 @@ public class DotEditFragment extends Fragment {
         // check if has changes
         if (!hasChanges) {
             Snackbar.make(getView(), "no changes detected...", Snackbar.LENGTH_SHORT).show();
+            getActivity().finish();
             return;
         }
 
@@ -268,6 +308,46 @@ public class DotEditFragment extends Fragment {
         progressDialog.show();
 
         new DotUpdateTask().execute(user);
+    }
+
+    public boolean validate() {
+        boolean valid = true;
+
+        String fName = mFNameText.getText().toString();
+        String lName = mLNameText.getText().toString();
+        String email = mEmailText.getText().toString();
+        String blogUrl = mBlogUrl.getText().toString();
+
+        if (fName.isEmpty() || fName.length() < 1) {
+            mFNameText.setError("at least 1 character");
+            valid = false;
+        } else {
+            mFNameText.setError(null);
+        }
+
+        if (lName.isEmpty() || lName.length() < 1) {
+            mLNameText.setError("at least 1 character");
+            valid = false;
+        } else {
+            mLNameText.setError(null);
+        }
+
+        if (email.isEmpty() || !Utils.isValidEmail(email)) {
+            mEmailText.setError("enter a valid email address");
+            valid = false;
+        } else {
+            mEmailText.setError(null);
+        }
+
+
+        if (StringUtils.isNotBlank(blogUrl) && !Utils.isValidUri(blogUrl)) {
+            mBlogUrl.setError("must be a valid url");
+            valid = false;
+        } else {
+            mBlogUrl.setError(null);
+        }
+
+        return valid;
     }
 
     private static final class LocalHandler extends Handler {
@@ -324,21 +404,37 @@ public class DotEditFragment extends Fragment {
         @Override
         protected void onPostExecute(User user) {
             Utils.dismissSilently(progressDialog);
-            if (user != null) {
-                Gson gson = new Gson();
-                String userStr = gson.toJson(user);
-                Type mapType = new TypeToken<Map<String, String>>() {
-                }.getType();
-                Map<String, String> userNew = gson.fromJson(userStr, mapType);
+            try {
+                if (user != null) {
+                    Gson gson = new Gson();
+                    String userStr = gson.toJson(user);
+                    Type mapType = new TypeToken<Map<String, String>>() {
+                    }.getType();
+                    Map<String, String> userNew = gson.fromJson(userStr, mapType);
 
-                Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-                userInfo.putAll(userNew);
-                Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userInfo);
+                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                    userInfo.putAll(userNew);
+                    Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userInfo);
 
-                String userInfoStr = gson.toJson(user);
-                mUser = gson.fromJson(userInfoStr, User.class);
-                setupData(mUser);
+                    String userInfoStr = gson.toJson(user);
+                    mUser = gson.fromJson(userInfoStr, User.class);
+                    setupData(mUser);
+                    Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
+                    // finish
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            getActivity().setResult(Activity.RESULT_OK);
+                            getActivity().finish();
+                        }
+                    }, 99);
+
+                    return;
+                }
+            } catch (Exception e) {
+                // muted
             }
+            Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_LONG).show();
         }
     }
 

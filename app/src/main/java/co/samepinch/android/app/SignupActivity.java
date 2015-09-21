@@ -281,15 +281,15 @@ public class SignupActivity extends AppCompatActivity {
         String pinchHandle = _pinchHandle.getText().toString();
 
 
-        if (fName.isEmpty() || fName.length() < 3) {
-            _fNameText.setError("at least 3 characters");
+        if (fName.isEmpty() || fName.length() < 1) {
+            _fNameText.setError("at least 1 character");
             valid = false;
         } else {
             _fNameText.setError(null);
         }
 
-        if (lName.isEmpty() || lName.length() < 3) {
-            _lNameText.setError("at least 3 characters");
+        if (lName.isEmpty() || lName.length() < 1) {
+            _lNameText.setError("at least 1 character");
             valid = false;
         } else {
             _lNameText.setError(null);
