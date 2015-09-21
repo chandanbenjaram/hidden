@@ -12,6 +12,8 @@ public class User {
     String photo;
     String email;
     String prefName;
+    @SerializedName("key")
+    String imageKey;
     @SerializedName("pinch_handle")
     String pinchHandle;
     @SerializedName("posts_count")
@@ -121,5 +123,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+
+    public String getImageKey() {
+        return imageKey;
+    }
+
+    public void setImageKey(String imageKey) {
+        this.imageKey = imageKey;
     }
 }

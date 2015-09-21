@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
@@ -38,8 +40,10 @@ import org.springframework.http.ResponseEntity;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +51,12 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.data.dto.User;
+import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
-import co.samepinch.android.rest.RestBase;
+import co.samepinch.android.rest.RespUserDetails;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.USERS;
@@ -83,11 +90,10 @@ public class DotEditFragment extends Fragment {
     EditText mBlogUrl;
 
     ProgressDialog progressDialog;
-
-    String uploadedImageKey;
-    boolean uploadPending;
+    private LocalHandler mHandler;
 
     User mUser;
+    Map<String, String> mImageTaskMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +103,9 @@ public class DotEditFragment extends Fragment {
         progressDialog = new ProgressDialog(getActivity(),
                 R.style.Theme_AppCompat_Dialog);
         progressDialog.setCancelable(Boolean.FALSE);
+        mHandler = new LocalHandler(this);
+
+        mImageTaskMap = new HashMap<>();
     }
 
     @Override
@@ -112,7 +121,6 @@ public class DotEditFragment extends Fragment {
                 editorIntent.putExtra(Constants.EXTRA_TOOLS_DISABLE_VIBRATION, "any");
                 editorIntent.putExtra(Constants.EXTRA_OUTPUT_FORMAT, Bitmap.CompressFormat.JPEG.name());
                 editorIntent.putExtra(Constants.EXTRA_OUTPUT_QUALITY, 55);
-//                editorIntent.putExtra( Constants.EXTRA_OUTPUT, outputFileUri);
                 startActivityForResult(editorIntent, AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue());
             } else if (requestCode == AppConstants.KV.REQUEST_EDIT_PICTURE.getIntValue()) {
                 Uri processedImageUri = Uri.parse("file://" + intent.getData());
@@ -122,13 +130,14 @@ public class DotEditFragment extends Fragment {
                     // image has been changed by the user?
                     boolean changed = extra.getBoolean(Constants.EXTRA_OUT_BITMAP_CHANGED);
                 }
-
                 try {
                     InputStream localImageIS = getActivity().getContentResolver().openInputStream(Uri.parse(processedImageUri.toString()));
                     byte[] localImageBytes = Utils.getBytes(localImageIS);
                     String localImageEnc = Base64.encodeToString(localImageBytes, Base64.DEFAULT);
 
-                    this.uploadPending = Boolean.TRUE;
+                    mImageTaskMap.clear();
+                    mImageTaskMap.put(processedImageUri.toString(), null);
+                    new ImageUploadTask().execute(new String[]{"droid.jpeg", localImageEnc, processedImageUri.toString()});
 
                     mAvatarView.setImageURI(processedImageUri);
                     mAvatarView.refreshDrawableState();
@@ -159,12 +168,12 @@ public class DotEditFragment extends Fragment {
             getActivity().finish();
         }
 
-        setUpData(mUser);
+        setupData(mUser);
 
         return view;
     }
 
-    private void setUpData(User user) {
+    private void setupData(User user) {
         if (StringUtils.isNotBlank(user.getPhoto())) {
             mAvatarView.setImageURI(Uri.parse(user.getPhoto()));
         }
@@ -194,8 +203,71 @@ public class DotEditFragment extends Fragment {
 
     @OnClick(R.id.btn_update)
     public void onUpdateEvent() {
-        mUser.setFname(mFNameText.getText().toString());
-        new DotUpdateTask().execute(mUser);
+        saveAction(0);
+    }
+
+    public void saveAction(int delay) {
+        User user = new User();
+        boolean hasChanges = false;
+        String fName = mFNameText.getText().toString();
+        if (!StringUtils.equals(fName, mUser.getFname())) {
+            hasChanges = true;
+            user.setFname(fName);
+        }
+
+        String lName = mLNameText.getText().toString();
+        if (!StringUtils.equals(lName, mUser.getLname())) {
+            hasChanges = true;
+            user.setLname(lName);
+        }
+
+        String email = mEmailText.getText().toString();
+        if (!StringUtils.equals(email, mUser.getEmail())) {
+            hasChanges = true;
+            user.setEmail(email);
+        }
+
+        String aboutMe = mAboutMe.getText().toString();
+        if (!StringUtils.equals(aboutMe, mUser.getSummary())) {
+            hasChanges = true;
+            user.setSummary(aboutMe);
+        }
+
+        String blog = mBlogUrl.getText().toString();
+        if (!StringUtils.equals(blog, mUser.getBlog())) {
+            hasChanges = true;
+            user.setBlog(blog);
+        }
+
+        if (!mImageTaskMap.isEmpty()) {
+            hasChanges = true;
+            String imgVal = null;
+            for (Map.Entry<String, String> entry : mImageTaskMap.entrySet()) {
+                imgVal = entry.getValue();
+                break;
+            }
+            if (imgVal == null) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveAction(0);
+                    }
+                }, 500);
+            } else {
+                user.setImageKey(imgVal);
+            }
+        }
+
+        // check if has changes
+        if (!hasChanges) {
+            Snackbar.make(getView(), "no changes detected...", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressDialog.setMessage("updating...");
+        progressDialog.show();
+
+        new DotUpdateTask().execute(user);
     }
 
     private static final class LocalHandler extends Handler {
@@ -214,20 +286,33 @@ public class DotEditFragment extends Fragment {
             }
 
             try {
-                RestBase<User> req = new RestBase<User>() {
-                };
+                ReqSetBody req = new ReqSetBody();
                 // set base args
                 req.setToken(Utils.getNonBlankAppToken());
                 req.setCmd("update");
-                req.setBody(users[0]);
+
+                Map<String, String> args = new HashMap<>();
+                Gson gson = new Gson();
+                String userStr = gson.toJson(users[0]);
+
+                Type mapType = new TypeToken<Map<String, String>>() {
+                }.getType();
+                Map<String, String> body = gson.fromJson(userStr, mapType);
+
+                // set body
+                req.setBody(body);
 
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-                HttpEntity<RestBase<User>> payloadEntity = new HttpEntity<>(req, headers);
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
 
-                ResponseEntity<String> resp = RestClient.INSTANCE.handle().exchange(USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+                ResponseEntity<RespUserDetails> resp = RestClient.INSTANCE.handle().exchange(USERS.getValue(), HttpMethod.POST, payloadEntity, RespUserDetails.class);
+                User updated;
+                if (resp != null && resp.getBody() != null && (updated = resp.getBody().getBody()) != null) {
+                    return updated;
+                }
             } catch (Exception e) {
                 // muted
                 Resp resp = Utils.parseAsRespSilently(e);
@@ -239,6 +324,21 @@ public class DotEditFragment extends Fragment {
         @Override
         protected void onPostExecute(User user) {
             Utils.dismissSilently(progressDialog);
+            if (user != null) {
+                Gson gson = new Gson();
+                String userStr = gson.toJson(user);
+                Type mapType = new TypeToken<Map<String, String>>() {
+                }.getType();
+                Map<String, String> userNew = gson.fromJson(userStr, mapType);
+
+                Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                userInfo.putAll(userNew);
+                Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userInfo);
+
+                String userInfoStr = gson.toJson(user);
+                mUser = gson.fromJson(userInfoStr, User.class);
+                setupData(mUser);
+            }
         }
     }
 
@@ -274,5 +374,62 @@ public class DotEditFragment extends Fragment {
         // Add the camera options.
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
         startActivityForResult(chooserIntent, AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue());
+    }
+
+    class ImageUploadTask extends AsyncTask<String, Integer, Bundle> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Bundle doInBackground(String... args) {
+            Bundle respBundle = new Bundle();
+
+            try {
+                StorageComponent component = DaggerStorageComponent.create();
+                ReqSetBody req = component.provideReqSetBody();
+                // set base args
+                req.setToken(Utils.getNonBlankAppToken());
+                req.setCmd("s3upload");
+
+                Map<String, String> body = new HashMap<>();
+                body.put("name", args[0]);
+                body.put("content", args[1]);
+                body.put("content_type", "image/jpeg");
+
+                req.setBody(body);
+
+                //headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp.getBody() != null) {
+                    Map<String, Object> respBody = resp.getBody().getBody();
+                    if (respBody != null) {
+                        String v = (String) respBody.get(AppConstants.APP_INTENT.KEY_KEY.getValue());
+                        respBundle.putString(args[2], v);
+                        return respBundle;
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "err uploading...");
+
+            }
+            return respBundle;
+        }
+
+        @Override
+        protected void onPostExecute(Bundle result) {
+            if (result == null || mImageTaskMap.isEmpty()) {
+                return;
+            }
+            for (String k : result.keySet()) {
+                mImageTaskMap.put(k, result.getString(k));
+            }
+        }
     }
 }
