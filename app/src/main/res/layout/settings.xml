@@ -15,56 +15,357 @@
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-
-        <TableLayout
+        <com.fenjuly.mylibrary.DropDownLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:stretchColumns="1">
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp">
 
-            <TableRow>
+            <com.fenjuly.mylibrary.ToggleExpandLayout
+                android:id="@+id/toogleLayout1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp">
 
-                <TextView
-                    android:id="@+id/settings_email_sub"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Email Subscription"
-                    android:padding="3dip"/>
+                <LinearLayout
+                    android:id="@+id/id2"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="2dp"
+                    android:outlineProvider="bounds">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/first_menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Set date" />
 
-                <com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch
-                    android:id="@+id/settings_email_selection"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:ball_press_color="@color/blue_700"
-                    app:ball_release_color="@color/grey_200"
-                    app:base_press_color="@color/blue_100"
-                    app:base_release_color="@color/grey_200"
-                    app:icon_press="@drawable/tickmark"
-                    app:icon_release="@drawable/x_mark"
-                    android:padding="3dip"
-                    android:gravity="right"/>
-            </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/first_menu"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="23 August 2015"
+                            android:textColor="#cccccc" />
+                    </RelativeLayout>
 
-            <TableRow>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/settings_notif_sub"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Notifications"
-                    android:padding="3dip"/>
+                <LinearLayout
+                    android:id="@+id/id3"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="3dp"
+                    android:outlineProvider="bounds">
 
-                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                    android:id="@+id/settings_notif_sub_selection"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    app:dsb_min="1"
-                    app:dsb_max="3"
-                    />
-            </TableRow>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-        </TableLayout>
+                        <TextView
+                            android:id="@+id/second_menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Set time" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/second_menu"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="15:47"
+                            android:textColor="#cccccc" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/id4"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="4dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Automatic date and time" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/menu"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Use network provide time"
+                            android:textColor="#cccccc" />
+
+                        <com.kyleduo.switchbutton.SwitchButton
+                            android:id="@+id/switch_button1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="10dp"
+                            android:padding="16dp" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.fenjuly.mylibrary.ToggleExpandLayout>
+
+            <com.fenjuly.mylibrary.ToggleExpandLayout
+                android:id="@+id/toogleLayout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp">
+
+                <LinearLayout
+                    android:id="@+id/id6"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="2dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/first_menu2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Set Sex" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/first_menu2"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Girl"
+                            android:textColor="#cccccc" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/id7"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="3dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/second_menu2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Set Name" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/second_menu2"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="[FeN]July"
+                            android:textColor="#cccccc" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/id8"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="4dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/menu2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Quicklu set name and sex" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/menu2"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Use the default"
+                            android:textColor="#cccccc" />
+
+                        <com.kyleduo.switchbutton.SwitchButton
+                            android:id="@+id/switch_button2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="10dp"
+                            android:padding="16dp" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.fenjuly.mylibrary.ToggleExpandLayout>
+
+            <com.fenjuly.mylibrary.ToggleExpandLayout
+                android:id="@+id/toogleLayout3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp">
+
+                <LinearLayout
+                    android:id="@+id/id9"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="2dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/first_menu3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Set Game" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/first_menu3"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Final Fantasy typy-0"
+                            android:textColor="#cccccc" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/id10"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="3dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/second_menu3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Set Host" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/second_menu3"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Sony PlayStation 4"
+                            android:textColor="#cccccc" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/id11"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="4dp"
+                    android:outlineProvider="bounds">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/menu3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Automatic date and time" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/menu3"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Use network provide time"
+                            android:textColor="#cccccc" />
+
+                        <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/switch_button3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
+                        android:padding="16dp" />
+                        <!--<com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch-->
+                            <!--android:id="@+id/switch_button3"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_alignParentRight="true"-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:padding="16dp"-->
+                            <!--app:ball_press_color="@color/blue_700"-->
+                            <!--app:ball_release_color="@color/grey_200"-->
+                            <!--app:base_press_color="@color/blue_100"-->
+                            <!--app:base_release_color="@color/grey_200"-->
+                            <!--app:icon_press="@drawable/tickmark"-->
+                            <!--app:icon_release="@drawable/x_mark" />-->
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.fenjuly.mylibrary.ToggleExpandLayout>
+        </com.fenjuly.mylibrary.DropDownLayout>
 
     </LinearLayout>
 

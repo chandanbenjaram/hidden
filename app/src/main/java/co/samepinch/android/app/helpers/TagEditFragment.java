@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
-import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
+import com.kyleduo.switchbutton.SwitchButton;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,9 +63,8 @@ public class TagEditFragment extends Fragment {
     @Bind(R.id.tag_edit_cancel)
     ImageButton mTagEditCancelBtn;
 
-    //tag_subscription_switch
     @Bind(R.id.tag_subscription_switch)
-    MaterialAnimatedSwitch aSubscriptionSwitch;
+    SwitchButton aSubscriptionSwitch;
 
     ProgressDialog progressDialog;
     private LocalHandler mHandler;
@@ -101,18 +100,10 @@ public class TagEditFragment extends Fragment {
 
         // currUserId
         final String currUserId = getArguments().getString(AppConstants.APP_INTENT.KEY_UID.getValue(), null);
-        // checked state
         final String tagUserId = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_USER_ID));
+        // checked state
         initSwitchAsChecked = StringUtils.equals(tagUserId, currUserId);
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // init state
-                if (initSwitchAsChecked) {
-                    aSubscriptionSwitch.toggle();
-                }
-            }
-        });
+        aSubscriptionSwitch.setChecked(initSwitchAsChecked);
 
         // hold tag uid
         mTagUID = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_UID));

@@ -3,8 +3,8 @@ apply plugin: 'com.neenbedankt.android-apt'
 //apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
 
     defaultConfig {
         applicationId "co.samepinch.android.app"
@@ -12,8 +12,8 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
-        renderscriptTargetApi 19
-        renderscriptSupportModeEnabled  true
+        renderscriptTargetApi 23
+//        renderscriptSupportModeEnabled  true
         // Enabling multidex support.
 //        multiDexEnabled true
     }
@@ -40,6 +40,9 @@ repositories {
     maven {
         url "http://dl.bintray.com/glomadrian/maven"
     }
+    maven {
+        url "https://jitpack.io"
+    }
 }
 
 configurations.all {
@@ -50,17 +53,14 @@ configurations.all {
 //apply plugin: 'com.google.gms.google-services'
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     // M-VIEW
-    compile 'com.android.support:percent:22.2.0'
-    compile 'com.android.support:design:22.+'
-    compile 'com.android.support:support-v4:22.+'
-    compile 'com.android.support:appcompat-v7:22.+'
-    compile 'com.android.support:cardview-v7:22.+'
-    compile 'com.android.support:recyclerview-v7:22.+'
-    compile 'com.android.support:palette-v7:22.+'
-
+    compile 'com.android.support:percent:23.0.0'
+    compile 'com.android.support:design:23.0.0'
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.android.support:cardview-v7:23.0.0'
+    compile 'com.android.support:recyclerview-v7:23.0.0'
+    compile 'com.android.support:palette-v7:23.0.0'
     // 3rd PARTY
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'org.adw.library:discrete-seekbar:1.0.0'
@@ -75,9 +75,11 @@ dependencies {
     compile 'org.glassfish:javax.annotation:10.0-b28'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'jp.wasabeef:recyclerview-animators:1.2.2'
-    compile 'com.github.glomadrian:MaterialAnimatedSwitch:1.1@aar'
-//    compile 'com.leaking.slideswitch:app:1.0.0'
-//    compile 'com.facebook.rebound:rebound:0.3.8'
+    compile 'com.kyleduo.switchbutton:library:1.2.9'
+    compile 'com.github.fenjuly:ToggleExpandLayout:4388a563ec'
+
+    // compile 'com.leaking.slideswitch:app:1.0.0'
+    // compile 'com.facebook.rebound:rebound:0.3.8'
     // compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
 
     // misc.
@@ -87,6 +89,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-identity:7.5.0'
     compile 'com.google.android.gms:play-services-base:7.5.0'
     compile 'com.facebook.android:facebook-android-sdk:4.1.0'
-
 }
 

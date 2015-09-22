@@ -4,13 +4,17 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
+import com.fenjuly.mylibrary.ToggleExpandLayout;
+import com.kyleduo.switchbutton.SwitchButton;
 import com.squareup.otto.Subscribe;
 
 import java.util.Map;
@@ -18,7 +22,6 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.adapters.TagsToManageRVAdapter;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
@@ -28,9 +31,25 @@ public class SettingsFragment extends Fragment {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    ProgressDialog progressDialog;
-    TagsToManageRVAdapter mTagsToManageRVAdapter;
+    @Bind(R.id.toogleLayout1)
+    ToggleExpandLayout layout1;
 
+    @Bind(R.id.toogleLayout2)
+    ToggleExpandLayout layout2;
+
+    @Bind(R.id.toogleLayout3)
+    ToggleExpandLayout layout3;
+
+    @Bind(R.id.switch_button1)
+    SwitchButton switchButton1;
+
+    @Bind(R.id.switch_button2)
+    SwitchButton switchButton2;
+
+    @Bind(R.id.switch_button3)
+    SwitchButton switchButton3;
+
+    ProgressDialog progressDialog;
     String mCurrUserId;
 
     @Override
@@ -64,14 +83,59 @@ public class SettingsFragment extends Fragment {
                 ((AppCompatActivity) getActivity()).onBackPressed();
             }
         });
-        toolbar.setTitle("MANAGE TAGS");
-
+        toolbar.setTitle("SETTINGS");
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.back_2x);
         ab.setDisplayHomeAsUpEnabled(true);
-
-
+        setupPreferences();
         return view;
+    }
+
+    private void setupPreferences() {
+        setupLayoutWithToggleExpand(layout1, switchButton1);
+        setupLayoutWithToggleExpand(layout2, switchButton2);
+        setupLayoutWithToggleExpand(layout3, switchButton3);
+    }
+
+    private void setupLayoutWithToggleExpand(final ToggleExpandLayout aLayout, final SwitchButton aSwitch) {
+        aLayout.setOnToggleTouchListener(new ToggleExpandLayout.OnToggleTouchListener() {
+            @Override
+            public void onStartOpen(int height, int originalHeight) {
+            }
+
+            @Override
+            public void onOpen() {
+                int childCount = aLayout.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    View view = aLayout.getChildAt(i);
+                    ViewCompat.setElevation(view, dp2px(i));
+                }
+            }
+
+            @Override
+            public void onStartClose(int height, int originalHeight) {
+                int childCount = aLayout.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    View view = aLayout.getChildAt(i);
+                    ViewCompat.setElevation(view, dp2px(i));
+                }
+            }
+
+            @Override
+            public void onClosed() {
+
+            }
+        });
+
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    aLayout.open();
+                } else {
+                    aLayout.close();
+                }
+            }
+        });
     }
 
 
@@ -102,5 +166,10 @@ public class SettingsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    public float dp2px(float dp) {
+        final float scale = getResources().getDisplayMetrics().density;
+        return dp * scale + 0.5f;
     }
 }
