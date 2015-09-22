@@ -83,7 +83,7 @@ public class SIMView extends RelativeLayout {
     }
 
     public void populateImageView(String imgUri) {
-        populateImageViewWithAdjustedAspect(imgUri, null);
+        populateImageViewWithAdjustedAspect(imgUri);
     }
 
     public void populateImageViewWithAdjustedAspect(String imgUri, Integer... resizeDimensions) {

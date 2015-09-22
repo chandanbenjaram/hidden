@@ -130,6 +130,7 @@ public class AppConstants {
         FRAGMENT_MANAGE_TAGS,
         FRAGMENT_MANAGE_A_TAG,
         FRAGMENT_DOTEDIT,
+        FRAGMENT_SETTINGS,
         KEY_TAG,
         KEY_DOT,
         Wall,

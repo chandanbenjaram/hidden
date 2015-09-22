@@ -211,6 +211,9 @@ public class MainActivityIn extends AppCompatActivity {
                             case R.id.nav_tags:
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_TAGS.name());
                                 break;
+                            case R.id.nav_settings:
+                                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_SETTINGS.name());
+                                break;
                             default:
                                 Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
                                 break;
