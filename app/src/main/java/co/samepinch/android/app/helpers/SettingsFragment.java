@@ -1,24 +1,15 @@
 package co.samepinch.android.app.helpers;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.AnticipateOvershootInterpolator;
-import android.widget.FrameLayout;
 
 import com.squareup.otto.Subscribe;
 
@@ -26,24 +17,16 @@ import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.adapters.TagsToManageRVAdapter;
-import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.data.dao.SchemaTags;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 public class SettingsFragment extends Fragment {
     public static final String TAG = "SettingsFragment";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
-
-    @Bind(R.id.holder_recyclerview)
-    FrameLayout frameLayout;
 
     ProgressDialog progressDialog;
     TagsToManageRVAdapter mTagsToManageRVAdapter;
@@ -69,7 +52,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.manage_tags, container, false);
+        View view = inflater.inflate(R.layout.settings, container, false);
         ButterKnife.bind(this, view);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -88,93 +71,9 @@ public class SettingsFragment extends Fragment {
         ab.setDisplayHomeAsUpEnabled(true);
 
 
-        // setup recyler view
-        setupRecyclerView();
-
-        // call for intent
-        Intent tagRefreshIntent =
-                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
-        getActivity().startService(tagRefreshIntent);
-
         return view;
     }
 
-    private void setupRecyclerView() {
-        frameLayout.removeAllViews();
-        // recycler view
-        final RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
-            @Override
-            public void scrollBy(int x, int y) {
-                try {
-                    super.scrollBy(x, y);
-                } catch (NullPointerException nlp) {
-                    // muted
-                }
-            }
-        };
-
-        frameLayout.addView(rv);
-
-        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
-        rv.setLayoutManager(gridLayoutManager);
-        rv.setHasFixedSize(true);
-
-        rv.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        rv.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        int viewWidth = rv.getMeasuredWidth();
-                        float cardViewWidth = getActivity().getResources().getDimension(R.dimen.cardview_layout_width);
-                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
-                        gridLayoutManager.setSpanCount(newSpanCount);
-                        gridLayoutManager.requestLayout();
-                    }
-                });
-
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
-        TagsToManageRVAdapter.ItemEventListener itemEventListener = new TagsToManageRVAdapter.ItemEventListener<String>() {
-            @Override
-            public void onClick(String tag) {
-                Bundle args = new Bundle();
-                args.putString(AppConstants.APP_INTENT.KEY_TAG.getValue(), tag);
-                args.putString(AppConstants.APP_INTENT.KEY_UID.getValue(), mCurrUserId);
-                // target
-                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_A_TAG.name());
-
-                // intent
-                Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
-                intent.putExtras(args);
-                startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_TAG.getIntValue());
-            }
-        };
-
-        // adapter
-        mTagsToManageRVAdapter = new TagsToManageRVAdapter(getActivity(), cursor, itemEventListener, mCurrUserId);
-
-        // ANIMATIONS
-        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mTagsToManageRVAdapter));
-        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
-        wrapperAdapter.setDuration(300);
-        wrapperAdapter.setFirstOnly(Boolean.FALSE);
-        rv.setAdapter(wrapperAdapter);
-    }
-
-    @Subscribe
-    public void onTagsRefreshedEvent(Events.TagsRefreshedEvent event) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-//                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
-//                    mTagsToManageRVAdapter.changeCursor(cursor);
-                    dataSetChanged();
-                } catch (Exception e) {
-                    //e.printStackTrace();
-                }
-            }
-        });
-    }
 
     @Subscribe
     public void onTagsRefreshFailEvent(final Events.TagsRefreshFailEvent event) {

@@ -62,6 +62,9 @@ public class RootFragment extends Fragment {
             case FRAGMENT_DOTEDIT:
                 fragment = new DotEditFragment();
                 break;
+            case FRAGMENT_SETTINGS:
+                fragment = new SettingsFragment();
+                break;
             default:
                 throw new IllegalArgumentException("un-known fragment " + targetFragment);
         }

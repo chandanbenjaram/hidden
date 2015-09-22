@@ -15,53 +15,55 @@
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <RelativeLayout
+
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:stretchColumns="1">
 
-            <TextView
-                android:id="@+id/settings_notifications"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:text="Push Notifications"/>
-            <com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch
-                android:id="@+id/settings_notifications_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:ball_press_color="@color/blue_700"
-                app:ball_release_color="@color/grey_200"
-                app:base_press_color="@color/blue_100"
-                app:base_release_color="@color/grey_200"
-                app:icon_press="@drawable/tickmark"
-                app:icon_release="@drawable/x_mark"
-                android:layout_alignParentRight="true"/>
+            <TableRow>
 
-            <TextView
-                android:id="@+id/settings_subsription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Email Notifications"
-                android:layout_below="@+id/settings_notifications_switch"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-            <com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch
-                android:id="@+id/settings_subsription_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:ball_press_color="@color/blue_700"
-                app:ball_release_color="@color/grey_200"
-                app:base_press_color="@color/blue_100"
-                app:base_release_color="@color/grey_200"
-                app:icon_press="@drawable/tickmark"
-                app:icon_release="@drawable/x_mark"
-                android:layout_alignTop="@+id/settings_subsription"
-                android:layout_alignLeft="@+id/settings_notifications_switch"
-                android:layout_alignStart="@+id/settings_notifications_switch" />
+                <TextView
+                    android:id="@+id/settings_email_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email Subscription"
+                    android:padding="3dip"/>
 
-        </RelativeLayout>
+                <com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch
+                    android:id="@+id/settings_email_selection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:ball_press_color="@color/blue_700"
+                    app:ball_release_color="@color/grey_200"
+                    app:base_press_color="@color/blue_100"
+                    app:base_release_color="@color/grey_200"
+                    app:icon_press="@drawable/tickmark"
+                    app:icon_release="@drawable/x_mark"
+                    android:padding="3dip"
+                    android:gravity="right"/>
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/settings_notif_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:padding="3dip"/>
+
+                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                    android:id="@+id/settings_notif_sub_selection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    app:dsb_min="1"
+                    app:dsb_max="3"
+                    />
+            </TableRow>
+
+        </TableLayout>
 
 
     </LinearLayout>
