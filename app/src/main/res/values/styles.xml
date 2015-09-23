@@ -129,4 +129,8 @@
     <style name="TransparentBG">
         <item name="android:color">#AA000000</item>
     </style>
+    <style name="SP_SUB_LINE">
+        <item name="android:color">@color/grey_100</item>
+        <item name="android:textSize">9sp</item>
+    </style>
 </resources>

@@ -2,7 +2,6 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -13,288 +12,225 @@
         android:layout_height="?attr/actionBarSize"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <android.support.v7.widget.CardView
+    <com.fenjuly.mylibrary.DropDownLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_margin="10dp"
         android:clipChildren="false"
         android:clipToPadding="false"
-        card_view:cardElevation="0dp"
-        card_view:cardPreventCornerOverlap="true"
-        android:padding="10dp"
-        android:layout_margin="9dp">
+        android:padding="10dp">
 
-        <com.fenjuly.mylibrary.DropDownLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <com.fenjuly.mylibrary.ToggleExpandLayout
-                android:id="@+id/toggleLayout1"
-                android:layout_width="wrap_content"
+        <com.fenjuly.mylibrary.ToggleExpandLayout
+            android:id="@+id/toggleLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp">
-
-                <LinearLayout
+                android:elevation="2dp"
+                android:outlineProvider="bounds"
+                android:padding="2dp">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="2dp"
-                    android:outlineProvider="bounds">
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/settings_notifs_posts_likes_tags"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/settings_notifs_posts_likes_tags_switch"
+                        android:text="@string/settings_notifs_posts_likes_tags" />
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/settings_notifs_posts_likes_tags_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/first_menu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set date" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/first_menu"
-                            android:text="23 August 2015"
-                            android:textColor="#cccccc" />
-                    </RelativeLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="3dp"
-                    android:outlineProvider="bounds">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/second_menu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set time" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/second_menu"
-                            android:text="15:47"
-                            android:textColor="#cccccc" />
-                    </RelativeLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    android:outlineProvider="bounds">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/menu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:text="Time settings" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/menu"
-                            android:text="time sub-line"
-                            android:textColor="#cccccc" />
-
-                        <com.kyleduo.switchbutton.SwitchButton
-                            android:id="@+id/switch_button1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-                </LinearLayout>
-            </com.fenjuly.mylibrary.ToggleExpandLayout>
-
-            <com.fenjuly.mylibrary.ToggleExpandLayout
-                android:id="@+id/toggleLayout2"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp">
+                android:elevation="3dp"
+                android:outlineProvider="bounds"
+                android:padding="2dp">
 
-                <LinearLayout
-                    android:id="@+id/id6"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="2dp"
-                    android:outlineProvider="bounds">
+                    android:layout_height="match_parent">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/settings_notifs_posts_likes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/settings_notifs_posts_likes_switch"
+                        android:text="@string/settings_notifs_posts_likes" />
 
-                        <TextView
-                            android:id="@+id/first_menu2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set Sex" />
+                    <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/settings_notifs_posts_likes_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/first_menu2"
-                            android:text="Girl"
-                            android:textColor="#cccccc" />
-                    </RelativeLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/id7"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="3dp"
-                    android:outlineProvider="bounds">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/second_menu2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set Name" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/second_menu2"
-                            android:text="July"
-                            android:textColor="#cccccc" />
-                    </RelativeLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/id8"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    android:outlineProvider="bounds">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/menu2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Quickly set name and sex" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/menu2"
-                            android:text="Use the default"
-                            android:textColor="#cccccc" />
-
-                        <com.kyleduo.switchbutton.SwitchButton
-                            android:id="@+id/switch_button2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-                </LinearLayout>
-            </com.fenjuly.mylibrary.ToggleExpandLayout>
-
-            <com.fenjuly.mylibrary.ToggleExpandLayout
-                android:id="@+id/toggleLayout3"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp">
+                android:elevation="3dp"
+                android:outlineProvider="bounds"
+                android:padding="2dp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="2dp"
-                    android:outlineProvider="bounds">
+                    android:layout_height="match_parent">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/settings_notifs_posts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/settings_notifs_posts_switch"
+                        android:text="@string/settings_notifs_posts" />
 
-                        <TextView
-                            android:id="@+id/first_menu3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set Game" />
+                    <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/settings_notifs_posts_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/first_menu3"
-                            android:text="Cricket"
-                            android:textColor="#cccccc" />
-                    </RelativeLayout>
-                </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:outlineProvider="bounds">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="3dp"
-                    android:outlineProvider="bounds">
+                    android:layout_height="match_parent">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                        <TextView
-                            android:id="@+id/second_menu3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set Host" />
+                    <TextView
+                        android:id="@+id/menu1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toLeftOf="@+id/switch_button1"
+                        android:text="@string/settings_notifs" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/second_menu3"
-                            android:text="Ground"
-                            android:textColor="#cccccc" />
-                    </RelativeLayout>
+                    <TextView
+                        style="@style/SP_SUB_LINE"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/menu1"
+                        android:layout_toLeftOf="@+id/switch_button1"
+                        android:text="@string/settings_notifs_subline" />
 
-                </LinearLayout>
+                    <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/switch_button1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:paddingRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.fenjuly.mylibrary.ToggleExpandLayout>
 
-                <LinearLayout
+        <com.fenjuly.mylibrary.ToggleExpandLayout
+            android:id="@+id/toggleLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="2dp"
+                android:outlineProvider="bounds"
+                android:padding="2dp">
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    android:outlineProvider="bounds">
+                    android:layout_height="match_parent">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/settings_email_subscribe_switch"
+                        android:text="@string/settings_email_subscribe" />
 
-                        <TextView
-                            android:id="@+id/menu3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Play" />
+                    <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/settings_email_subscribe_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/menu3"
-                            android:text="choose match and location"
-                            android:textColor="#cccccc" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:outlineProvider="bounds">
 
-                        <com.kyleduo.switchbutton.SwitchButton
-                            android:id="@+id/switch_button3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-                </LinearLayout>
-            </com.fenjuly.mylibrary.ToggleExpandLayout>
-        </com.fenjuly.mylibrary.DropDownLayout>
-    </android.support.v7.widget.CardView>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/menu2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toLeftOf="@+id/switch_button2"
+                        android:text="@string/settings_email" />
+
+                    <TextView
+                        style="@style/SP_SUB_LINE"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/menu2"
+                        android:layout_toLeftOf="@+id/switch_button2"
+                        android:text="@string/settings_email_subline" />
+
+                    <com.kyleduo.switchbutton.SwitchButton
+                        android:id="@+id/switch_button2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:paddingRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.fenjuly.mylibrary.ToggleExpandLayout>
+
+    </com.fenjuly.mylibrary.DropDownLayout>
 </LinearLayout>

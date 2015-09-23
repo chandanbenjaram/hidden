@@ -24,6 +24,9 @@ public class User {
     String blog;
     Boolean follow;
 
+    Integer apnNotify;
+    Boolean emailNotify;
+
     public Long getPostsCount() {
         return postsCount;
     }
@@ -132,5 +135,21 @@ public class User {
 
     public void setImageKey(String imageKey) {
         this.imageKey = imageKey;
+    }
+
+    public Integer getApnNotify() {
+        return apnNotify;
+    }
+
+    public void setApnNotify(Integer apnNotify) {
+        this.apnNotify = apnNotify;
+    }
+
+    public Boolean getEmailNotify() {
+        return emailNotify;
+    }
+
+    public void setEmailNotify(Boolean emailNotify) {
+        this.emailNotify = emailNotify;
     }
 }

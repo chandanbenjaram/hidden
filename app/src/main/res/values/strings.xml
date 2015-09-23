@@ -64,4 +64,12 @@
     <string name="signin_with_fb">Sign in with Facebook</string>
     <string name="loading">-</string>
     <string name="empty"></string>
+    <string name="settings_notifs">Push Notifications</string>
+    <string name="settings_notifs_subline">set when you want to get notified</string>
+    <string name="settings_notifs_posts">Posts I made</string>
+    <string name="settings_notifs_posts_likes">Posts I am interested-in (like posts by me or someone I like, etc.)</string>
+    <string name="settings_notifs_posts_likes_tags">Posts into tags I am currently subscribed to</string>
+    <string name="settings_email">Email Settings</string>
+    <string name="settings_email_subline">subscription allows you to get email digests, important communication, etc. </string>
+    <string name="settings_email_subscribe">Subscribe</string>
 </resources>

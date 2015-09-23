@@ -1,6 +1,7 @@
 package co.samepinch.android.app.helpers;
 
 import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -8,22 +9,42 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 import com.fenjuly.mylibrary.ToggleExpandLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kyleduo.switchbutton.SwitchButton;
-import com.squareup.otto.Subscribe;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
-import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dto.User;
+import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RespUserDetails;
+import co.samepinch.android.rest.RestClient;
+
+import static co.samepinch.android.app.helpers.AppConstants.API.USERS;
 
 public class SettingsFragment extends Fragment {
     public static final String TAG = "SettingsFragment";
@@ -37,35 +58,38 @@ public class SettingsFragment extends Fragment {
     @Bind(R.id.toggleLayout2)
     ToggleExpandLayout layout2;
 
-    @Bind(R.id.toggleLayout3)
-    ToggleExpandLayout layout3;
-
     @Bind(R.id.switch_button1)
     SwitchButton switchButton1;
 
     @Bind(R.id.switch_button2)
     SwitchButton switchButton2;
 
-    @Bind(R.id.switch_button3)
-    SwitchButton switchButton3;
+
+    // options
+    @Bind(R.id.settings_notifs_posts_likes_tags_switch)
+    SwitchButton notifsPostsLikesTags;
+
+    @Bind(R.id.settings_notifs_posts_likes_switch)
+    SwitchButton notifsPostsLikes;
+
+    @Bind(R.id.settings_notifs_posts_switch)
+    SwitchButton notifsPosts;
+
+    @Bind(R.id.settings_email_subscribe_switch)
+    SwitchButton emailSubscribe;
 
     ProgressDialog progressDialog;
-    String mCurrUserId;
+    User mUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // retain this fragment across configuration changes.
-        setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         // progress dialog properties
         progressDialog = new ProgressDialog(getActivity(),
                 R.style.Theme_AppCompat_Dialog);
         progressDialog.setCancelable(Boolean.FALSE);
-
-        // keep current logged in user id
-        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-        mCurrUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
     }
 
     @Override
@@ -83,17 +107,160 @@ public class SettingsFragment extends Fragment {
                 ((AppCompatActivity) getActivity()).onBackPressed();
             }
         });
-        toolbar.setTitle("SETTINGS");
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        setupPreferences();
+
+        try {
+            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+            Gson gson = new Gson();
+            String userInfoStr = gson.toJson(userInfo);
+            mUser = gson.fromJson(userInfoStr, User.class);
+        } catch (Exception e) {
+            // muted
+            getActivity().finish();
+        }
+
+        setupLayoutWithToggleExpand(layout1, switchButton1);
+        setupLayoutWithToggleExpand(layout2, switchButton2);
+
+        setupData(mUser);
         return view;
     }
 
-    private void setupPreferences() {
-        setupLayoutWithToggleExpand(layout1, switchButton1);
-        setupLayoutWithToggleExpand(layout2, switchButton2);
-        setupLayoutWithToggleExpand(layout3, switchButton3);
+    private void setupData(User aUser) {
+        // notification stuff
+        if (aUser.getApnNotify() != null) {
+            notifsPostsLikesTags.setChecked(aUser.getApnNotify() == 3);
+            notifsPostsLikes.setChecked(aUser.getApnNotify() == 2);
+            notifsPosts.setChecked(aUser.getApnNotify() == 1);
+
+        }
+        // email stuff
+        if (aUser.getEmailNotify() != null) {
+            emailSubscribe.setChecked(aUser.getEmailNotify().booleanValue());
+        } else {
+            emailSubscribe.setChecked(false);
+        }
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.dot_settings_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                (getActivity()).onBackPressed();
+                return true;
+
+            case R.id.menuitem_update:
+                saveAction();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void saveAction() {
+        User userDTO = new User();
+        // notifications
+        Integer apnNotify = 3;
+        if(notifsPostsLikesTags.isChecked()){
+            apnNotify = 3;
+        }else if(notifsPostsLikes.isChecked()){
+            apnNotify = 2;
+        }else if(notifsPosts.isChecked()){
+            apnNotify = 1;
+        }
+
+        // app notify
+        userDTO.setApnNotify(apnNotify);
+
+        // email
+        userDTO.setEmailNotify(emailSubscribe.isChecked());
+
+        progressDialog.setMessage("saving your preferences...");
+        progressDialog.show();
+
+        new SettingsUpdateTask().execute(userDTO);
+    }
+
+
+    private class SettingsUpdateTask extends AsyncTask<User, Integer, User> {
+        @Override
+        protected User doInBackground(User... users) {
+            if (users == null || users.length < 1) {
+                return null;
+            }
+
+            try {
+                ReqSetBody req = new ReqSetBody();
+                // set base args
+                req.setToken(Utils.getNonBlankAppToken());
+                req.setCmd("update");
+
+                Map<String, String> args = new HashMap<>();
+                Gson gson = new Gson();
+                String userStr = gson.toJson(users[0]);
+
+                Type mapType = new TypeToken<Map<String, String>>() {
+                }.getType();
+                Map<String, String> body = gson.fromJson(userStr, mapType);
+
+                // set body
+                req.setBody(body);
+
+                //headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+
+                ResponseEntity<RespUserDetails> resp = RestClient.INSTANCE.handle().exchange(USERS.getValue(), HttpMethod.POST, payloadEntity, RespUserDetails.class);
+                User updated;
+                if (resp != null && resp.getBody() != null && (updated = resp.getBody().getBody()) != null) {
+                    return updated;
+                }
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            Utils.dismissSilently(progressDialog);
+            try {
+                if (user != null) {
+                    Gson gson = new Gson();
+                    String userStr = gson.toJson(user);
+                    Type mapType = new TypeToken<Map<String, String>>() {
+                    }.getType();
+                    Map<String, String> userNew = gson.fromJson(userStr, mapType);
+
+                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                    userInfo.putAll(userNew);
+                    Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userInfo);
+
+                    String userInfoStr = gson.toJson(user);
+                    mUser = gson.fromJson(userInfoStr, User.class);
+                    setupData(mUser);
+                    Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
+//                    getActivity().setResult(Activity.RESULT_OK);
+//                    getActivity().finish();
+
+                    return;
+                }
+            } catch (Exception e) {
+                // muted
+            }
+            Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private void setupLayoutWithToggleExpand(final ToggleExpandLayout aLayout, final SwitchButton aSwitch) {
@@ -134,17 +301,6 @@ public class SettingsFragment extends Fragment {
                 } else {
                     aLayout.close();
                 }
-            }
-        });
-    }
-
-
-    @Subscribe
-    public void onTagsRefreshFailEvent(final Events.TagsRefreshFailEvent event) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Snackbar.make(getView(), event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
             }
         });
     }
