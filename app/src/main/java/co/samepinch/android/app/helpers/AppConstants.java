@@ -22,7 +22,11 @@ public class AppConstants {
         POSTS(BASE.getValue().concat("api/posts")),
         COMMENTS(BASE.getValue().concat("api/comments")),
         GROUPS(BASE.getValue().concat("api/groups")),
-        CONTENT_AUTHORITY("co.samepinch.android.app");
+        CONTENT_AUTHORITY("co.samepinch.android.app"),
+        URL_RULES("http://www.samepinch.co/rules/"),
+        URL_TERMS_COND("http://www.samepinch.co/t&c"),
+        URL_SYS_STATUS("http://www.samepinch.co/systemstatus/"),
+        ;
         private final String value;
 
         API(String value) {

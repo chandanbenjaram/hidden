@@ -32,6 +32,7 @@
     <string name="app_name">SamePinch</string>
     <!-- pinch handle-->
     <string name="pinch_handle">\u0040<xliff:g id="handle">%1$s</xliff:g></string>
+    <string name="terms_n_cond">Terms \u0026 Conditions</string>
     <string name="enter_comment">enter your comment here...</string>
     <string name="enter_post">type here...</string>
     <string name="select_tags">tag this post with</string>
@@ -72,4 +73,9 @@
     <string name="settings_email">Email Settings</string>
     <string name="settings_email_subline">subscription allows you to get email digests, important communication, etc. </string>
     <string name="settings_email_subscribe">Subscribe</string>
+
+    <!--SHARE TEXT -->
+    <string name="share_subject">I\u0027ve started using SamePinch app\u0021</string>
+    <string name="share_body">Thought you may be interested to check out this app I am in love with.\u000A\u000AGet your copy from Android\u002FApple store. \u000A\u000AA SamePinch Fan \u000Awww.samepinch.co</string>
+
 </resources>

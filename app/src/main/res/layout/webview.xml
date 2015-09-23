@@ -11,6 +11,7 @@
 
     <ImageButton
         android:id="@+id/close"
+        android:layout_margin="9dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -21,5 +22,3 @@
         android:padding="9dp"
         android:src="@drawable/x_mark" />
 </RelativeLayout>
-
-

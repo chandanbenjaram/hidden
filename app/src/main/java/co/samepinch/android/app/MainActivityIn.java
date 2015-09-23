@@ -1,6 +1,7 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -12,11 +13,16 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +47,9 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH
 public class MainActivityIn extends AppCompatActivity {
     public static final String TAG = "MainActivityIn";
     private static final int INTENT_LOGOUT = 1;
+
+    @Bind(R.id.bottomsheet)
+    BottomSheetLayout mBottomsheet;
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -215,16 +224,20 @@ public class MainActivityIn extends AppCompatActivity {
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_SETTINGS.name());
                                 break;
                             case R.id.nav_rules:
-                                args.putString(AppConstants.K.REMOTE_URL.name(), "http://www.samepinch.co/rules/");
+                                args.putString(AppConstants.K.REMOTE_URL.name(), AppConstants.API.URL_RULES.getValue());
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
                                 break;
                             case R.id.nav_sys_status:
-                                args.putString(AppConstants.K.REMOTE_URL.name(), "http://www.samepinch.co/systemstatus/");
+                                args.putString(AppConstants.K.REMOTE_URL.name(), AppConstants.API.URL_SYS_STATUS.getValue());
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
                                 break;
                             case R.id.nav_t_n_c:
-                                args.putString(AppConstants.K.REMOTE_URL.name(), "http://www.samepinch.co/t&c");
+                                args.putString(AppConstants.K.REMOTE_URL.name(), AppConstants.API.URL_TERMS_COND.getValue());
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
+                                break;
+
+                            case R.id.nav_spread_it:
+                                doSpreadIt();
                                 break;
                             default:
                                 Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
@@ -241,6 +254,48 @@ public class MainActivityIn extends AppCompatActivity {
                         return true;
                     }
                 });
+    }
+
+    private void doSpreadIt() {
+        final String subject = getApplicationContext().getString(R.string.share_subject);
+        final String body = getApplicationContext().getString(R.string.share_body);
+
+        // prepare menu options
+        View menu = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
+        LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
+        // sms
+        TextView viaSMS = (TextView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_raw_sms, null);
+        viaSMS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBottomsheet.dismissSheet();
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"));
+                intent.putExtra("sms_body", body);
+                intent.putExtra(intent.EXTRA_TEXT, body);
+                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        layout.addView(viaSMS);
+        // email
+        TextView viaEmail = (TextView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_raw_email, null);
+        viaEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBottomsheet.dismissSheet();
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
+                intent.setType("message/rfc822");
+                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                intent.putExtra(Intent.EXTRA_TEXT, body);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        layout.addView(viaEmail);
+
+        mBottomsheet.showWithSheetView(menu);
     }
 
     @OnClick(R.id.fab)

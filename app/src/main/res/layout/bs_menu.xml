@@ -17,5 +17,6 @@
         android:duplicateParentState="true"
         android:showDividers="middle"
         android:orientation="vertical"
-        />
+        android:layout_gravity="center">
+        </LinearLayout>
 </LinearLayout>

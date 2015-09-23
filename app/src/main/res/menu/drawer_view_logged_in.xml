@@ -27,19 +27,19 @@
         <menu>
             <item
                 android:id="@+id/nav_spread_it"
-                android:title="Spread Love" />
+                android:title="Spread The Love" />
             <item
                 android:id="@+id/nav_rate_it"
-                android:title="Rate It" />
+                android:title="Rate App" />
             <item
                 android:id="@+id/nav_rules"
                 android:title="Rules" />
             <item
                 android:id="@+id/nav_t_n_c"
-                android:title="Terms and Conditions" />
+                android:title="@string/terms_n_cond" />
             <item
-                android:id="@+id/nav_help_n_feedback"
-                android:title="Help/Feedback" />
+                android:id="@+id/nav_feedback"
+                android:title="Feedback" />
             <item
                 android:id="@+id/nav_sys_status"
                 android:title="System Status" />
