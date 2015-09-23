@@ -1,6 +1,8 @@
 package co.samepinch.android.app.helpers;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -11,8 +13,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,15 +27,14 @@ import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import co.samepinch.android.app.R;
 
-public class WebViewFragment extends Fragment {
+public class WebViewFragment extends Fragment implements AdvancedWebView.Listener {
     public static final String TAG = "WebViewFragment";
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
 
     @Bind(R.id.webview)
-    WebView mWebView;
+    AdvancedWebView mWebView;
 
     private LocalHandler mHandler;
 
@@ -51,56 +57,14 @@ public class WebViewFragment extends Fragment {
             handleError("missing url. closing...");
         }
 
-
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
-            }
-        });
-        ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        setupData();
+        mWebView.setListener(getActivity(), this);
+        mWebView.loadUrl(mUrl);
         return view;
     }
 
-    private void setupData() {
-        // Let's display the progress in the activity title bar, like the
-        // browser app does.
-//        getActivity().getWindow().requestFeature(Window.FEATURE_PROGRESS);
-
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDisplayZoomControls(Boolean.TRUE);
-
-        final Activity activity = getActivity();
-//        mWebView.setWebChromeClient(new WebChromeClient() {
-//            public void onProgressChanged(WebView view, int progress) {
-//                // Activities and WebViews measure progress with different scales.
-//                // The progress meter will automatically disappear when we reach 100%
-//                activity.setProgress(progress * 1000);
-//            }
-//        });
-//        mWebView.setWebViewClient(new WebViewClient() {
-//            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-//                handleError("error opening url");
-//            }
-//        });
-
-        mWebView.loadUrl(mUrl);
-    }
-
-    private void handleError(String errMsg) {
-        Snackbar.make(getView(), errMsg, Snackbar.LENGTH_SHORT).show();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getActivity().finish();
-            }
-        }, 999);
+    @OnClick(R.id.close)
+    public void onCloseEvent() {
+        getActivity().finish();
     }
 
     @Override
@@ -115,6 +79,54 @@ public class WebViewFragment extends Fragment {
         public LocalHandler(WebViewFragment parent) {
             mActivity = new WeakReference<WebViewFragment>(parent);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mWebView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mWebView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        mWebView.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    @Override
+    public void onPageStarted(String url, Bitmap favicon) {
+    }
+
+    @Override
+    public void onPageFinished(String url) {
+    }
+
+    @Override
+    public void onPageError(int errorCode, String description, String failingUrl) {
+    }
+
+    @Override
+    public void onDownloadRequested(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+    }
+
+    @Override
+    public void onExternalPageRequest(String url) {
+    }
+
+    private void handleError(String errMsg) {
+        Snackbar.make(getView(), errMsg, Snackbar.LENGTH_SHORT).show();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().finish();
+            }
+        }, 999);
     }
 
 }

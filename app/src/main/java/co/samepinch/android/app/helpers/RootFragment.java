@@ -1,5 +1,6 @@
 package co.samepinch.android.app.helpers;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -18,13 +19,19 @@ import static co.samepinch.android.app.helpers.AppConstants.K;
  * Created by imaginationcoder on 7/11/15.
  */
 public class RootFragment extends Fragment {
-    private Bundle mArgs;
+    Fragment mFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // fragment args
-        mArgs = getArguments();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(mFragment !=null){
+            mFragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -33,7 +40,7 @@ public class RootFragment extends Fragment {
         View view = inflater.inflate(R.layout.root_fragment, container, false);
 
         Fragment fragment = null;
-        String targetFragment = mArgs.getString(K.TARGET_FRAGMENT.name());
+        String targetFragment = getArguments().getString(K.TARGET_FRAGMENT.name());
         switch (K.valueOf(targetFragment)) {
             case FRAGMENT_TAGWALL:
                 fragment = new TagWallFragment();
@@ -72,7 +79,8 @@ public class RootFragment extends Fragment {
                 throw new IllegalArgumentException("un-known fragment " + targetFragment);
         }
 
-        fragment.setArguments(mArgs);
+        fragment.setArguments(getArguments());
+        mFragment = fragment;
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.root_frame, fragment).commit();
 
