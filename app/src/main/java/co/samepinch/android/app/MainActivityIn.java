@@ -103,6 +103,27 @@ public class MainActivityIn extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
+
+        setupDrawerContent();
+        setupViewPager();
+
+    }
+
+    private void setupViewPager() {
+        adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
+        adapterViewPager.setCount(2);
+        mViewPager.setAdapter(adapterViewPager);
+
+        mTabLayout.setupWithViewPager(mViewPager);
+        mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        for (int i = 0; i < mTabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = mTabLayout.getTabAt(i);
+            tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
+        }
+    }
+
+    private void setupDrawerContent() {
         Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
         if (StringUtils.isNotBlank(userInfo.get(KEY_PHOTO.getValue()))) {
             mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get(KEY_PHOTO.getValue()));
@@ -117,88 +138,12 @@ public class MainActivityIn extends AppCompatActivity {
         String pinchHandle = String.format(getString(R.string.pinch_handle), userInfo.get(KEY_PINCH_HANDLE.getValue()));
         mNavHeaderSummary.setText(pinchHandle);
 
-        setupDrawerContent(mNavigationView);
-        setupViewPager(mViewPager);
-
-        mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-
-        for (int i = 0; i < mTabLayout.getTabCount(); i++) {
-            TabLayout.Tab tab = mTabLayout.getTabAt(i);
-            tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
-        }
+        // drawer nav events
+        setupDrawerNavListener();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!Utils.isLoggedIn()) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                    Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            if (!this.isFinishing()) {
-                finish();
-            }
-        }
-
-        mNavigationView.getMenu().getItem(0).setChecked(true);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == INTENT_LOGOUT) {
-            if (resultCode == RESULT_OK) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                if (!this.isFinishing()) {
-                    finish();
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        BusProvider.INSTANCE.getBus().unregister(this);
-    }
-
-    private void setupViewPager(ViewPager viewPager) {
-        adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
-        adapterViewPager.setCount(2);
-        viewPager.setAdapter(adapterViewPager);
-    }
-
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
+    private void setupDrawerNavListener() {
+        mNavigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -250,6 +195,68 @@ public class MainActivityIn extends AppCompatActivity {
                         return true;
                     }
                 });
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!Utils.isLoggedIn()) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                    Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            if (!this.isFinishing()) {
+                finish();
+            }
+        }
+
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_LOGOUT) {
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                if (!this.isFinishing()) {
+                    finish();
+                }
+            }
+        }
+    }
+//
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        return true;
+//    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.INSTANCE.getBus().unregister(this);
     }
 
     private void doSpreadIt() {
