@@ -214,6 +214,18 @@ public class MainActivityIn extends AppCompatActivity {
                             case R.id.nav_settings:
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_SETTINGS.name());
                                 break;
+                            case R.id.nav_rules:
+                                args.putString(AppConstants.K.REMOTE_URL.name(), "http://www.samepinch.co/rules/");
+                                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
+                                break;
+                            case R.id.nav_sys_status:
+                                args.putString(AppConstants.K.REMOTE_URL.name(), "http://www.samepinch.co/systemstatus/");
+                                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
+                                break;
+                            case R.id.nav_t_n_c:
+                                args.putString(AppConstants.K.REMOTE_URL.name(), "http://www.samepinch.co/t&c");
+                                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
+                                break;
                             default:
                                 Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
                                 break;

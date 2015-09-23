@@ -65,6 +65,9 @@ public class RootFragment extends Fragment {
             case FRAGMENT_SETTINGS:
                 fragment = new SettingsFragment();
                 break;
+            case FRAGMENT_WEBVIEW:
+                fragment = new WebViewFragment();
+                break;
             default:
                 throw new IllegalArgumentException("un-known fragment " + targetFragment);
         }

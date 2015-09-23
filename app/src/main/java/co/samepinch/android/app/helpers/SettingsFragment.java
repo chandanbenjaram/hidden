@@ -37,7 +37,6 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
@@ -303,19 +302,6 @@ public class SettingsFragment extends Fragment {
                 }
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        BusProvider.INSTANCE.getBus().register(this);
-        setRetainInstance(true);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.INSTANCE.getBus().unregister(this);
     }
 
     @Override

@@ -4,8 +4,7 @@
         <item
             android:id="@+id/nav_wall"
             android:icon="@drawable/ic_dashboard"
-            android:title="Home"
-            />
+            android:title="Home" />
         <item
             android:id="@+id/nav_post"
             android:icon="@drawable/ic_event"
@@ -24,13 +23,26 @@
             android:title="Notifications" />
     </group>
 
-    <item android:title="ABOUT APP">
+    <item android:title="THE APP">
         <menu>
-            <item android:title="Status" />
-            <item android:title="Spread" />
-            <item android:title="Rate It" />
-            <item android:title="Rules" />
-            <item android:title="Help" />
+            <item
+                android:id="@+id/nav_spread_it"
+                android:title="Spread Love" />
+            <item
+                android:id="@+id/nav_rate_it"
+                android:title="Rate It" />
+            <item
+                android:id="@+id/nav_rules"
+                android:title="Rules" />
+            <item
+                android:id="@+id/nav_t_n_c"
+                android:title="Terms and Conditions" />
+            <item
+                android:id="@+id/nav_help_n_feedback"
+                android:title="Help/Feedback" />
+            <item
+                android:id="@+id/nav_sys_status"
+                android:title="System Status" />
         </menu>
     </item>
 

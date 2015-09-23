@@ -131,6 +131,7 @@ public class AppConstants {
         FRAGMENT_MANAGE_A_TAG,
         FRAGMENT_DOTEDIT,
         FRAGMENT_SETTINGS,
+        FRAGMENT_WEBVIEW,
         KEY_TAG,
         KEY_DOT,
         Wall,
@@ -142,6 +143,7 @@ public class AppConstants {
         google,
         via_email_password,
         provider,
-        MESSAGE
+        MESSAGE,
+        REMOTE_URL
     }
 }
