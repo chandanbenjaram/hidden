@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.flipboard.bottomsheet.BottomSheetLayout;
-import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -167,15 +166,11 @@ public class MainActivityIn extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.menuitem_sign_in_id).setVisible(false);
-        menu.findItem(R.id.menuitem_sign_out_id).setVisible(true);
-
         return true;
     }
 
@@ -184,10 +179,6 @@ public class MainActivityIn extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-            case R.id.menuitem_sign_out_id:
-                Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
-                startActivityForResult(logOutIntent, INTENT_LOGOUT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -238,6 +229,11 @@ public class MainActivityIn extends AppCompatActivity {
 
                             case R.id.nav_spread_it:
                                 doSpreadIt();
+                                break;
+
+                            case R.id.nav_sign_out:
+                                Intent logOutIntent = new Intent(getApplicationContext(), LogoutActivity.class);
+                                startActivityForResult(logOutIntent, INTENT_LOGOUT);
                                 break;
                             default:
                                 Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
