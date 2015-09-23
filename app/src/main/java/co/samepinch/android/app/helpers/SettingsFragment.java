@@ -31,13 +31,13 @@ public class SettingsFragment extends Fragment {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.toogleLayout1)
+    @Bind(R.id.toggleLayout1)
     ToggleExpandLayout layout1;
 
-    @Bind(R.id.toogleLayout2)
+    @Bind(R.id.toggleLayout2)
     ToggleExpandLayout layout2;
 
-    @Bind(R.id.toogleLayout3)
+    @Bind(R.id.toggleLayout3)
     ToggleExpandLayout layout3;
 
     @Bind(R.id.switch_button1)

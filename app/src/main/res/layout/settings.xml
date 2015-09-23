@@ -1,68 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:layout_gravity="center"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        card_view:cardElevation="0dp"
+        card_view:cardPreventCornerOverlap="true"
+        android:padding="10dp"
+        android:layout_margin="9dp">
 
         <com.fenjuly.mylibrary.DropDownLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="15dp">
-
+            android:layout_height="match_parent">
             <com.fenjuly.mylibrary.ToggleExpandLayout
-                android:id="@+id/toogleLayout1"
+                android:id="@+id/toggleLayout1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp">
 
                 <LinearLayout
-                    android:id="@+id/id2"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="2dp"
                     android:outlineProvider="bounds">
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
+
                         <TextView
                             android:id="@+id/first_menu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="Set date" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/first_menu"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
                             android:text="23 August 2015"
                             android:textColor="#cccccc" />
                     </RelativeLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/id3"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="3dp"
                     android:outlineProvider="bounds">
 
@@ -74,27 +72,20 @@
                             android:id="@+id/second_menu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="Set time" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/second_menu"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
                             android:text="15:47"
                             android:textColor="#cccccc" />
                     </RelativeLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/id4"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="4dp"
                     android:outlineProvider="bounds">
 
@@ -106,43 +97,36 @@
                             android:id="@+id/menu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
-                            android:text="Automatic date and time" />
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:text="Time settings" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/menu"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text="Use network provide time"
+                            android:text="time sub-line"
                             android:textColor="#cccccc" />
 
                         <com.kyleduo.switchbutton.SwitchButton
                             android:id="@+id/switch_button1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
-                            android:padding="16dp" />
-
+                            android:layout_alignParentRight="true" />
                     </RelativeLayout>
                 </LinearLayout>
             </com.fenjuly.mylibrary.ToggleExpandLayout>
 
             <com.fenjuly.mylibrary.ToggleExpandLayout
-                android:id="@+id/toogleLayout2"
+                android:id="@+id/toggleLayout2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp">
 
                 <LinearLayout
                     android:id="@+id/id6"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="2dp"
                     android:outlineProvider="bounds">
 
@@ -154,27 +138,21 @@
                             android:id="@+id/first_menu2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="Set Sex" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/first_menu2"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
                             android:text="Girl"
                             android:textColor="#cccccc" />
                     </RelativeLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/id7"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="3dp"
                     android:outlineProvider="bounds">
 
@@ -186,27 +164,21 @@
                             android:id="@+id/second_menu2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="Set Name" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/second_menu2"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text="[FeN]July"
+                            android:text="July"
                             android:textColor="#cccccc" />
                     </RelativeLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/id8"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="4dp"
                     android:outlineProvider="bounds">
 
@@ -218,16 +190,12 @@
                             android:id="@+id/menu2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
-                            android:text="Quicklu set name and sex" />
+                            android:text="Quickly set name and sex" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/menu2"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
                             android:text="Use the default"
                             android:textColor="#cccccc" />
 
@@ -235,25 +203,20 @@
                             android:id="@+id/switch_button2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
-                            android:padding="16dp" />
+                            android:layout_alignParentRight="true" />
                     </RelativeLayout>
                 </LinearLayout>
             </com.fenjuly.mylibrary.ToggleExpandLayout>
 
             <com.fenjuly.mylibrary.ToggleExpandLayout
-                android:id="@+id/toogleLayout3"
+                android:id="@+id/toggleLayout3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp">
 
                 <LinearLayout
-                    android:id="@+id/id9"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="2dp"
                     android:outlineProvider="bounds">
 
@@ -265,59 +228,45 @@
                             android:id="@+id/first_menu3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="Set Game" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/first_menu3"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text="Final Fantasy typy-0"
+                            android:text="Cricket"
                             android:textColor="#cccccc" />
                     </RelativeLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/id10"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="3dp"
                     android:outlineProvider="bounds">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-
                         <TextView
                             android:id="@+id/second_menu3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="Set Host" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/second_menu3"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text="Sony PlayStation 4"
+                            android:text="Ground"
                             android:textColor="#cccccc" />
                     </RelativeLayout>
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/id11"
-                    android:layout_width="300dp"
-                    android:layout_height="80dp"
-                    android:background="#ffffff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:elevation="4dp"
                     android:outlineProvider="bounds">
 
@@ -329,44 +278,23 @@
                             android:id="@+id/menu3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="8dp"
-                            android:text="Automatic date and time" />
+                            android:text="Play" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/menu3"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text="Use network provide time"
+                            android:text="choose match and location"
                             android:textColor="#cccccc" />
 
                         <com.kyleduo.switchbutton.SwitchButton
-                        android:id="@+id/switch_button3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="10dp"
-                        android:padding="16dp" />
-                        <!--<com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch-->
-                            <!--android:id="@+id/switch_button3"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_alignParentRight="true"-->
-                            <!--android:layout_marginRight="10dp"-->
-                            <!--android:padding="16dp"-->
-                            <!--app:ball_press_color="@color/blue_700"-->
-                            <!--app:ball_release_color="@color/grey_200"-->
-                            <!--app:base_press_color="@color/blue_100"-->
-                            <!--app:base_release_color="@color/grey_200"-->
-                            <!--app:icon_press="@drawable/tickmark"-->
-                            <!--app:icon_release="@drawable/x_mark" />-->
+                            android:id="@+id/switch_button3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true" />
                     </RelativeLayout>
                 </LinearLayout>
             </com.fenjuly.mylibrary.ToggleExpandLayout>
         </com.fenjuly.mylibrary.DropDownLayout>
-
-    </LinearLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>
