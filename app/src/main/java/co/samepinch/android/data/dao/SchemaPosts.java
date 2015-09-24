@@ -23,7 +23,8 @@ public interface SchemaPosts extends BaseColumns {
     String COLUMN_COMMENTERS = "commenters";
     String COLUMN_TAGS = "tags";
     String COLUMN_OWNER = "dot_uid";
-
+    String COLUMN_SOURCE_KEY = "source_key";
+    String COLUMN_SOURCE_BY = "source_by";
 
     String TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + TABLE_NAME
@@ -40,6 +41,8 @@ public interface SchemaPosts extends BaseColumns {
             + COLUMN_COMMENTERS + " TEXT DEFAULT '', "
             + COLUMN_TAGS + " TEXT DEFAULT '', "
             + COLUMN_OWNER + " TEXT NOT NULL, "
+            + COLUMN_SOURCE_KEY + " TEXT DEFAULT '', "
+            + COLUMN_SOURCE_BY + " TEXT DEFAULT '', "
             + "FOREIGN KEY(dot_uid) REFERENCES dots(uid)"
             + ")";
 
@@ -54,7 +57,9 @@ public interface SchemaPosts extends BaseColumns {
     String[] POST_COLUMNS = new String[]{
             _ID, COLUMN_UID, COLUMN_CONTENT, COLUMN_COMMENT_COUNT,
             COLUMN_UPVOTE_COUNT, COLUMN_VIEWS, COLUMN_ANONYMOUS,
-            COLUMN_CREATED_AT, COLUMN_COMMENTERS, COLUMN_TAGS, COLUMN_OWNER, COLUMN_IMAGES
+            COLUMN_CREATED_AT, COLUMN_COMMENTERS, COLUMN_TAGS,
+            COLUMN_OWNER, COLUMN_IMAGES, COLUMN_SOURCE_KEY,
+            COLUMN_SOURCE_BY
     };
 
     String VIEW_CREATE_POST_WITH_DOT_NAME = "VIEW_POST_WITH_DOT";
@@ -73,6 +78,8 @@ public interface SchemaPosts extends BaseColumns {
             + ", p." + COLUMN_OWNER
             + ", p." + COLUMN_IMAGES
             + ", p." + COLUMN_CREATED_AT
+            + ", p." + COLUMN_SOURCE_KEY
+            + ", p." + COLUMN_SOURCE_BY
             + ", d." + SchemaDots.COLUMN_PINCH_HANDLE
             + ", d." + SchemaDots.COLUMN_FNAME
             + ", d." + SchemaDots.COLUMN_LNAME

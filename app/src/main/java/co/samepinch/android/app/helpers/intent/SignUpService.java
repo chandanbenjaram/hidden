@@ -72,11 +72,9 @@ public class SignUpService extends IntentService {
                 req.setKey(iArgs.getString(KEY_KEY.getValue()));
             }
 
-            HttpEntity<ReqSignUp> payloadEntity;
-            ResponseEntity<RespLogin> resp = null;
             // call remote
-            payloadEntity = new HttpEntity<>(req.build(), headers);
-            resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
+            HttpEntity<ReqSignUp> payloadEntity = new HttpEntity<>(req.build(), headers);
+            ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
 
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.via_email_password.name());
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());

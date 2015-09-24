@@ -1,5 +1,6 @@
 package co.samepinch.android.app.helpers;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -62,7 +63,6 @@ public class SettingsFragment extends Fragment {
 
     @Bind(R.id.switch_button2)
     SwitchButton switchButton2;
-
 
     // options
     @Bind(R.id.settings_notifs_posts_likes_tags_switch)
@@ -142,7 +142,6 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -167,11 +166,11 @@ public class SettingsFragment extends Fragment {
         User userDTO = new User();
         // notifications
         Integer apnNotify = 3;
-        if(notifsPostsLikesTags.isChecked()){
+        if (notifsPostsLikesTags.isChecked()) {
             apnNotify = 3;
-        }else if(notifsPostsLikes.isChecked()){
+        } else if (notifsPostsLikes.isChecked()) {
             apnNotify = 2;
-        }else if(notifsPosts.isChecked()){
+        } else if (notifsPosts.isChecked()) {
             apnNotify = 1;
         }
 
@@ -250,9 +249,8 @@ public class SettingsFragment extends Fragment {
                     mUser = gson.fromJson(userInfoStr, User.class);
                     setupData(mUser);
                     Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
-//                    getActivity().setResult(Activity.RESULT_OK);
-//                    getActivity().finish();
-
+                    getActivity().setResult(Activity.RESULT_OK);
+                    getActivity().finish();
                     return;
                 }
             } catch (Exception e) {

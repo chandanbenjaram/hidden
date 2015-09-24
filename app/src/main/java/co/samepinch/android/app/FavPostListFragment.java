@@ -15,6 +15,8 @@ import android.view.animation.AnticipateOvershootInterpolator;
 
 import com.squareup.otto.Subscribe;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 
 import butterknife.Bind;
@@ -30,6 +32,9 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
+
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
 
 public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     public static final String LOG_TAG = "FavPostListFragment";
@@ -73,19 +78,6 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         ButterKnife.bind(this, view);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
-
-//        // custom recycler
-//        RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
-//            @Override
-//            public void scrollBy(int x, int y) {
-//                try {
-//                    super.scrollBy(x, y);
-//                } catch (NullPointerException nlp) {
-//                    // muted
-//                }
-//            }
-//        };
-
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
@@ -122,10 +114,11 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
         Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
+        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
         for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey(), e.getValue());
+            iArgs.putString(e.getKey(), e.getValue().toString());
         }
+        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_FAV.getValue());
 
         // call for intent
         Intent mServiceIntent =
@@ -136,13 +129,18 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        Map<String, String> eMData = event.getMetaData();
+        if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-//                pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
-                mRefreshLayout.setRefreshing(false);
                 try {
+                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+                    pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
+                    mRefreshLayout.setRefreshing(false);
+
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {

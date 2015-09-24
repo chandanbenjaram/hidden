@@ -11,6 +11,7 @@ public class AppConstants {
         PREF_AUTH_USER("auth.user"),
         PREF_AUTH_PROVIDER("auth.provider"),
         PREF_POSTS_LIST("posts.lists"),
+        PREF_POSTS_LIST_FAV("posts.lists"),
         PREF_ANONYMOUS_IMG("anonymous.image"),
         DEFAULT_DATE_FORMAT("MM/dd/yyyy hh:mma"),
 
@@ -70,6 +71,7 @@ public class AppConstants {
         KEY_TAGS_PULL_TYPE("type"),
         KEY_TAGS_PULL_ALL("all"),
         KEY_TAGS_PULL_FAV("favourites"),
+        KEY_POSTS_FAV("favourites"),
         KEY_TAGS_PULL_RECOMMENDED("recommended"),
         KEY_MSG_GENERIC_ERR("something went wrong. try again..."),
         CHOOSE_PINCH_HANDLE("77");

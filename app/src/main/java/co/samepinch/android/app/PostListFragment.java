@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 public class PostListFragment extends Fragment implements FragmentLifecycle {
-    public static final String LOG_TAG = "PostListFragment";
+    public static final String TAG = "PostListFragment";
     public static final String ARG_PAGE = "ARG_PAGE";
 
     PostCursorRecyclerViewAdapter mViewAdapter;
@@ -106,9 +107,17 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         Bundle iArgs = new Bundle();
         Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
         Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
-        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey(), e.getValue());
+        try {
+            Log.d(TAG, "inserting...");
+            for (Map.Entry<String, String> e : pPosts.entrySet()) {
+                Log.d(TAG, e.getKey() + "---" + e.getValue());
+                iArgs.putString(e.getKey().toString(), e.getValue().toString());
+            }
+            Log.d(TAG, "...done");
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
+
 
         // call for intent
         Intent mServiceIntent =
@@ -122,10 +131,10 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-//                pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
-
                 try {
+                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+                    pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
+
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {

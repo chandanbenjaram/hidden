@@ -215,8 +215,11 @@ public class LoginActivity extends AppCompatActivity implements
         } else {
             // Show the signed-out UI
 //            showSignedOutUI();
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.reconnect();
+            if (mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.clearDefaultAccountAndReconnect();
+            } else {
+                mGoogleApiClient.connect();
+            }
         }
     }
 
@@ -364,6 +367,14 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Subscribe
     public void onAuthFailEvent(final Events.AuthFailEvent event) {
+        if (event != null && event.getMetaData() != null && event.getMetaData().get(AppConstants.K.MESSAGE.name()) != null) {
+            LoginActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Snackbar.make(findViewById(R.id.login_layout), event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
+                }
+            });
+        }
         socialSignOutLocally(event.getMetaData());
     }
 
@@ -451,6 +462,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     private static final class LocalHandler extends Handler {
         private final WeakReference<LoginActivity> mActivity;
+
         public LocalHandler(LoginActivity parent) {
             mActivity = new WeakReference<LoginActivity>(parent);
         }

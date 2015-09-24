@@ -24,6 +24,12 @@ public class Events {
         }
     }
 
+    public static class FavPostsRefreshedEvent extends EventBase {
+        public FavPostsRefreshedEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
     public static class TagRefreshedEvent extends EventBase {
         public TagRefreshedEvent(Map<String, String> metaData) {
             super(metaData);

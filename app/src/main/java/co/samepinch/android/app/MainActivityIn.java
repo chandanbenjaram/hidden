@@ -117,6 +117,24 @@ public class MainActivityIn extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_LOGOUT) {
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                if (!this.isFinishing()) {
+                    finish();
+                }
+            }
+        }
+    }
+
     private void setupViewPager() {
         final TabItemAdapter pagerAdapter = new TabItemAdapter(getSupportFragmentManager(), TAB_ITEM_COUNT);
         mViewPager.setAdapter(pagerAdapter);
@@ -259,23 +277,6 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == INTENT_LOGOUT) {
-            if (resultCode == RESULT_OK) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                if (!this.isFinishing()) {
-                    finish();
-                }
-            }
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -367,14 +368,20 @@ public class MainActivityIn extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return PostListFragment.newInstance(position);
-                case 1:
-                    return FavPostListFragment.newInstance(position);
-                default:
-                    throw new IllegalStateException("non-bound position index: " + position);
+            Fragment fragment = getRegisteredFragment(position);
+            if (fragment == null) {
+                switch (position) {
+                    case 0:
+                        fragment = PostListFragment.newInstance(position);
+                        break;
+                    case 1:
+                        fragment = FavPostListFragment.newInstance(position);
+                        break;
+                    default:
+                        throw new IllegalStateException("non-bound position index: " + position);
+                }
             }
+            return fragment;
         }
     }
 }
