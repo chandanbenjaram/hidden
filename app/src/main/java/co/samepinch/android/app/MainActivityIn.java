@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -14,13 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.squareup.otto.Subscribe;
 
@@ -32,8 +34,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 import co.samepinch.android.app.helpers.Utils;
-import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
+import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
@@ -46,6 +49,7 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH
 public class MainActivityIn extends AppCompatActivity {
     public static final String TAG = "MainActivityIn";
     private static final int INTENT_LOGOUT = 1;
+    private static final int TAB_ITEM_COUNT = 2;
 
     @Bind(R.id.bottomsheet)
     BottomSheetLayout mBottomsheet;
@@ -53,17 +57,23 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
 
-    @Bind(R.id.drawer_layout)
-    DrawerLayout mDrawerLayout;
-
-    @Bind(R.id.nav_view)
-    NavigationView mNavigationView;
-
+    /**
+     * BODY
+     */
     @Bind(R.id.tabs)
     TabLayout mTabLayout;
 
     @Bind(R.id.viewpager)
     ViewPager mViewPager;
+
+    /**
+     * NAVIGATION RELATED
+     */
+    @Bind(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+
+    @Bind(R.id.nav_view)
+    NavigationView mNavigationView;
 
     @Bind(R.id.nav_header_switch)
     ViewSwitcher mHeaderSwitch;
@@ -76,8 +86,6 @@ public class MainActivityIn extends AppCompatActivity {
 
     @Bind(R.id.nav_header_summary)
     TextView mNavHeaderSummary;
-
-    SPFragmentPagerAdapter adapterViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,17 +118,52 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     private void setupViewPager() {
-        adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
-        adapterViewPager.setCount(2);
-        mViewPager.setAdapter(adapterViewPager);
+        final TabItemAdapter pagerAdapter = new TabItemAdapter(getSupportFragmentManager(), TAB_ITEM_COUNT);
+        mViewPager.setAdapter(pagerAdapter);
+//        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mViewPager.setPageTransformer(false, new ZoomInTransformer());
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                FragmentLifecycle active = (FragmentLifecycle) pagerAdapter.getItem(position);
+                active.onResumeFragment();
+
+                FragmentLifecycle passive;
+                for (int i = 0; i < pagerAdapter.getCount(); i++) {
+                    if (i == position) {
+                        // skip
+                        continue;
+                    }
+                    // rest call onPause even though redundant for already hidden
+                    passive = (FragmentLifecycle) pagerAdapter.getItem(i);
+                    passive.onPauseFragment();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        // setup tabs
         mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        // title tabs
         for (int i = 0; i < mTabLayout.getTabCount(); i++) {
             TabLayout.Tab tab = mTabLayout.getTabAt(i);
-            tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
+            tab.setCustomView(getCustomTabView(i));
         }
+    }
+
+    public View getCustomTabView(int position) {
+        View v = LayoutInflater.from(getApplicationContext()).inflate(R.layout.custom_tab_main, null);
+        ViewSwitcher vs = (ViewSwitcher) v.findViewById(R.id.tab_main_switch);
+        vs.setDisplayedChild(position);
+        return v;
     }
 
     private void setupDrawerContent() {
@@ -231,16 +274,6 @@ public class MainActivityIn extends AppCompatActivity {
             }
         }
     }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        return true;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -256,6 +289,7 @@ public class MainActivityIn extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mViewPager.clearOnPageChangeListeners();
         BusProvider.INSTANCE.getBus().unregister(this);
     }
 
@@ -316,5 +350,31 @@ public class MainActivityIn extends AppCompatActivity {
     @Subscribe
     public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
         Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
+    }
+
+    public class TabItemAdapter extends SmartFragmentStatePagerAdapter {
+        private final int itemCount;
+
+        public TabItemAdapter(FragmentManager fm, int itemCount) {
+            super(fm);
+            this.itemCount = itemCount;
+        }
+
+        @Override
+        public int getCount() {
+            return itemCount;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return PostListFragment.newInstance(position);
+                case 1:
+                    return FavPostListFragment.newInstance(position);
+                default:
+                    throw new IllegalStateException("non-bound position index: " + position);
+            }
+        }
     }
 }
