@@ -7,8 +7,8 @@ import android.graphics.Bitmap;
  * Created by cbenjaram on 9/18/15.
  */
 public class ImageUtils {
-    private static final float BITMAP_SCALE = 0.4f;
-    private static final float BLUR_RADIUS = 7.5f;
+    private static final float BITMAP_SCALE = 0.2f;
+    private static final int BLUR_RADIUS = 2;
 
     public static Bitmap blur(Context ctx, Bitmap image) {
 //        int width = Math.round(image.getWidth() * BITMAP_SCALE);
@@ -26,11 +26,10 @@ public class ImageUtils {
 ////        theIntrinsic.forEach(tmpOut);
 ////        tmpOut.copyTo(outputBitmap);
 
-        return fastblur(image, BITMAP_SCALE, 7);
+        return fastblur(image, BITMAP_SCALE, BLUR_RADIUS);
     }
 
     public static Bitmap fastblur(Bitmap sentBitmap, float scale, int radius) {
-
         int width = Math.round(sentBitmap.getWidth() * scale);
         int height = Math.round(sentBitmap.getHeight() * scale);
         sentBitmap = Bitmap.createScaledBitmap(sentBitmap, width, height, false);

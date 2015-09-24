@@ -158,6 +158,17 @@ public class LoginActivity extends AppCompatActivity implements
 //        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
         String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
         Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+
+        if(person == null){
+            Utils.dismissSilently(progressDialog);
+            if (mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.clearDefaultAccountAndReconnect();
+            } else {
+                mGoogleApiClient.connect();
+            }
+
+            return;
+        }
         Person.Name personName = person.getName();
         String fName = personName.getGivenName();
         String lName = personName.getFamilyName();

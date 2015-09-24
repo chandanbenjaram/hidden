@@ -87,7 +87,7 @@ public class PostsPullService extends IntentService {
             metaData.put(KEY_LAST_MODIFIED.getValue(), respBody.getLastModifiedStr());
             metaData.put(KEY_ETAG.getValue(), respBody.getEtag());
             metaData.put(KEY_POST_COUNT.getValue(), String.valueOf(respBody.getPostCount()));
-//            metaData.put(KEY_BY.getValue(), iArgs.getString(KEY_BY.getValue()));
+            metaData.put(KEY_BY.getValue(), iArgs.getString(KEY_BY.getValue(), EMPTY));
             // publish success event
             BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
         } catch (Exception e) {
@@ -114,7 +114,7 @@ public class PostsPullService extends IntentService {
             // dot
             appendDOTOps(postOwner, anonyOwner, ops);
             // post
-            appendPostOps(post, anonyOwner, ops);
+            appendPostOps(post, postOwner, anonyOwner, ops);
             // tags
             appendTagOps(post, ops);
         }
@@ -212,7 +212,7 @@ public class PostsPullService extends IntentService {
         }
     }
 
-    private static void appendPostOps(Post post, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
+    private static void appendPostOps(Post post, User postOwner, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
         ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
                 .withValue(SchemaPosts.COLUMN_UID, post.getUid())
                 .withValue(SchemaPosts.COLUMN_CONTENT, post.getContent())
@@ -223,7 +223,7 @@ public class PostsPullService extends IntentService {
                 .withValue(SchemaPosts.COLUMN_ANONYMOUS, post.getAnonymous())
                 .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
                 .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
-                .withValue(SchemaPosts.COLUMN_OWNER, post.getUid())
+                .withValue(SchemaPosts.COLUMN_OWNER, postOwner != null ?  postOwner.getUid() : anonyOwner.getUid())
                 .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB()).build());
     }
 

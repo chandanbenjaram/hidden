@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,6 +102,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         rv.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        Log.d(LOG_TAG, SchemaPosts.VIEW_CREATE_POST_WITH_DOT.toString());
 
         // ANIMATIONS
         ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
@@ -129,6 +131,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        if(mRefreshLayout.isRefreshing()){
+            mRefreshLayout.setRefreshing(false);
+        }
+
         Map<String, String> eMData = event.getMetaData();
         if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
             return;
@@ -139,12 +145,11 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                 try {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
-                    mRefreshLayout.setRefreshing(false);
 
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
         });
