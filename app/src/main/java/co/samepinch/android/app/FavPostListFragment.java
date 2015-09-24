@@ -48,7 +48,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     RecyclerView mRecyclerView;
 
     PostCursorRecyclerViewAdapter mViewAdapter;
-    private LinearLayoutManager mLayoutManager;
+    LinearLayoutManager mLayoutManager;
 
     public static FavPostListFragment newInstance(int page) {
         Bundle args = new Bundle();
@@ -91,25 +91,26 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                 callForRemotePosts();
             }
         });
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        setupRecyclerView(mRecyclerView);
+        setupRecyclerView();
 
         return view;
     }
 
-    private void setupRecyclerView(RecyclerView rv) {
-        rv.setHasFixedSize(true);
+    private void setupRecyclerView() {
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        if(cursor.getCount() < 1){
+            callForRemotePosts();
+        }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
-        Log.d(LOG_TAG, SchemaPosts.VIEW_CREATE_POST_WITH_DOT.toString());
 
         // ANIMATIONS
         ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
         wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
         wrapperAdapter.setDuration(300);
         wrapperAdapter.setFirstOnly(Boolean.FALSE);
-        rv.setAdapter(wrapperAdapter);
+        mRecyclerView.setAdapter(wrapperAdapter);
     }
 
     private void callForRemotePosts() {
@@ -146,8 +147,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
 
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-                    mViewAdapter.changeCursor(cursor);
+                   setupRecyclerView();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

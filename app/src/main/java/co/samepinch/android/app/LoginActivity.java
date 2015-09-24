@@ -1,6 +1,8 @@
 package co.samepinch.android.app;
 
 import android.app.ProgressDialog;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
@@ -29,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +49,11 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dao.SchemaComments;
+import co.samepinch.android.data.dao.SchemaDots;
+import co.samepinch.android.data.dao.SchemaPostDetails;
+import co.samepinch.android.data.dao.SchemaPosts;
+import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
@@ -125,6 +133,7 @@ public class LoginActivity extends AppCompatActivity implements
 
             mIsResolving = false;
             mGoogleApiClient.connect();
+            return;
         } else if (requestCode == AppConstants.KV.REQUEST_SIGNUP.getIntValue()) {
             if (resultCode == RESULT_OK) {
                 setResult(RESULT_OK);
@@ -141,12 +150,26 @@ public class LoginActivity extends AppCompatActivity implements
                         new Intent(getApplicationContext(), FBAuthService.class);
                 mServiceIntent.putExtras(iArgs);
                 startService(mServiceIntent);
+                return;
             } catch (Exception e) {
                 Utils.dismissSilently(progressDialog);
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
                 if (mGoogleApiClient.isConnected()) {
                     mGoogleApiClient.disconnect();
                 }
+            }
+        }
+
+        if (RESULT_OK == resultCode) {
+            // clear db
+            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+            ops.add(ContentProviderOperation.newDelete(SchemaPosts.CONTENT_URI).build());
+            ops.add(ContentProviderOperation.newDelete(SchemaPostDetails.CONTENT_URI).build());
+            try {
+                ContentProviderResult[] result = getContentResolver().
+                        applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+            } catch (Exception e) {
+                // muted
             }
         }
     }
@@ -159,7 +182,7 @@ public class LoginActivity extends AppCompatActivity implements
         String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
         Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
 
-        if(person == null){
+        if (person == null) {
             Utils.dismissSilently(progressDialog);
             if (mGoogleApiClient.isConnected()) {
                 mGoogleApiClient.clearDefaultAccountAndReconnect();
