@@ -38,7 +38,7 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
 
 public class FavPostListFragment extends Fragment implements FragmentLifecycle {
-    public static final String LOG_TAG = "FavPostListFragment";
+    public static final String TAG = "FavPostListFragment";
     public static final String ARG_PAGE = "ARG_PAGE";
 
     @Bind(R.id.swipeRefreshLayout)
@@ -99,8 +99,8 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     private void setupRecyclerView() {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-        if(cursor.getCount() < 1){
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
+        if (cursor.getCount() < 1) {
             callForRemotePosts();
         }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
@@ -132,22 +132,23 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
-        if(mRefreshLayout.isRefreshing()){
-            mRefreshLayout.setRefreshing(false);
-        }
-
-        Map<String, String> eMData = event.getMetaData();
-        if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
-            return;
-        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+
+                    Map<String, String> eMData = event.getMetaData();
+                    if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
+                        return;
+                    }
+
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
 
-                   setupRecyclerView();
+                    setupRecyclerView();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -157,11 +158,12 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Override
     public void onPauseFragment() {
-//        BusProvider.INSTANCE.getBus().unregister(this);
+        if (mRefreshLayout.isRefreshing()) {
+            mRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
     public void onResumeFragment() {
-//        BusProvider.INSTANCE.getBus().register(this);
     }
 }

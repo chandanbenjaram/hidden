@@ -54,6 +54,8 @@ public class PostsPullService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Map<String, String> metaData = new HashMap<>();
+
         try {
             StorageComponent component = DaggerStorageComponent.create();
             ReqPosts postsReq = component.provideReqPosts();
@@ -64,12 +66,12 @@ public class PostsPullService extends IntentService {
             postsReq.setToken(Utils.getNonBlankAppToken());
             postsReq.setCmd("filter");
             // set context args
-            postsReq.setPostCount(iArgs.getString(KEY_POST_COUNT.getValue(), "99"));
+            postsReq.setPostCount(iArgs.getString(KEY_POST_COUNT.getValue(), ""));
             postsReq.setLastModified(iArgs.getString(KEY_LAST_MODIFIED.getValue(), EMPTY));
             postsReq.setKey(iArgs.getString(KEY_STEP.getValue(), EMPTY));
             postsReq.setEtag(iArgs.getString(KEY_ETAG.getValue(), EMPTY));
             postsReq.setKey(iArgs.getString(KEY_KEY.getValue(), EMPTY));
-            postsReq.setKey(iArgs.getString(KEY_BY.getValue(), EMPTY));
+            postsReq.setBy(iArgs.getString(KEY_BY.getValue(), EMPTY));
 
             //headers
             HttpHeaders headers = new HttpHeaders();
@@ -78,26 +80,28 @@ public class PostsPullService extends IntentService {
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
             ResponseEntity<RespPosts> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS_WITH_FILTER.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
             ArrayList<ContentProviderOperation> ops = parseResponse(iArgs, resp.getBody());
-            ContentProviderResult[] result = getContentResolver().
-                    applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
 
-            // event data
-            Map<String, String> metaData = new HashMap<>();
-            RespPosts.Body respBody = resp.getBody().getBody();
-            metaData.put(KEY_LAST_MODIFIED.getValue(), respBody.getLastModifiedStr());
-            metaData.put(KEY_ETAG.getValue(), respBody.getEtag());
-            metaData.put(KEY_POST_COUNT.getValue(), String.valueOf(respBody.getPostCount()));
-            metaData.put(KEY_BY.getValue(), iArgs.getString(KEY_BY.getValue(), EMPTY));
-            // publish success event
-            BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
+            if (ops != null) {
+                ContentProviderResult[] result = getContentResolver().
+                        applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+                if (result.length > 0) {
+                    // event data
+                    RespPosts.Body respBody = resp.getBody().getBody();
+                    metaData.put(KEY_LAST_MODIFIED.getValue(), respBody.getLastModifiedStr());
+                    metaData.put(KEY_ETAG.getValue(), respBody.getEtag());
+                    metaData.put(KEY_POST_COUNT.getValue(), String.valueOf(respBody.getPostCount()));
+                    metaData.put(KEY_BY.getValue(), iArgs.getString(KEY_BY.getValue(), EMPTY));
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "error refreshing posts...", e);
         }
+        BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
     }
 
 
-    private ArrayList<ContentProviderOperation> parseResponse(Bundle reqArgs, RespPosts respData) {
+    private ArrayList<ContentProviderOperation> parseResponse(Bundle iArgs, RespPosts respData) {
         List<Post> postsToInsert = respData.getBody().getPosts();
         if (postsToInsert == null) {
             return null;
@@ -114,7 +118,7 @@ public class PostsPullService extends IntentService {
             // dot
             appendDOTOps(postOwner, anonyOwner, ops);
             // post
-            appendPostOps(post, postOwner, anonyOwner, ops);
+            appendPostOps(iArgs, post, postOwner, anonyOwner, ops);
             // tags
             appendTagOps(post, ops);
         }
@@ -142,7 +146,7 @@ public class PostsPullService extends IntentService {
         }
     }
 
-    private static void appendPostOps(Post post, User postOwner, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
+    private static void appendPostOps(Bundle iArgs, Post post, User postOwner, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
         ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
                 .withValue(SchemaPosts.COLUMN_UID, post.getUid())
                 .withValue(SchemaPosts.COLUMN_CONTENT, post.getContent())
@@ -153,8 +157,11 @@ public class PostsPullService extends IntentService {
                 .withValue(SchemaPosts.COLUMN_ANONYMOUS, post.getAnonymous())
                 .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
                 .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
-                .withValue(SchemaPosts.COLUMN_OWNER, postOwner != null ?  postOwner.getUid() : anonyOwner.getUid())
-                .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB()).build());
+                .withValue(SchemaPosts.COLUMN_OWNER, postOwner != null ? postOwner.getUid() : anonyOwner.getUid())
+                .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB())
+                .withValue(SchemaPosts.COLUMN_SOURCE_BY, iArgs.getString(KEY_BY.getValue(), EMPTY))
+                .withValue(SchemaPosts.COLUMN_SOURCE_KEY, iArgs.getString(KEY_KEY.getValue(), EMPTY))
+                .build());
     }
 
     private static void appendTagOps(Post post, ArrayList<ContentProviderOperation> ops) {

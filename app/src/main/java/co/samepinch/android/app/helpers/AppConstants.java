@@ -4,6 +4,7 @@ package co.samepinch.android.app.helpers;
  * Created by imaginationcoder on 6/26/15.
  */
 public class AppConstants {
+    public final static int BATCH_COUNT_POSTS = 1;
 
     public enum API {
         SHARED_PREFS_NAME("co.samepinch.android.app.pref"),
@@ -72,9 +73,11 @@ public class AppConstants {
         KEY_TAGS_PULL_ALL("all"),
         KEY_TAGS_PULL_FAV("favourites"),
         KEY_POSTS_FAV("favourites"),
+        KEY_POSTS_TAG("tag"),
         KEY_TAGS_PULL_RECOMMENDED("recommended"),
         KEY_MSG_GENERIC_ERR("something went wrong. try again..."),
-        CHOOSE_PINCH_HANDLE("77");
+        CHOOSE_PINCH_HANDLE("77"),
+        ;
 
         private final String value;
 

@@ -36,6 +36,7 @@ import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POST_COUNT;
 
 public class PostListFragment extends Fragment implements FragmentLifecycle {
     public static final String TAG = "PostListFragment";
@@ -122,7 +123,8 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         for (Map.Entry<String, String> e : pPosts.entrySet()) {
             iArgs.putString(e.getKey().toString(), e.getValue().toString());
         }
-
+        // set posts batch
+        iArgs.putString(KEY_POST_COUNT.getValue(), String.valueOf(AppConstants.BATCH_COUNT_POSTS));
         // call for intent
         Intent mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
@@ -132,19 +134,18 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
-        if (mRefreshLayout.isRefreshing()) {
-            mRefreshLayout.setRefreshing(false);
-        }
-
-        Map<String, String> eMData = event.getMetaData();
-        if ((eMData = event.getMetaData()) != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
-            return;
-        }
-
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                    Map<String, String> eMData = event.getMetaData();
+                    if ((eMData = event.getMetaData()) != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
+                        return;
+                    }
+
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
 
@@ -156,13 +157,15 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         });
     }
 
+
     @Override
     public void onPauseFragment() {
-//        BusProvider.INSTANCE.getBus().unregister(this);
+        if (mRefreshLayout.isRefreshing()) {
+            mRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
     public void onResumeFragment() {
-//        BusProvider.INSTANCE.getBus().register(this);
     }
 }
