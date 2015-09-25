@@ -7,7 +7,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,18 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnticipateOvershootInterpolator;
-import android.widget.LinearLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Map;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
@@ -42,7 +37,6 @@ import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_NAME;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_TAG;
 import static co.samepinch.android.app.helpers.AppConstants.K;
 

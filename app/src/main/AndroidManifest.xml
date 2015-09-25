@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".helpers.RootActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -34,6 +34,7 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".LogoutActivity" />
         <activity android:name=".SignupActivity" />
+        <activity android:name=".MainActivity" />
         <activity android:name=".MainActivityIn" />
 
 

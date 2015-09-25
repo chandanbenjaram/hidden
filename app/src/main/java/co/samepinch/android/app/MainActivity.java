@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package co.samepinch.android.app;
 
 import android.content.Intent;
@@ -38,15 +22,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 
-/**
- * TODO
- */
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     private static final int INTENT_LOGIN = 0;
@@ -72,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (Utils.isLoggedIn()) {
-            Intent intent = new Intent(this, MainActivityIn.class);
+            Intent intent = new Intent(this, RootActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
                     Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -87,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Utils.isLoggedIn()) {
-            Intent intent = new Intent(this, MainActivityIn.class);
+            Intent intent = new Intent(this, RootActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
                     Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -124,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == INTENT_LOGIN) {
             if (resultCode == RESULT_OK) {
-                Intent intent = new Intent(this, MainActivityIn.class);
+                Intent intent = new Intent(this, RootActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                         Intent.FLAG_ACTIVITY_CLEAR_TASK |
                         Intent.FLAG_ACTIVITY_NEW_TASK);

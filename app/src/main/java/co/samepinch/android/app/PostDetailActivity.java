@@ -289,12 +289,10 @@ public class PostDetailActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.post_detail_menu, menu);
-        if (mPostDetails != null) {
-            List<String> permissions = mPostDetails.getPermissions();
-            if (permissions.contains("edit")) {
-                // self
-                menu.findItem(R.id.menuitem_post_edit_id).setVisible(Boolean.TRUE);
-            }
+        List<String> permissions = mPostDetails == null ? null : mPostDetails.getPermissions();
+        if (permissions != null && permissions.contains("edit")) {
+            // self
+            menu.findItem(R.id.menuitem_post_edit_id).setVisible(Boolean.TRUE);
         }
         return true;
     }

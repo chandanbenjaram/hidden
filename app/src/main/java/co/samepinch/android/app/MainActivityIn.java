@@ -34,6 +34,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
@@ -91,7 +92,7 @@ public class MainActivityIn extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!Utils.isLoggedIn()) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, RootActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
                     Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -123,7 +124,7 @@ public class MainActivityIn extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == INTENT_LOGOUT) {
             if (resultCode == RESULT_OK) {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, RootActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                         Intent.FLAG_ACTIVITY_CLEAR_TASK |
                         Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -263,7 +264,7 @@ public class MainActivityIn extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (!Utils.isLoggedIn()) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, RootActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
                     Intent.FLAG_ACTIVITY_NEW_TASK);

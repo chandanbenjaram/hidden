@@ -17,7 +17,7 @@ public class SPApplication extends Application {
         super.onCreate();
 
         Fresco.initialize(getApplicationContext());
-        Utils.PreferencesManager.initializeInstance(this);
+        Utils.PreferencesManager.initializeInstance(SPApplication.this);
         FacebookSdk.sdkInitialize(getApplicationContext());
     }
 }
