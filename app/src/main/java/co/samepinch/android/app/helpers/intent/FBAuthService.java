@@ -57,15 +57,16 @@ public class FBAuthService extends IntentService {
             loginReq.setToken(Utils.getAppToken(true));
             loginReq.setCmd("externalSignIn");
 
-            HttpEntity<ReqSetBody> payloadEntity;
-            ResponseEntity<RespLogin> resp = null;
             // call remote
-            payloadEntity = new HttpEntity<>(loginReq, headers);
-            resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
+            HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(loginReq, headers);
+            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+            ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
 
+            // register login type
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), intent.getStringExtra("provider"));
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
 
+            // broadcast event
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(eventData));
         } catch (Exception e) {
             Resp resp = Utils.parseAsRespSilently(e);

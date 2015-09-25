@@ -169,8 +169,8 @@ public class LoginActivity extends AppCompatActivity implements
                 // muted
             }
 
-            setResult(RESULT_OK);
-            finish();
+//            setResult(RESULT_OK);
+//            finish();
         }
     }
 

@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,13 +62,10 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
     private JSONObject fbUserObject;
     private String fbUserImg;
 
-    private LocalHandler mHandler;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // retain this fragment across configuration changes.
-        setRetainInstance(true);
 
         // fallback
         if (!FacebookSdk.isInitialized()) {
@@ -96,8 +90,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         if (accessToken != null) {
             fetchUserInfo();
         }
-
-        mHandler = new LocalHandler(this);
     }
 
     @Override
@@ -295,75 +287,69 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         protected void onPostExecute(Boolean result) {
             if (result != null) {
                 if (result.booleanValue()) {
-                    mHandler.sendEmptyMessage(1);
+                    handleResult(1);
                 } else {
-                    mHandler.sendEmptyMessage(0);
+                    handleResult(0);
                 }
             } else {
-                mHandler.sendEmptyMessage(-1);
+                handleResult(-1);
             }
         }
     }
 
-    private static final class LocalHandler extends Handler {
-        private final WeakReference<LoginFBFragment> mActivity;
-        public LocalHandler(LoginFBFragment parent) {
-            mActivity = new WeakReference<LoginFBFragment>(parent);
-        }
 
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            // call for intent
-            Intent signOutIntent =
-                    new Intent(mActivity.get().getActivity(), SignOutService.class);
-            switch (msg.what) {
-                case 0:
-                    mActivity.get().progressDialog.setMessage("setting up your account...");
-                    Bundle args = new Bundle();
-                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+    public void handleResult(int status) {
+        switch (status) {
+            case 0:
+                progressDialog.setMessage("setting up your account...");
+                Bundle args = new Bundle();
+                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CHOOSE_HANDLE.name());
+                try {
+                    args.putString("fname", fbUserObject.getString("first_name"));
+                    args.putString("lname", fbUserObject.getString("last_name"));
+                    args.putString("image", fbUserImg);
+                } catch (Exception e) {
+                    // muted
+                }
+                // intent
+                Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+                intent.putExtras(args);
+                startActivityForResult(intent, Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue()));
+                break;
+            case 1:
+                progressDialog.setMessage("found your account.\nsigning-in...");
+                Bundle iArgs = new Bundle();
+                if (fbUserObject != null) {
+                    iArgs.putString(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
                     try {
-                        args.putString("fname", mActivity.get().fbUserObject.getString("first_name"));
-                        args.putString("lname", mActivity.get().fbUserObject.getString("last_name"));
-                        args.putString("image", mActivity.get().fbUserImg);
+                        fbUserObject.put("image", fbUserImg);
+                        iArgs.putSerializable("user", (Serializable) FBAuthService.toMap(fbUserObject));
                     } catch (Exception e) {
                         // muted
                     }
-                    // intent
-                    Intent intent = new Intent(mActivity.get().getActivity().getApplicationContext(), ActivityFragment.class);
-                    intent.putExtras(args);
-                    mActivity.get().startActivityForResult(intent, Integer.parseInt(AppConstants.APP_INTENT.CHOOSE_PINCH_HANDLE.getValue()));
-                    break;
-                case 1:
-                    mActivity.get().progressDialog.setMessage("found your account.\nsigning-in...");
-                    Bundle iArgs = new Bundle();
-                    if (mActivity.get().fbUserObject != null) {
-                        iArgs.putString(AppConstants.K.provider.name(), AppConstants.K.facebook.name());
-                        try {
-                            mActivity.get().fbUserObject.put("image", mActivity.get().fbUserImg);
-                            iArgs.putSerializable("user", (Serializable) FBAuthService.toMap(mActivity.get().fbUserObject));
-                        } catch (Exception e) {
-                            // muted
-                        }
-                    } else {
-                        mActivity.get().progressDialog.setMessage("sign-in failed\ntry again");
-                        Utils.dismissSilently(mActivity.get().progressDialog);
-                        // call for intent
-                        mActivity.get().getActivity().startService(signOutIntent);
-                        return;
-                    }
+                } else {
+                    progressDialog.setMessage("sign-in failed\ntry again");
+                    Utils.dismissSilently(progressDialog);
                     // call for intent
-                    Intent mServiceIntent =
-                            new Intent(mActivity.get().getActivity(), FBAuthService.class);
-                    mServiceIntent.putExtras(iArgs);
-                    mActivity.get().getActivity().startService(mServiceIntent);
-                    break;
-                default:
-                    mActivity.get().progressDialog.setMessage("sign-in failed\ntry again");
-                    Utils.dismissSilently(mActivity.get().progressDialog);
-                    mActivity.get().getActivity().startService(signOutIntent);
-                    break;
-            }
+                    Intent signOutIntent =
+                            new Intent(getActivity(), SignOutService.class);
+                    getActivity().startService(signOutIntent);
+                    return;
+                }
+                // call for intent
+                Intent mServiceIntent =
+                        new Intent(getActivity(), FBAuthService.class);
+                mServiceIntent.putExtras(iArgs);
+                getActivity().startService(mServiceIntent);
+                break;
+            default:
+                progressDialog.setMessage("sign-in failed\ntry again");
+                Utils.dismissSilently(progressDialog);
+                // call for intent
+                Intent signOutIntent =
+                        new Intent(getActivity(), SignOutService.class);
+                getActivity().startService(signOutIntent);
+                break;
         }
-    };
+    }
 }
