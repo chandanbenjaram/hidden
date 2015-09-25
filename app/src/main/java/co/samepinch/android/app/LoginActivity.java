@@ -49,11 +49,8 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.data.dao.SchemaComments;
-import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
-import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
@@ -171,6 +168,9 @@ public class LoginActivity extends AppCompatActivity implements
             } catch (Exception e) {
                 // muted
             }
+
+            setResult(RESULT_OK);
+            finish();
         }
     }
 

@@ -71,6 +71,8 @@ public class AuthService extends IntentService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
             HttpEntity<ReqLogin> payloadEntity = new HttpEntity<>(loginReq.build(), headers);
+            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
+
             ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
 
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.via_email_password.name());

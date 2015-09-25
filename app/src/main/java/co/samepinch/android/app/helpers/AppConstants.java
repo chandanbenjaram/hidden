@@ -76,6 +76,7 @@ public class AppConstants {
         KEY_POSTS_TAG("tag"),
         KEY_TAGS_PULL_RECOMMENDED("recommended"),
         KEY_MSG_GENERIC_ERR("something went wrong. try again..."),
+        KEY_FRESH_DATA_FLAG("freshDataFlag"),
         CHOOSE_PINCH_HANDLE("77"),
         ;
 

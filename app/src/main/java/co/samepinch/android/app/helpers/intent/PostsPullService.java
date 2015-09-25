@@ -25,7 +25,9 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
+import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.Post;
@@ -36,6 +38,7 @@ import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_ETAG;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FRESH_DATA_FLAG;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LAST_MODIFIED;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POST_COUNT;
@@ -66,12 +69,15 @@ public class PostsPullService extends IntentService {
             postsReq.setToken(Utils.getNonBlankAppToken());
             postsReq.setCmd("filter");
             // set context args
-            postsReq.setPostCount(iArgs.getString(KEY_POST_COUNT.getValue(), ""));
+            Integer postCount = Integer.parseInt(iArgs.getString(KEY_POST_COUNT.getValue(), "0"));
+            postsReq.setPostCount(postCount);
             postsReq.setLastModified(iArgs.getString(KEY_LAST_MODIFIED.getValue(), EMPTY));
-            postsReq.setKey(iArgs.getString(KEY_STEP.getValue(), EMPTY));
+            postsReq.setKey(iArgs.getString(KEY_STEP.getValue(), "new"));
             postsReq.setEtag(iArgs.getString(KEY_ETAG.getValue(), EMPTY));
             postsReq.setKey(iArgs.getString(KEY_KEY.getValue(), EMPTY));
             postsReq.setBy(iArgs.getString(KEY_BY.getValue(), EMPTY));
+
+            boolean isFreshData = iArgs.getBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.FALSE);
 
             //headers
             HttpHeaders headers = new HttpHeaders();
@@ -82,11 +88,23 @@ public class PostsPullService extends IntentService {
             ArrayList<ContentProviderOperation> ops = parseResponse(iArgs, resp.getBody());
 
             if (ops != null) {
+                if(isFreshData){
+                    // clear db
+                    ArrayList<ContentProviderOperation> dropOps = new ArrayList<ContentProviderOperation>();
+                    dropOps.add(ContentProviderOperation.newDelete(SchemaPosts.CONTENT_URI).build());
+                    dropOps.add(ContentProviderOperation.newDelete(SchemaPostDetails.CONTENT_URI).build());
+                    dropOps.add(ContentProviderOperation.newDelete(SchemaComments.CONTENT_URI).build());
+
+                    ContentProviderResult[] result = getContentResolver().
+                            applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+                }
+
                 ContentProviderResult[] result = getContentResolver().
                         applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
                 if (result.length > 0) {
                     // event data
                     RespPosts.Body respBody = resp.getBody().getBody();
+                    metaData.put(KEY_STEP.getValue(), respBody.getEtag());
                     metaData.put(KEY_LAST_MODIFIED.getValue(), respBody.getLastModifiedStr());
                     metaData.put(KEY_ETAG.getValue(), respBody.getEtag());
                     metaData.put(KEY_POST_COUNT.getValue(), String.valueOf(respBody.getPostCount()));

@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +34,8 @@ import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FRESH_DATA_FLAG;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POST_COUNT;
 
 public class PostListFragment extends Fragment implements FragmentLifecycle {
     public static final String TAG = "PostListFragment";
@@ -83,13 +82,14 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
+                callForRemotePosts(Boolean.TRUE);
             }
         });
 
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                callForRemotePosts();
+                callForRemotePosts(false);
             }
         });
         setupRecyclerView();
@@ -102,7 +102,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
         if (cursor.getCount() < 1) {
-            callForRemotePosts();
+            callForRemotePosts(Boolean.FALSE);
         }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
@@ -115,16 +115,20 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
     }
 
 
-    private void callForRemotePosts() {
+    private void callForRemotePosts(boolean isPaginating) {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
-        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey().toString(), e.getValue().toString());
+        if(isPaginating){
+            Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+            Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
+            for (Map.Entry<String, String> e : pPosts.entrySet()) {
+                iArgs.putString(e.getKey().toString(), e.getValue().toString());
+            }
+        }else{
+            iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
         // set posts batch
-        iArgs.putString(KEY_POST_COUNT.getValue(), String.valueOf(AppConstants.BATCH_COUNT_POSTS));
+//        iArgs.putString(KEY_POST_COUNT.getValue(), String.valueOf(AppConstants.BATCH_COUNT_POSTS));
         // call for intent
         Intent mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
@@ -141,6 +145,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     if (mRefreshLayout.isRefreshing()) {
                         mRefreshLayout.setRefreshing(false);
                     }
+
                     Map<String, String> eMData = event.getMetaData();
                     if ((eMData = event.getMetaData()) != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
                         return;

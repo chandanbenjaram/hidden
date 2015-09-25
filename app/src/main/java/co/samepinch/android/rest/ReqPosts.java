@@ -8,19 +8,19 @@ import co.samepinch.android.app.helpers.Utils;
 /**
  * Created by imaginationcoder on 6/30/15.
  */
-public class ReqPosts extends RestBase<Map<String, String>> {
-    transient String postCount;
+public class ReqPosts extends RestBase<Map<String, Object>> {
+    transient Integer postCount;
     transient String lastModified;
     transient String step;
     transient String etag;
     transient String key;
     transient String by;
 
-    public String getPostCount() {
+    public Integer getPostCount() {
         return postCount;
     }
 
-    public void setPostCount(String postCount) {
+    public void setPostCount(Integer postCount) {
         this.postCount = postCount;
     }
 
@@ -66,18 +66,18 @@ public class ReqPosts extends RestBase<Map<String, String>> {
 
     @Override
 
-    public Map<String, String> getBody() {
+    public Map<String, Object> getBody() {
         return body;
     }
 
     @Override
-    public void setBody(Map<String, String> body) {
+    public void setBody(Map<String, Object> body) {
         this.body = body;
     }
 
     public ReqPosts build() {
-        Map<String, String> body = new HashMap<>();
-        body.put("post_count", Utils.emptyIfNull(postCount));
+        Map<String, Object> body = new HashMap<>();
+        body.put("post_count", Utils.zeroIfNull(postCount));
         body.put("last_modified", Utils.emptyIfNull(lastModified));
         body.put("step", Utils.emptyIfNull(step));
         body.put("etag", Utils.emptyIfNull(etag));

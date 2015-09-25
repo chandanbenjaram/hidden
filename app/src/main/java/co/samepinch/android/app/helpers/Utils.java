@@ -388,6 +388,10 @@ public class Utils {
         return arg0 == null ? "" : arg0;
     }
 
+    public static Integer zeroIfNull(Integer arg0) {
+        return arg0 == null ? 0 : arg0;
+    }
+
     public static String getNonBlankAppToken() {
         String token = getAppToken(false);
         if (StringUtils.isBlank(token)) {
