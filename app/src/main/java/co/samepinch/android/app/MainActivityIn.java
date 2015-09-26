@@ -1,8 +1,10 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -13,27 +15,34 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.imagepipeline.request.BasePostprocessor;
+import com.facebook.imagepipeline.request.Postprocessor;
 import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Map;
+import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.ImageUtils;
 import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 import co.samepinch.android.app.helpers.Utils;
@@ -41,11 +50,7 @@ import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
-
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PHOTO;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
+import co.samepinch.android.data.dto.User;
 
 public class MainActivityIn extends AppCompatActivity {
     public static final String TAG = "MainActivityIn";
@@ -76,21 +81,46 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.nav_view)
     NavigationView mNavigationView;
 
-    @Bind(R.id.nav_header_switch)
-    ViewSwitcher mHeaderSwitch;
+//    @Bind(R.id.nav_header_img)
+//    SIMView mNavHeaderImg;
 
-    @Bind(R.id.nav_header_img)
-    SIMView mNavHeaderImg;
+    @Bind(R.id.dot_wall_switch)
+    ViewSwitcher mVS;
 
-    @Bind(R.id.nav_header_name)
-    TextView mNavHeaderName;
+    @Bind(R.id.backdrop)
+    ImageView mBackdrop;
 
-    @Bind(R.id.nav_header_summary)
-    TextView mNavHeaderSummary;
+    @Bind(R.id.dot_wall_image)
+    SIMView mDotImage;
+
+    @Bind(R.id.dot_wall_image_txt)
+    TextView mDotImageText;
+
+    @Bind(R.id.dot_wall_name)
+    TextView mDotName;
+
+    @Bind(R.id.dot_wall_handle)
+    TextView mDotHandle;
+
+    @Bind(R.id.dot_wall_about)
+    TextView mDotAbout;
+
+    @Bind(R.id.dot_wall_followers_count)
+    TextView mDotFollowersCnt;
+
+    @Bind(R.id.dot_wall_posts_count)
+    TextView mDotPostsCnt;
+
+    @Bind(R.id.dot_wall_blog)
+    ImageView mDotBlog;
+
+    private LocalHandler mHandler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (!Utils.isLoggedIn()) {
             Intent intent = new Intent(this, RootActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
@@ -102,8 +132,9 @@ public class MainActivityIn extends AppCompatActivity {
             }
         }
 
-        setContentView(R.layout.activity_main_in);
+        mHandler = new LocalHandler(this);
 
+        setContentView(R.layout.activity_main_in);
         ButterKnife.bind(MainActivityIn.this);
         BusProvider.INSTANCE.getBus().register(this);
 
@@ -112,12 +143,9 @@ public class MainActivityIn extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-
         setupDrawerContent();
         setupViewPager();
-
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -186,19 +214,81 @@ public class MainActivityIn extends AppCompatActivity {
     }
 
     private void setupDrawerContent() {
-        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-        if (StringUtils.isNotBlank(userInfo.get(KEY_PHOTO.getValue()))) {
-            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get(KEY_PHOTO.getValue()));
-        } else {
-            String fName = userInfo.get(KEY_FNAME.getValue());
-            String lName = userInfo.get(KEY_LNAME.getValue());
+        String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
+        Gson gson = new Gson();
+        final User user = gson.fromJson(userStr, User.class);
+        String fName = user.getFname();
+        String lName = user.getLname();
+        // tag map
+        if (StringUtils.isBlank(user.getPhoto())) {
+            mVS.setDisplayedChild(1);
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
-            mNavHeaderName.setText(initials);
-            mHeaderSwitch.showNext();
+            mDotImageText.setText(initials);
+        } else {
+            mVS.setDisplayedChild(0);
+            Postprocessor postprocessor = new BasePostprocessor() {
+                @Override
+                public String getName() {
+                    return "redMeshPostprocessor";
+                }
+
+                @Override
+                public void process(final Bitmap bitmap) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Bitmap blurredBitmap = ImageUtils.blur(getApplicationContext(), bitmap);
+                            mBackdrop.setImageBitmap(blurredBitmap);
+                        }
+                    });
+
+                }
+            };
+
+            RoundingParams roundingParams = RoundingParams.asCircle();
+            roundingParams.setBorder(R.color.light_blue_500, 1.0f);
+
+            mDotImage.setRoundingParams(roundingParams);
+            mDotImage.populateImageViewWithAdjustedAspect(user.getPhoto(), postprocessor);
         }
 
-        String pinchHandle = String.format(getString(R.string.pinch_handle), userInfo.get(KEY_PINCH_HANDLE.getValue()));
-        mNavHeaderSummary.setText(pinchHandle);
+        mDotName.setText(StringUtils.join(new String[]{fName, lName}, " "));
+        String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
+        mDotHandle.setText(pinchHandle);
+        if (user.getFollowersCount() != null) {
+            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+        }
+
+        if (user.getFollowersCount() != null) {
+            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+        }
+
+        if (user.getPostsCount() != null) {
+            mDotPostsCnt.setText(user.getPostsCount() + "");
+        }
+
+        if (Utils.isValidUri(user.getBlog())) {
+            mDotBlog.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(user.getBlog()));
+                    startActivity(intent);
+                }
+            });
+            mDotBlog.setVisibility(View.VISIBLE);
+        }
+//        if (StringUtils.isNotBlank(userInfo.get(KEY_PHOTO.getValue()))) {
+//            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get(KEY_PHOTO.getValue()));
+//        } else {
+//            String fName = userInfo.get(KEY_FNAME.getValue());
+//            String lName = userInfo.get(KEY_LNAME.getValue());
+//            String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
+//            mNavHeaderName.setText(initials);
+//            mHeaderSwitch.showNext();
+//        }
+//
+//        String pinchHandle = String.format(getString(R.string.pinch_handle), userInfo.get(KEY_PINCH_HANDLE.getValue()));
+//        mNavHeaderSummary.setText(pinchHandle);
 
         // drawer nav events
         setupDrawerNavListener();
@@ -383,6 +473,14 @@ public class MainActivityIn extends AppCompatActivity {
                 }
             }
             return fragment;
+        }
+    }
+
+    private static final class LocalHandler extends Handler {
+        private final WeakReference<MainActivityIn> mActivity;
+
+        public LocalHandler(MainActivityIn parent) {
+            mActivity = new WeakReference<MainActivityIn>(parent);
         }
     }
 }

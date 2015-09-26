@@ -39,7 +39,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -221,8 +220,6 @@ public class DotWallFragment extends Fragment {
             applyPalette(null);
         } else {
             mVS.setDisplayedChild(0);
-
-
             Postprocessor postprocessor = new BasePostprocessor() {
                 @Override
                 public String getName() {

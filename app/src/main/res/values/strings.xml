@@ -46,8 +46,8 @@
     <string name="post_create_label">post</string>
     <string name="post_edit_label">update</string>
     <string name="post_del_label">delete</string>
-    <string name="post_del_pop_title">Delete post?</string>PositiveClick
-    <string name="post_del_pop_desc">Deleted posts cannot be restored. You will loose complete data(content, likes, comments, views, etc) on this post. Alternatively, you can edit.</string>
+    <string name="post_del_pop_title">Please confirm?</string>
+    <string name="post_del_pop_desc">Deleted posts can not be restored. You will loose complete data(content, likes, comments, views, etc) on this post. Alternatively, you can edit.</string>
     <string name="contd_sign_in_label">continue</string>
     <string name="manage_account_label">Manage account</string>
     <string name="sign_out_label">Sign out</string>
