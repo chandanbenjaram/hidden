@@ -4,6 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.google.gson.Gson;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,6 +24,7 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqLogin;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
@@ -73,10 +76,13 @@ public class AuthService extends IntentService {
             HttpEntity<ReqLogin> payloadEntity = new HttpEntity<>(loginReq.build(), headers);
             ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
 
+            User user = resp.getBody().getBody();
+            Gson gson = new Gson();
+            String userStr = gson.toJson(user);
+
             // register login type
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.via_email_password.name());
-            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
-
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userStr);
             // broadcast event
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(eventData));
         } catch (Exception e) {
@@ -84,10 +90,6 @@ public class AuthService extends IntentService {
             if (resp != null) {
                 eventData.put(AppConstants.K.MESSAGE.name(), resp.getMessage());
             }
-//            // get rid of auth session
-//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
-
             BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eventData));
         }
     }

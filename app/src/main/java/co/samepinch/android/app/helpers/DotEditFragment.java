@@ -171,10 +171,9 @@ public class DotEditFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
-            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+            String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
             Gson gson = new Gson();
-            String userInfoStr = gson.toJson(userInfo);
-            mUser = gson.fromJson(userInfoStr, User.class);
+            mUser = gson.fromJson(userStr, User.class);
         } catch (Exception e) {
             // muted
             getActivity().finish();
@@ -402,22 +401,26 @@ public class DotEditFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(User user) {
+        protected void onPostExecute(User updatedUser) {
             Utils.dismissSilently(progressDialog);
             try {
-                if (user != null) {
+                if (updatedUser != null) {
                     Gson gson = new Gson();
-                    String userStr = gson.toJson(user);
-                    Type mapType = new TypeToken<Map<String, String>>() {
-                    }.getType();
-                    Map<String, String> userNew = gson.fromJson(userStr, mapType);
+                    // update stored user info
+                    String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
+                    User user = gson.fromJson(userStr, User.class);
+                    user.setFname(updatedUser.getFname());
+                    user.setLname(updatedUser.getLname());
+                    user.setPinchHandle(updatedUser.getPinchHandle());
+                    user.setSummary(updatedUser.getSummary());
+                    user.setBlog(updatedUser.getBlog());
+                    user.setBadges(updatedUser.getBadges());
+                    user.setPhoto(updatedUser.getPhoto());
+                    user.setImageKey(updatedUser.getImageKey());
+                    Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), gson.toJson(user));
 
-                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-                    userInfo.putAll(userNew);
-                    Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userInfo);
-
-                    String userInfoStr = gson.toJson(user);
-                    mUser = gson.fromJson(userInfoStr, User.class);
+                    // local setup
+                    mUser = user;
                     setupData(mUser);
                     Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
                     // finish

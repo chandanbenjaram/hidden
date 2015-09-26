@@ -39,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -268,9 +269,7 @@ public class DotWallFragment extends Fragment {
             mDotPostsCnt.setText(user.getPostsCount() + "");
         }
 
-        if (user.getBlog() != null) {
-            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-
+        if (Utils.isValidUri(user.getBlog())) {
             mDotBlog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

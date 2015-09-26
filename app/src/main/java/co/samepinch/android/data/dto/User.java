@@ -2,6 +2,8 @@ package co.samepinch.android.data.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by imaginationcoder on 7/1/15.
  */
@@ -23,9 +25,13 @@ public class User {
     String summary;
     String blog;
     Boolean follow;
+    List<String> badges;
 
     Integer apnNotify;
     Boolean emailNotify;
+
+    public User() {
+    }
 
     public Long getPostsCount() {
         return postsCount;
@@ -65,10 +71,6 @@ public class User {
 
     public void setFollow(Boolean follow) {
         this.follow = follow;
-    }
-
-    public User() {
-
     }
 
     public String getPinchHandle() {
@@ -151,5 +153,13 @@ public class User {
 
     public void setEmailNotify(Boolean emailNotify) {
         this.emailNotify = emailNotify;
+    }
+
+    public List<String> getBadges() {
+        return badges;
+    }
+
+    public void setBadges(List<String> badges) {
+        this.badges = badges;
     }
 }

@@ -622,7 +622,7 @@ public class Utils {
 
     public static boolean isValidUri(String arg0) {
         try {
-            new URL(arg0);
+            new URL(arg0).toURI();
             return true;
         } catch (Exception e) {
             return false;

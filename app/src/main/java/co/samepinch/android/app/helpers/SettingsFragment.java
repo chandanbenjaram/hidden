@@ -110,10 +110,9 @@ public class SettingsFragment extends Fragment {
         ab.setDisplayHomeAsUpEnabled(true);
 
         try {
-            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+            String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
             Gson gson = new Gson();
-            String userInfoStr = gson.toJson(userInfo);
-            mUser = gson.fromJson(userInfoStr, User.class);
+            mUser = gson.fromJson(userStr, User.class);
         } catch (Exception e) {
             // muted
             getActivity().finish();
@@ -132,7 +131,6 @@ public class SettingsFragment extends Fragment {
             notifsPostsLikesTags.setChecked(aUser.getApnNotify() == 3);
             notifsPostsLikes.setChecked(aUser.getApnNotify() == 2);
             notifsPosts.setChecked(aUser.getApnNotify() == 1);
-
         }
         // email stuff
         if (aUser.getEmailNotify() != null) {
@@ -231,22 +229,20 @@ public class SettingsFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(User user) {
+        protected void onPostExecute(User updatedUser) {
             Utils.dismissSilently(progressDialog);
             try {
-                if (user != null) {
+                if (updatedUser != null) {
                     Gson gson = new Gson();
-                    String userStr = gson.toJson(user);
-                    Type mapType = new TypeToken<Map<String, String>>() {
-                    }.getType();
-                    Map<String, String> userNew = gson.fromJson(userStr, mapType);
+                    // update stored user info
+                    String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
+                    User user = gson.fromJson(userStr, User.class);
+                    user.setApnNotify(updatedUser.getApnNotify());
+                    user.setEmailNotify(updatedUser.getEmailNotify());
+                    Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), gson.toJson(user));
 
-                    Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-                    userInfo.putAll(userNew);
-                    Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userInfo);
-
-                    String userInfoStr = gson.toJson(user);
-                    mUser = gson.fromJson(userInfoStr, User.class);
+                    // local setup
+                    mUser = user;
                     setupData(mUser);
                     Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
                     getActivity().setResult(Activity.RESULT_OK);

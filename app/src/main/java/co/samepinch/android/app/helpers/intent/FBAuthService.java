@@ -3,6 +3,8 @@ package co.samepinch.android.app.helpers.intent;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
@@ -21,6 +23,7 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespLogin;
@@ -61,10 +64,13 @@ public class FBAuthService extends IntentService {
             HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(loginReq, headers);
             ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
             ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
+            User user = resp.getBody().getBody();
+            Gson gson = new Gson();
+            String userStr = gson.toJson(user);
 
             // register login type
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), intent.getStringExtra("provider"));
-            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userStr);
 
             // broadcast event
             BusProvider.INSTANCE.getBus().post(new Events.AuthSuccessEvent(eventData));
@@ -73,9 +79,6 @@ public class FBAuthService extends IntentService {
             if (resp != null) {
                 eventData.put(AppConstants.K.MESSAGE.name(), resp.getMessage());
             }
-
-//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
-//            Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_AUTH_USER.getValue());
             BusProvider.INSTANCE.getBus().post(new Events.AuthFailEvent(eventData));
         }
     }

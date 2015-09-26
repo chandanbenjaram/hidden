@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by imaginationcoder on 6/30/15.
  */
-public abstract class RestBase<T> implements Serializable {
+public class RestBase<T> implements Serializable {
     @SerializedName("body")
     @Expose
     protected T body;

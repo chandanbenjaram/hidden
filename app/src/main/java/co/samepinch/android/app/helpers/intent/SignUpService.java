@@ -4,6 +4,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,6 +21,7 @@ import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqSignUp;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespLogin;
@@ -75,9 +79,12 @@ public class SignUpService extends IntentService {
             // call remote
             HttpEntity<ReqSignUp> payloadEntity = new HttpEntity<>(req.build(), headers);
             ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
+            User user = resp.getBody().getBody();
+            Gson gson = new Gson();
+            String userStr = gson.toJson(user);
 
             Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue(), AppConstants.K.via_email_password.name());
-            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), resp.getBody().getBody());
+            Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), userStr);
 
             BusProvider.INSTANCE.getBus().post(new Events.SignUpSuccessEvent(eData));
         } catch (Exception e) {
