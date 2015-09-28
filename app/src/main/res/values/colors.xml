@@ -295,4 +295,5 @@
 
     <color name="transparent_blue">#BE90caf9</color>
     <color name="transparent">#00000000</color>
+    <color name="transparent_grey">#0Ae3f2fd</color>
 </resources>

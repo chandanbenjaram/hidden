@@ -2,6 +2,9 @@ package co.samepinch.android.app.helpers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import co.samepinch.android.app.R;
 
 /**
  * Created by cbenjaram on 9/18/15.
@@ -11,6 +14,12 @@ public class ImageUtils {
     private static final int BLUR_RADIUS = 2;
 
     public static Bitmap blur(Context ctx, Bitmap image) {
+        try {
+            return fastblur(image, BITMAP_SCALE, BLUR_RADIUS);
+        } catch (Exception e) {
+            return BitmapFactory.decodeResource(ctx.getResources(),
+                    R.drawable.bg_blur_2x);
+        }
 //        int width = Math.round(image.getWidth() * BITMAP_SCALE);
 //        int height = Math.round(image.getHeight() * BITMAP_SCALE);
 //
@@ -26,7 +35,6 @@ public class ImageUtils {
 ////        theIntrinsic.forEach(tmpOut);
 ////        tmpOut.copyTo(outputBitmap);
 
-        return fastblur(image, BITMAP_SCALE, BLUR_RADIUS);
     }
 
     public static Bitmap fastblur(Bitmap sentBitmap, float scale, int radius) {

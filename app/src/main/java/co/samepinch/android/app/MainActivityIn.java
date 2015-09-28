@@ -160,9 +160,8 @@ public class MainActivityIn extends AppCompatActivity {
         // handler
         mHandler = new LocalHandler(this);
 
-        setupDrawerContent(mUser);
+        setupDrawerContent(mUser, true);
         setupViewPager();
-
 
         //update user details
         Bundle iArgs = new Bundle();
@@ -239,7 +238,7 @@ public class MainActivityIn extends AppCompatActivity {
         return v;
     }
 
-    private void setupDrawerContent(final User user) {
+    private void setupDrawerContent(final User user, boolean init) {
 
         String fName = user.getFname();
         String lName = user.getLname();
@@ -261,6 +260,7 @@ public class MainActivityIn extends AppCompatActivity {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            mBackdrop.setImageBitmap(null);
                             Bitmap blurredBitmap = ImageUtils.blur(getApplicationContext(), bitmap);
                             mBackdrop.setImageBitmap(blurredBitmap);
                         }
@@ -280,15 +280,21 @@ public class MainActivityIn extends AppCompatActivity {
         String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
         mDotHandle.setText(pinchHandle);
         if (user.getFollowersCount() != null) {
-            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+            mDotFollowersCnt.setText(Long.toString(user.getFollowersCount()));
+        } else {
+            mDotFollowersCnt.setVisibility(View.GONE);
         }
 
-        if (user.getFollowersCount() != null) {
-            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+        if (StringUtils.isNotBlank(user.getSummary())) {
+            mDotAbout.setText(user.getSummary());
+        } else {
+            mDotAbout.setVisibility(View.GONE);
         }
 
         if (user.getPostsCount() != null) {
-            mDotPostsCnt.setText(user.getPostsCount() + "");
+            mDotPostsCnt.setText(Long.toString(user.getPostsCount()));
+        } else {
+            mDotPostsCnt.setVisibility(View.GONE);
         }
 
         if (Utils.isValidUri(user.getBlog())) {
@@ -300,38 +306,28 @@ public class MainActivityIn extends AppCompatActivity {
                 }
             });
             mDotBlog.setVisibility(View.VISIBLE);
+        } else {
+            mDotBlog.setVisibility(View.GONE);
         }
 
-
         mDotEdit.setVisibility(View.VISIBLE);
-        mDotEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle args = new Bundle();
-                // target
-                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTEDIT.name());
+        if (init) {
+            mDotEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle args = new Bundle();
+                    // target
+                    args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTEDIT.name());
 
-                // intent
-                Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
-                intent.putExtras(args);
-                startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
-            }
-        });
-//        if (StringUtils.isNotBlank(userInfo.get(KEY_PHOTO.getValue()))) {
-//            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get(KEY_PHOTO.getValue()));
-//        } else {
-//            String fName = userInfo.get(KEY_FNAME.getValue());
-//            String lName = userInfo.get(KEY_LNAME.getValue());
-//            String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
-//            mNavHeaderName.setText(initials);
-//            mHeaderSwitch.showNext();
-//        }
-//
-//        String pinchHandle = String.format(getString(R.string.pinch_handle), userInfo.get(KEY_PINCH_HANDLE.getValue()));
-//        mNavHeaderSummary.setText(pinchHandle);
+                    // intent
+                    Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                    intent.putExtras(args);
+                    startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
+                }
+            });
 
-        // drawer nav events
-        setupDrawerNavListener();
+            setupDrawerNavListener();
+        }
     }
 
     private void setupDrawerNavListener() {
@@ -405,6 +401,13 @@ public class MainActivityIn extends AppCompatActivity {
         }
 
         mNavigationView.getMenu().getItem(0).setChecked(true);
+        //update user details
+        Bundle iArgs = new Bundle();
+        iArgs.putString(AppConstants.K.DOT.name(), mUser.getUid());
+        Intent intent =
+                new Intent(getApplicationContext(), DotDetailsService.class);
+        intent.putExtras(iArgs);
+        startService(intent);
     }
 
     @Override
@@ -463,7 +466,6 @@ public class MainActivityIn extends AppCompatActivity {
             }
         });
         layout.addView(viaEmail);
-
         mBottomsheet.showWithSheetView(menu);
     }
 
@@ -521,15 +523,35 @@ public class MainActivityIn extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Cursor cursor = null;
                 try {
-                    Cursor cursor = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{mUser.getUid()}, null);
+                    cursor = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{mUser.getUid()}, null);
                     if (cursor.moveToFirst()) {
-//                        User user = Utils.cursorToUserEntity(cursor);
-//                        setupDrawerContent(user);
+                        User updatedUser = Utils.cursorToUserEntity(cursor);
+
+                        Gson gson = new Gson();
+                        // update stored user info
+                        String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
+                        User user = gson.fromJson(userStr, User.class);
+                        user.setFname(updatedUser.getFname());
+                        user.setLname(updatedUser.getLname());
+                        user.setSummary(updatedUser.getSummary());
+                        user.setBlog(updatedUser.getBlog());
+                        user.setBadges(updatedUser.getBadges());
+                        user.setPhoto(updatedUser.getPhoto());
+                        user.setImageKey(updatedUser.getImageKey());
+                        user.setPostsCount(updatedUser.getPostsCount());
+                        user.setFollowersCount(updatedUser.getFollowersCount());
+                        Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), gson.toJson(user));
+                        invalidateOptionsMenu();
+                        setupDrawerContent(user, false);
                     }
-                    cursor.close();
                 } catch (Exception e) {
                     //e.printStackTrace();
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
                 }
             }
         });

@@ -255,15 +255,21 @@ public class DotWallFragment extends Fragment {
         mDotName.setText(StringUtils.join(new String[]{fName, lName}, " "));
         mDotHandle.setText(pinchHandle);
         if (user.getFollowersCount() != null) {
-            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+            mDotFollowersCnt.setText(Long.toString(user.getFollowersCount()));
+        } else {
+            mDotFollowersCnt.setVisibility(View.GONE);
         }
 
-        if (user.getFollowersCount() != null) {
-            mDotFollowersCnt.setText(user.getFollowersCount() + "");
+        if (StringUtils.isNotBlank(user.getSummary())) {
+            mDotAbout.setText(user.getSummary());
+        } else {
+            mDotAbout.setVisibility(View.GONE);
         }
 
         if (user.getPostsCount() != null) {
-            mDotPostsCnt.setText(user.getPostsCount() + "");
+            mDotPostsCnt.setText(Long.toString(user.getPostsCount()));
+        } else {
+            mDotPostsCnt.setVisibility(View.GONE);
         }
 
         if (Utils.isValidUri(user.getBlog())) {
@@ -275,7 +281,10 @@ public class DotWallFragment extends Fragment {
                 }
             });
             mDotBlog.setVisibility(View.VISIBLE);
+        } else {
+            mDotBlog.setVisibility(View.GONE);
         }
+
 
         if (Utils.isLoggedIn()) {
             Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
