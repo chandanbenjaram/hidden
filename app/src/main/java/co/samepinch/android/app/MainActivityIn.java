@@ -1,6 +1,7 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,10 +46,12 @@ import co.samepinch.android.app.helpers.ImageUtils;
 import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.SmartFragmentStatePagerAdapter;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.intent.DotDetailsService;
 import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
+import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dto.User;
 
 public class MainActivityIn extends AppCompatActivity {
@@ -114,14 +116,28 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.dot_wall_blog)
     ImageView mDotBlog;
 
+    @Bind(R.id.dot_wall_edit)
+    ImageView mDotEdit;
+
     private LocalHandler mHandler;
+
+    private User mUser;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!Utils.isLoggedIn()) {
+        try {
+            if (Utils.isLoggedIn()) {
+                String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
+                Gson gson = new Gson();
+                mUser = gson.fromJson(userStr, User.class);
+            } else {
+                throw new IllegalStateException("failed to load user.");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage() == null ? "" : e.getMessage(), e);
             Intent intent = new Intent(this, RootActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
@@ -130,10 +146,8 @@ public class MainActivityIn extends AppCompatActivity {
             if (!this.isFinishing()) {
                 finish();
             }
+
         }
-
-        mHandler = new LocalHandler(this);
-
         setContentView(R.layout.activity_main_in);
         ButterKnife.bind(MainActivityIn.this);
         BusProvider.INSTANCE.getBus().register(this);
@@ -143,8 +157,20 @@ public class MainActivityIn extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        setupDrawerContent();
+        // handler
+        mHandler = new LocalHandler(this);
+
+        setupDrawerContent(mUser);
         setupViewPager();
+
+
+        //update user details
+        Bundle iArgs = new Bundle();
+        iArgs.putString(AppConstants.K.DOT.name(), mUser.getUid());
+        Intent intent =
+                new Intent(getApplicationContext(), DotDetailsService.class);
+        intent.putExtras(iArgs);
+        startService(intent);
     }
 
     @Override
@@ -213,10 +239,8 @@ public class MainActivityIn extends AppCompatActivity {
         return v;
     }
 
-    private void setupDrawerContent() {
-        String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
-        Gson gson = new Gson();
-        final User user = gson.fromJson(userStr, User.class);
+    private void setupDrawerContent(final User user) {
+
         String fName = user.getFname();
         String lName = user.getLname();
         // tag map
@@ -277,6 +301,22 @@ public class MainActivityIn extends AppCompatActivity {
             });
             mDotBlog.setVisibility(View.VISIBLE);
         }
+
+
+        mDotEdit.setVisibility(View.VISIBLE);
+        mDotEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle args = new Bundle();
+                // target
+                args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTEDIT.name());
+
+                // intent
+                Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+                intent.putExtras(args);
+                startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
+            }
+        });
 //        if (StringUtils.isNotBlank(userInfo.get(KEY_PHOTO.getValue()))) {
 //            mNavHeaderImg.populateImageViewWithAdjustedAspect(userInfo.get(KEY_PHOTO.getValue()));
 //        } else {
@@ -474,6 +514,25 @@ public class MainActivityIn extends AppCompatActivity {
             }
             return fragment;
         }
+    }
+
+    @Subscribe
+    public void onDotDetailsRefreshEvent(final Events.DotDetailsRefreshEvent event) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Cursor cursor = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{mUser.getUid()}, null);
+                    if (cursor.moveToFirst()) {
+//                        User user = Utils.cursorToUserEntity(cursor);
+//                        setupDrawerContent(user);
+                    }
+                    cursor.close();
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+            }
+        });
     }
 
     private static final class LocalHandler extends Handler {

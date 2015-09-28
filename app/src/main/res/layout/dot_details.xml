@@ -22,41 +22,39 @@
             android:layout_height="@dimen/signup_avatar_size"
             android:layout_gravity="center_horizontal|center" />
     </ViewSwitcher>
-
-    <LinearLayout
-        android:id="@+id/dot_about_pane"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/dot_wall_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="name" />
-
-        <TextView
-            android:id="@+id/dot_wall_handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="handle" />
-
-        <TextView
-            android:id="@+id/dot_wall_about"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="about"
-            android:visibility="gone" />
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/dot_about_pane"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dot_wall_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="name" />
+
+            <TextView
+                android:id="@+id/dot_wall_handle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="handle" />
+
+            <TextView
+                android:id="@+id/dot_wall_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="about"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
