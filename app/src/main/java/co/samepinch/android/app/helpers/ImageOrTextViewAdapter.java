@@ -73,11 +73,13 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
             @Override
             public void onClick(View view) {
                 // grab next text item
-                ImageOrText nextSiblingItem = mItems.get(position + 1);
-                if (position > 0 && StringUtils.isNotBlank(nextSiblingItem.getText())) {
-                    ImageOrText prevSiblingItem = mItems.get(position - 1);
-                    prevSiblingItem.setText(StringUtils.join(prevSiblingItem.getText(), "\n", nextSiblingItem.getText()));
-                    mItems.remove(position + 1);
+                if (mItems.size() > position + 1) {
+                    ImageOrText nextSiblingItem = mItems.get(position + 1);
+                    if (position > 0 && StringUtils.isNotBlank(nextSiblingItem.getText())) {
+                        ImageOrText prevSiblingItem = mItems.get(position - 1);
+                        prevSiblingItem.setText(StringUtils.join(prevSiblingItem.getText(), "\n", nextSiblingItem.getText()));
+                        mItems.remove(position + 1);
+                    }
                 }
 
                 mItems.remove(position);

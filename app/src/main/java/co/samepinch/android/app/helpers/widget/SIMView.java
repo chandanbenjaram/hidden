@@ -90,6 +90,10 @@ public class SIMView extends RelativeLayout {
         populateImageViewWithAdjustedAspect(imgUri, null, resizeDimensions);
     }
 
+    public void setAspectRatio(float aspectRatio) {
+        mSIMView.setAspectRatio(aspectRatio);
+    }
+
     public void setRoundingParams(RoundingParams roundingParams) {
         mSIMView.getHierarchy().setRoundingParams(roundingParams);
     }
@@ -127,5 +131,6 @@ public class SIMView extends RelativeLayout {
         mSIMView.setController(controller);
         mSIMView.setDrawingCacheEnabled(true);
         mSIMView.buildDrawingCache(true);
+        mSIMView.setAspectRatio(mSIMView.getAspectRatio());
     }
 }

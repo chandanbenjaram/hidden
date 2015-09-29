@@ -4,7 +4,7 @@
         <menu>
             <item
                 android:id="@+id/nav_spread_it"
-                android:title="Spread The Love" />
+                android:title="Spread Your Love" />
             <item
                 android:id="@+id/nav_rate_it"
                 android:title="Rate App" />

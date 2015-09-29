@@ -1,45 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_header_wrapper"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="192dp"
-    android:background="@color/white"
-    android:gravity="bottom"
-    android:orientation="vertical"
-    android:padding="0dp">
+    android:layout_gravity="center_horizontal">
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/backdrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
-        <ViewSwitcher
-            android:id="@+id/nav_header_switch"
-            android:layout_width="match_parent"
-            android:layout_height="192dp"
-            android:layout_gravity="center_horizontal">
-            <co.samepinch.android.app.helpers.widget.SIMView
-                android:id="@+id/nav_header_img"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop" />
 
-            <TextView
-                android:id="@+id/nav_header_name"
-                android:layout_width="@dimen/signup_avatar_size"
-                android:layout_height="@dimen/signup_avatar_size"
-                android:layout_gravity="center_horizontal|center"
-                style="@style/SP_NAV_NAME" />
-        </ViewSwitcher>
-        <TextView
-            android:id="@+id/nav_header_summary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/nav_header_switch"
-            android:layout_alignLeft="@+id/nav_header_switch"
-            android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/nav_header_switch"
-            android:background="@drawable/bground_gradient_desc"
-            android:gravity="center_horizontal|bottom"
-            android:text="footer..." />
-    </RelativeLayout>
-</FrameLayout>
+    <TextView
+        android:id="@+id/login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/backdrop"
+        android:layout_alignLeft="@+id/backdrop"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/backdrop"
+        android:background="@drawable/bground_gradient_desc"
+        android:gravity="center_horizontal|bottom"
+        android:text="login" />
+</RelativeLayout>

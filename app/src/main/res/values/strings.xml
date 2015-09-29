@@ -39,7 +39,7 @@
     <string name="enter_here">enter here...</string>
     <string name="enter_comment_actionLabel">Submit</string>
     <string name="profile_picture_desc">Profile picture</string>
-    <string name="welcome_title">Welcome to SamePinch!</string>
+    <string name="welcome_title">Welcome to SamePinch</string>
     <string name="welcome_sub_title">SamePinch is created by idealists who believe in new era of social networking where people engage with others on a wide variety of topics. Imagine a virtual wall where you can post anything you like (even as anonymous) and community is watching, learning and commenting.</string>
     <string name="sign_in_label">Sign in</string>
     <string name="save_label">Save</string>
@@ -74,8 +74,11 @@
     <string name="settings_email_subline">subscription allows you to get email digests, important communication, etc. </string>
     <string name="settings_email_subscribe">Subscribe</string>
 
-    <!--SHARE TEXT -->
+    <!-- SHARE -->
     <string name="share_subject">I\u0027ve started using SamePinch app\u0021</string>
     <string name="share_body">Thought you may be interested to check out this app I am in love with.\u000A\u000AGet your copy from Android\u002FApple store. \u000A\u000AA SamePinch Fan \u000Awww.samepinch.co</string>
 
+    <!-- FEEDBACK -->
+    <string name="feedback_to">friends@samepinch.co</string>
+    <string name="feedback_subject">SamePinch Feedback</string>
 </resources>

@@ -2,10 +2,12 @@ package co.samepinch.android.app.helpers.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import co.samepinch.android.app.PostDetailActivity;
 import co.samepinch.android.app.R;
 
 public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsRVHolder> {

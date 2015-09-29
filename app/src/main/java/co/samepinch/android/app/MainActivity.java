@@ -1,6 +1,8 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,6 +38,7 @@ import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.app.helpers.widget.SIMView;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
@@ -57,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Bind(R.id.viewpager)
     ViewPager mViewPager;
+
+    @Bind(R.id.backdrop)
+    ImageView mBackdrop;
 
     SPFragmentPagerAdapter adapterViewPager;
 
@@ -104,11 +111,14 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-
         for (int i = 0; i < mTabLayout.getTabCount(); i++) {
             TabLayout.Tab tab = mTabLayout.getTabAt(i);
             tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
         }
+
+
+        Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        mBackdrop.setImageBitmap(appIcon);
     }
 
     @Override
@@ -149,8 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.menuitem_sign_in_id:
-                Intent loginIntent = new Intent(this, LoginActivity.class);
-                startActivityForResult(loginIntent, INTENT_LOGIN);
+                onLoginEvent();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -193,11 +202,17 @@ public class MainActivity extends AppCompatActivity {
                                 args.putString(AppConstants.K.REMOTE_URL.name(), AppConstants.API.URL_TERMS_COND.getValue());
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
                                 break;
-
                             case R.id.nav_spread_it:
                                 doSpreadIt();
                                 break;
-
+                            case R.id.nav_rate_it:
+                                Intent iRate = new Intent(Intent.ACTION_VIEW);
+                                iRate.setData(Uri.parse(AppConstants.API.GPLAY_LINK.getValue()));
+                                startActivity(iRate);
+                                break;
+                            case R.id.nav_feedback:
+                                doFeedback();
+                                break;
                             default:
                                 Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
                                 break;
@@ -255,6 +270,25 @@ public class MainActivity extends AppCompatActivity {
         });
         layout.addView(viaEmail);
         mBottomsheet.showWithSheetView(menu);
+    }
+
+    private void doFeedback() {
+        final String subject = getApplicationContext().getString(R.string.feedback_subject);
+        final String to = getApplicationContext().getString(R.string.feedback_to);
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("message/rfc822");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.login)
+    public void onLoginEvent(){
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivityForResult(loginIntent, INTENT_LOGIN);
     }
 
     @OnClick(R.id.fab)

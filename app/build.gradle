@@ -17,10 +17,21 @@ android {
         // Enabling multidex support.
 //        multiDexEnabled true
     }
+
+    signingConfigs {
+        release {
+            storeFile file("/tmp/upload/ks/gplay_ks.jks")
+            keyAlias "samepinch_release"
+            storePassword "123456"
+            keyPassword "123456"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-fresco.pro'
+            signingConfig signingConfigs.release
         }
     }
 

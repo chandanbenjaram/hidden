@@ -17,6 +17,7 @@ public class AppConstants {
         DEFAULT_DATE_FORMAT("MM/dd/yyyy hh:mma"),
 
         BASE("https://msocl.herokuapp.com/"),
+        GPLAY_LINK("market://details?id=co.samepinch.android.app"),
         CLIENTAUTH(BASE.getValue().concat("api/clients/token")),
         POSTS_WITH_FILTER(BASE.getValue().concat("api/v2/posts")),
         USERS(BASE.getValue().concat("api/users")),

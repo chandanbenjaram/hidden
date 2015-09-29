@@ -359,7 +359,14 @@ public class MainActivityIn extends AppCompatActivity {
                                 args.putString(AppConstants.K.REMOTE_URL.name(), AppConstants.API.URL_TERMS_COND.getValue());
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
                                 break;
-
+                            case R.id.nav_rate_it:
+                                Intent iRate = new Intent(Intent.ACTION_VIEW);
+                                iRate.setData(Uri.parse(AppConstants.API.GPLAY_LINK.getValue()));
+                                startActivity(iRate);
+                                break;
+                            case R.id.nav_feedback:
+                                doFeedback();
+                                break;
                             case R.id.nav_spread_it:
                                 doSpreadIt();
                                 break;
@@ -467,6 +474,19 @@ public class MainActivityIn extends AppCompatActivity {
         });
         layout.addView(viaEmail);
         mBottomsheet.showWithSheetView(menu);
+    }
+
+    private void doFeedback() {
+        final String subject = getApplicationContext().getString(R.string.feedback_subject);
+        final String to = getApplicationContext().getString(R.string.feedback_to);
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("message/rfc822");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @OnClick(R.id.fab)
