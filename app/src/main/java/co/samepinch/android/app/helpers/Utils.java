@@ -4,8 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
@@ -45,6 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import co.samepinch.android.app.ActivityFragment;
+import co.samepinch.android.app.R;
 import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
@@ -542,8 +544,15 @@ public class Utils {
     }
 
     public static void markTags(final Context context, TextView view, String[] tags) {
-        SpannableStringBuilder spanTxt = new SpannableStringBuilder();
 
+        final Paint tagPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        tagPaint.setColor(context.getResources().getColor(R.color.light_blue_500));
+        tagPaint.setTextSize(view.getTextSize());
+        tagPaint.setLinearText(false);
+        tagPaint.setSubpixelText(false);
+//        final float fontSize = Utils.sp2px(context.getResources(), view.getTextSize());
+
+        SpannableStringBuilder spanTxt = new SpannableStringBuilder();
         for (final String tag : tags) {
             spanTxt.append(tag);
             spanTxt.setSpan(new ClickableSpan() {
@@ -565,8 +574,10 @@ public class Utils {
                 @Override
                 public void updateDrawState(TextPaint ds) {
                     super.updateDrawState(ds);
-                    ds.setUnderlineText(false);
-                    ds.setColor(Color.BLUE);
+//                    tagPaint.setTextSize(ds.getTextSize());
+                    ds.set(tagPaint);
+//                    ds.setTextSize(fontSize);
+
                 }
             }, spanTxt.length() - tag.length(), spanTxt.length(), 0);
             spanTxt.append(" ");
@@ -629,7 +640,17 @@ public class Utils {
         }
     }
 
-    public static boolean isValidEmail(String arg0){
+    public static boolean isValidEmail(String arg0) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(arg0).matches();
+    }
+
+    public static float dp2px(Resources resources, float dp) {
+        final float scale = resources.getDisplayMetrics().density;
+        return  dp * scale + 0.5f;
+    }
+
+    public static float sp2px(Resources resources, float sp){
+        final float scale = resources.getDisplayMetrics().scaledDensity;
+        return sp * scale;
     }
 }

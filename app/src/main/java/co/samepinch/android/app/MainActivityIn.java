@@ -83,9 +83,6 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.nav_view)
     NavigationView mNavigationView;
 
-//    @Bind(R.id.nav_header_img)
-//    SIMView mNavHeaderImg;
-
     @Bind(R.id.dot_wall_switch)
     ViewSwitcher mVS;
 
@@ -146,8 +143,8 @@ public class MainActivityIn extends AppCompatActivity {
             if (!this.isFinishing()) {
                 finish();
             }
-
         }
+
         setContentView(R.layout.activity_main_in);
         ButterKnife.bind(MainActivityIn.this);
         BusProvider.INSTANCE.getBus().register(this);
