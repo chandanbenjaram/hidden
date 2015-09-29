@@ -129,8 +129,17 @@
     <style name="TransparentBG">
         <item name="android:color">#AA000000</item>
     </style>
+
     <style name="SP_SUB_LINE">
         <item name="android:color">@color/grey_100</item>
         <item name="android:textSize">9sp</item>
+    </style>
+
+    <style name="HorizontalLine">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">@dimen/horizontal_line_height</item>
+        <item name="android:background">@color/blue_500</item>
+        <item name="android:layout_marginTop">@dimen/large_spacer</item>
+        <item name="android:layout_marginBottom">@dimen/large_spacer</item>
     </style>
 </resources>
