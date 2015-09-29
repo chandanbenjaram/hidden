@@ -26,8 +26,6 @@ import android.widget.TextView;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.squareup.otto.Subscribe;
 
-import java.util.Map;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -35,10 +33,8 @@ import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
-import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.app.helpers.widget.SIMView;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
@@ -286,29 +282,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.login)
-    public void onLoginEvent(){
+    public void onLoginEvent() {
         Intent loginIntent = new Intent(this, LoginActivity.class);
         startActivityForResult(loginIntent, INTENT_LOGIN);
     }
 
-    @OnClick(R.id.fab)
-    public void onClickFAB() {
-        Bundle iArgs = new Bundle();
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
-        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey(), e.getValue());
-        }
-
-        // call for intent
-        Intent mServiceIntent =
-                new Intent(getApplicationContext(), PostsPullService.class);
-        mServiceIntent.putExtras(iArgs);
-        startService(mServiceIntent);
-    }
-
     @Subscribe
     public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
-        Snackbar.make(this.findViewById(R.id.fab), "refreshed", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mBottomsheet, "refreshed", Snackbar.LENGTH_LONG).show();
     }
 }
