@@ -19,17 +19,14 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
         this.context = context;
     }
 
-
     @Override
     public PostRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context)
                 .inflate(R.layout.list_item, parent, false);
-
         // setup view
         PostRecyclerViewHolder vh = new PostRecyclerViewHolder(context, v);
         return vh;
     }
-
 
     @Override
     public void onBindViewHolder(final PostRecyclerViewHolder vh, Cursor cursor) {

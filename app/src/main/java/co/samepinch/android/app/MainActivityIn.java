@@ -422,10 +422,9 @@ public class MainActivityIn extends AppCompatActivity {
         if (shouldRefresh != null && Boolean.valueOf(shouldRefresh).booleanValue()) {
             TabItemAdapter adapter = (TabItemAdapter) mViewPager.getAdapter();
             adapter.notifyDataSetChanged();
-        } else {
-            Utils.PreferencesManager.getInstance().remove(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
         }
-
+        // remove if there is one
+        Utils.PreferencesManager.getInstance().remove(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
     }
 
     @Override

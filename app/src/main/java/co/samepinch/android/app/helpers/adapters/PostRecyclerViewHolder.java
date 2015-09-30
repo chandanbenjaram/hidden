@@ -150,6 +150,10 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     @OnClick({R.id.avatar, R.id.avatar_name, R.id.wall_post_dot, R.id.wall_pinch_handle})
     public void doOpenDotWall() {
+        if(mPost.getAnonymous() !=null && mPost.getAnonymous().booleanValue()){
+            return;
+        }
+
         Bundle args = new Bundle();
         args.putString(AppConstants.K.KEY_DOT.name(), mPost.getOwner().getUid());
         args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());

@@ -285,7 +285,6 @@ public class DotWallFragment extends Fragment {
             mDotBlog.setVisibility(View.GONE);
         }
 
-
         if (Utils.isLoggedIn()) {
             Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
             String uidOfCurrUser = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
@@ -304,6 +303,7 @@ public class DotWallFragment extends Fragment {
                         startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
                     }
                 });
+
             }
         }
 
@@ -325,10 +325,21 @@ public class DotWallFragment extends Fragment {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String command = user.getFollow() == null || !user.getFollow() ? "follow" : "unfollow";
-                new FollowActionTask().execute(new String[]{user.getUid(), command});
+                if(Utils.isLoggedIn()){
+                    String command = user.getFollow() == null || !user.getFollow() ? "follow" : "unfollow";
+                    new FollowActionTask().execute(new String[]{user.getUid(), command});
+                }else{
+                    doLogin();
+                }
             }
         });
+    }
+
+    private void doLogin() {
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     private void setupRecyclerView(RecyclerView rv) {
