@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -110,6 +111,8 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         // retain this fragment across configuration changes.
         setRetainInstance(true);
         setHasOptionsMenu(true);
@@ -594,12 +597,14 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         super.onResume();
         BusProvider.INSTANCE.getBus().register(this);
         setRetainInstance(true);
+        Utils.showKeyboard(getActivity());
     }
 
     @Override
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
+        Utils.hideKeyboard(getActivity());
     }
 
     @Override

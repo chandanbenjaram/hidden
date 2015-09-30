@@ -1,5 +1,6 @@
 package co.samepinch.android.app.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.text.Editable;
@@ -7,12 +8,14 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.flipboard.bottomsheet.commons.Util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -46,14 +49,10 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
         } else {
             vh = (ViewHolder) convertView.getTag();
         }
-        // text
+
         if (vh.textWatcher != null) {
             vh.text.removeTextChangedListener(vh.textWatcher);
         }
-
-        vh.text.setText(currItem.getText());
-        vh.image.setImageURI(currItem.getImageUri());
-
         vh.textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -68,7 +67,15 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
                 currItem.setText(editable.toString());
             }
         };
+        vh.text.setOnClickListener(null);
+
         vh.text.addTextChangedListener(vh.textWatcher);
+        vh.text.setText(currItem.getText());
+
+        // image
+        vh.image.setImageURI(currItem.getImageUri());
+
+        // remove button
         vh.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,11 +97,23 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
         ViewSwitcher vs = (ViewSwitcher) convertView.findViewById(R.id.post_create_switch);
         if (currItem.getImageUri() == null) {
             vs.setDisplayedChild(0);
+            vh.text.requestFocus();
         } else {
             vs.setDisplayedChild(1);
         }
 
         return convertView;
+    }
+
+    public void showSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager)
+                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+//        if (view.requestFocus()) {
+//            InputMethodManager imm = (InputMethodManager)
+//                    getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+//        }
     }
 
     public static class ViewHolder {
@@ -148,5 +167,4 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
             }
         }
     }
-
 }

@@ -3,6 +3,7 @@ package co.samepinch.android.app;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -20,6 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +38,7 @@ import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnFocusChange;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
@@ -68,9 +72,10 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
         progressDialog = new ProgressDialog(getActivity(),
                 R.style.Theme_AppCompat_Dialog);
         progressDialog.setCancelable(Boolean.FALSE);
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +84,15 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setTitle(StringUtils.EMPTY);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // hack to get click working
+                ((AppCompatActivity) getActivity()).onBackPressed();
+            }
+        });
 
         // get args
         String commentUid = getArguments().getString(AppConstants.K.COMMENT.name(), StringUtils.EMPTY);
@@ -91,15 +105,17 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
             commentTxt.setText(commentDetails.getText());
         }
 
-        toolbar.setTitle(StringUtils.EMPTY);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
-            }
-        });
+        commentTxt.requestFocus();
         return view;
+    }
+
+    @OnFocusChange(R.id.comment_text_id)
+    public void onCommentFocusChange(boolean focussed) {
+        if (focussed) {
+            Utils.showKeyboard(getActivity());
+        } else {
+            Utils.hideKeyboard(getActivity());
+        }
     }
 
     @Override
@@ -171,6 +187,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
     private void showCommentAsMenu() {
         if (!Utils.isLoggedIn()) {
             doLogin();
+            return;
         }
 
         View commentItem = getActivity().findViewById(R.id.menuitem_comment);

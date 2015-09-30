@@ -35,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -110,6 +111,8 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         // retain this fragment across configuration changes.
         setRetainInstance(true);
         setHasOptionsMenu(true);
@@ -198,6 +201,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                 new Intent(getActivity().getApplicationContext(), TagsPullService.class);
         getActivity().startService(tagRefreshIntent);
 
+        Utils.showKeyboard((Activity) getContext());
         return view;
     }
 
@@ -515,12 +519,15 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         super.onResume();
         BusProvider.INSTANCE.getBus().register(this);
         setRetainInstance(true);
+
+        Utils.showKeyboard(getActivity());
     }
 
     @Override
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
+        Utils.hideKeyboard(getActivity());
     }
 
     @Override

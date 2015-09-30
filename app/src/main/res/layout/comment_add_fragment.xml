@@ -20,12 +20,13 @@
             android:layout_height="wrap_content"
             android:gravity="top|left"
             android:hint="@string/enter_comment"
-            android:imeOptions="actionNone"
+            android:imeOptions="actionDone"
             android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:lines="5"
             android:maxLines="999"
             android:minLines="1"
-            android:scrollHorizontally="false"></EditText>
+            android:scrollHorizontally="false">
+        </EditText>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
