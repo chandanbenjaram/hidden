@@ -93,7 +93,7 @@ public class TagEditFragment extends Fragment {
         ButterKnife.bind(this, this.mView);
 
         String tagId = getArguments().getString(AppConstants.APP_INTENT.KEY_TAG.getValue());
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tagId}, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + " LIKE ?", new String[]{"%" + tagId + "%"}, null);
         if (!cursor.moveToFirst()) {
             getActivity().finish();
         }

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.intent.TagDetailsService;
+import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
@@ -44,6 +46,8 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_NAME;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_TAG;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_FAV;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_TYPE;
 import static co.samepinch.android.app.helpers.AppConstants.K;
 
 public class TagWallFragment extends Fragment {
@@ -138,6 +142,13 @@ public class TagWallFragment extends Fragment {
         // refresh
         callForRemoteTagData();
         callForRemotePosts(false);
+
+        // call for intent
+        Intent tagRefreshIntent =
+                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
+        tagRefreshIntent.putExtra(KEY_TAGS_PULL_TYPE.getValue(), KEY_TAGS_PULL_FAV.getValue());
+        getActivity().startService(tagRefreshIntent);
+
         return view;
     }
 
@@ -295,6 +306,22 @@ public class TagWallFragment extends Fragment {
                     setupRecyclerView();
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void onTagsRefreshedEvent(Events.TagsRefreshedEvent event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+//                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
+//                    mTagsToManageRVAdapter.changeCursor(cursor);
+                    Log.d(TAG, "refreshed...");
+                } catch (Exception e) {
+                    //e.printStackTrace();
                 }
             }
         });
