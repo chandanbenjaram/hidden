@@ -38,8 +38,6 @@ public class SPFragmentPagerAdapter extends SmartFragmentStatePagerAdapter {
         switch (position) {
             case 0:
                 return new PostListFragment();
-            case 1:
-                return new PostListFragment();
             default:
                 return null;
         }

@@ -336,6 +336,10 @@ public class MainActivityIn extends AppCompatActivity {
                         menuItem.setChecked(true);
                         Bundle args = new Bundle();
                         switch (menuItem.getItemId()) {
+                            case R.id.nav_wall:
+                                mViewPager.getAdapter().notifyDataSetChanged();
+                                mViewPager.setCurrentItem(0);
+                                break;
                             case R.id.nav_post:
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_CREATE_POST.name());
                                 break;
@@ -416,7 +420,7 @@ public class MainActivityIn extends AppCompatActivity {
 
         String shouldRefresh = Utils.PreferencesManager.getInstance().getValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
         if (shouldRefresh != null && Boolean.valueOf(shouldRefresh).booleanValue()) {
-            TabItemAdapter adapter = (TabItemAdapter)mViewPager.getAdapter();
+            TabItemAdapter adapter = (TabItemAdapter) mViewPager.getAdapter();
             adapter.notifyDataSetChanged();
         } else {
             Utils.PreferencesManager.getInstance().remove(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
