@@ -1,9 +1,11 @@
 package co.samepinch.android.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnticipateOvershootInterpolator;
+import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.otto.Subscribe;
@@ -46,6 +49,9 @@ import static co.samepinch.android.app.helpers.AppConstants.K;
 public class TagWallFragment extends Fragment {
     public static final String TAG = "TagWallFragment";
 
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
+
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
 
@@ -61,21 +67,28 @@ public class TagWallFragment extends Fragment {
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
-    private String mTag;
+    @Bind(R.id.tag_wall_name)
+    TextView mTagName;
+
+    @Bind(R.id.tag_wall_followers_count)
+    TextView mTagFollowersCnt;
+
+    @Bind(R.id.tag_wall_posts_count)
+    TextView mTagPostsCnt;
+
     private PostCursorRecyclerViewAdapter mViewAdapter;
     private LinearLayoutManager mLayoutManager;
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // register to event bus
-        BusProvider.INSTANCE.getBus().register(this);
-    }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.INSTANCE.getBus().unregister(this);
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AppConstants.KV.REQUEST_EDIT_TAG.getIntValue()) {
+            if (resultCode == Activity.RESULT_OK) {
+                callForRemoteTagData();
+            }
+        }
     }
 
     @Override
@@ -99,18 +112,9 @@ public class TagWallFragment extends Fragment {
         mToolbarLayout.setExpandedTitleTextAppearance(R.style.TransparentText);
 
         // tag name
-        mTag = getArguments().getString(K.KEY_TAG.name());
-        mToolbarLayout.setTitle(mTag);
-
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTag}, null);
-        if (cursor.moveToFirst()) {
-            int imgIdx = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE);
-            String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
-            if (StringUtils.isNotBlank(imgStr)) {
-                Utils.setupLoadingImageHolder(mBackdrop, imgStr);
-            }
-        }
-        cursor.close();
+        String tag = getArguments().getString(K.KEY_TAG.name());
+        mToolbarLayout.setTitle(tag);
+        mTagName.setText(tag);
 
         // recyclers
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -128,12 +132,81 @@ public class TagWallFragment extends Fragment {
             }
         });
 
+        setUpMetaData();
         setupRecyclerView();
+
+        // refresh
         callForRemoteTagData();
         callForRemotePosts(false);
         return view;
     }
 
+    private void setUpMetaData() {
+        String tag = getArguments().getString(K.KEY_TAG.name());
+        Cursor cursor = null;
+        try {
+            cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
+            if (!cursor.moveToFirst()) {
+                return;
+            }
+
+            // followers
+            int followersCntIdx = cursor.getColumnIndex(SchemaTags.COLUMN_FOLLOWERS_COUNT);
+            String followersCnt = followersCntIdx > -1 ? cursor.getString(followersCntIdx) : null;
+            mTagFollowersCnt.setText(followersCnt);
+
+            // followers
+            int postsCntIdx = cursor.getColumnIndex(SchemaTags.COLUMN_POSTS_COUNT);
+            String postsCnt = postsCntIdx > -1 ? cursor.getString(postsCntIdx) : null;
+            mTagPostsCnt.setText(postsCnt);
+
+
+            // image
+            int imgIdx = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE);
+            String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
+            if (StringUtils.isNotBlank(imgStr)) {
+                Utils.setupLoadingImageHolder(mBackdrop, imgStr);
+            }
+
+            mFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Utils.isLoggedIn()) {
+                        // params
+                        String tag = getArguments().getString(K.KEY_TAG.name());
+                        Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                        String currUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
+
+                        Bundle args = new Bundle();
+                        args.putString(AppConstants.APP_INTENT.KEY_TAG.getValue(), tag);
+                        args.putString(AppConstants.APP_INTENT.KEY_UID.getValue(), currUserId);
+                        // target
+                        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_MANAGE_A_TAG.name());
+
+                        // intent
+                        Intent intent = new Intent(getActivity().getApplicationContext(), ActivityFragment.class);
+                        intent.putExtras(args);
+                        startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_TAG.getIntValue());
+                    } else {
+                        doLogin();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            // muted
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    private void doLogin() {
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        getActivity().finish();
+    }
 
     private void setupRecyclerView() {
         final String tag = getArguments().getString(K.KEY_TAG.name());
@@ -196,21 +269,7 @@ public class TagWallFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // update preferences metadata
-                Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTag}, null);
-                try {
-                    if (cursor.moveToFirst()) {
-                        int imgIdx = cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE);
-                        String imgStr = imgIdx > -1 ? cursor.getString(imgIdx) : null;
-                        if (StringUtils.isNotBlank(imgStr)) {
-                            Utils.setupLoadingImageHolder(mBackdrop, imgStr);
-                        }
-                    }
-                } catch (Exception e) {
-                    // e.printStackTrace();
-                } finally {
-                    cursor.close();
-                }
+                setUpMetaData();
             }
         });
     }
@@ -241,4 +300,19 @@ public class TagWallFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.INSTANCE.getBus().unregister(this);
+        if (mRefreshLayout.isRefreshing()) {
+            mRefreshLayout.setRefreshing(false);
+        }
+    }
 }
