@@ -83,7 +83,6 @@ public class TagDetailsService extends IntentService {
                 .withValue(SchemaTags.COLUMN_UID, body.getUid())
                 .withValue(SchemaTags.COLUMN_POSTS_COUNT, body.getPostsCount())
                 .withValue(SchemaTags.COLUMN_FOLLOWERS_COUNT, body.getFollowersCount())
-                .withValue(SchemaTags.COLUMN_FOLLOWERS_COUNT, body.getFollowersCount())
                 .withValue(SchemaTags.COLUMN_IMAGE, body.getImage())
                 .build());
         return ops;

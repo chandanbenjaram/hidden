@@ -8,13 +8,18 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import co.samepinch.android.app.helpers.AppConstants;
 
@@ -138,37 +143,59 @@ public class SPContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase db;
         Long rowId = null;
-        switch (sUriMatcher.match(uri)) {
-            case PATH_POSTS:
-            case PATH_POSTS_ITEM:
-                db = mHelper.getWritableDatabase();
-                rowId = db.replaceOrThrow(SchemaPosts.TABLE_NAME, "", values);
-                break;
-            case PATH_POST_DETAILS:
-            case PATH_POST_DETAILS_ITEM:
-                db = mHelper.getWritableDatabase();
-                rowId = db.replaceOrThrow(SchemaPostDetails.TABLE_NAME, "", values);
-                break;
-            case PATH_DOTS:
-            case PATH_DOTS_ITEM:
-                db = mHelper.getWritableDatabase();
-                rowId = db.replaceOrThrow(SchemaDots.TABLE_NAME, "", values);
-                break;
-            case PATH_TAGS:
-            case PATH_TAGS_ITEM:
-                db = mHelper.getWritableDatabase();
-                rowId = db.replaceOrThrow(SchemaTags.TABLE_NAME, "", values);
-                break;
-            case PATH_COMMENTS:
-            case PATH_COMMENTS_ITEM:
-                db = mHelper.getWritableDatabase();
-                rowId = db.replaceOrThrow(SchemaComments.TABLE_NAME, "", values);
-                break;
+        Map<String, String> selectionArgsMap = new HashMap<>();
+        try {
+            switch (sUriMatcher.match(uri)) {
+                case PATH_POSTS:
+                case PATH_POSTS_ITEM:
+                    selectionArgsMap.put(SchemaPosts.COLUMN_UID + "=?", values.getAsString(SchemaPosts.COLUMN_UID));
+                    db = mHelper.getWritableDatabase();
+                    rowId = db.insertWithOnConflict(SchemaPosts.TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_FAIL);
+                    break;
+                case PATH_POST_DETAILS:
+                case PATH_POST_DETAILS_ITEM:
+                    selectionArgsMap.put(SchemaPostDetails.COLUMN_UID + "=?", values.getAsString(SchemaPostDetails.COLUMN_UID));
+                    db = mHelper.getWritableDatabase();
+                    rowId = db.insertWithOnConflict(SchemaPostDetails.TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_FAIL);
+                    break;
+                case PATH_DOTS:
+                case PATH_DOTS_ITEM:
+                    selectionArgsMap.put(SchemaDots.COLUMN_UID + "=?", values.getAsString(SchemaDots.COLUMN_UID));
+                    db = mHelper.getWritableDatabase();
+                    rowId = db.insertWithOnConflict(SchemaDots.TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_FAIL);
+                    break;
+                case PATH_TAGS:
+                case PATH_TAGS_ITEM:
+                    selectionArgsMap.put(SchemaTags.COLUMN_NAME + "=?", values.getAsString(SchemaTags.COLUMN_NAME));
+                    db = mHelper.getWritableDatabase();
+                    rowId = db.insertWithOnConflict(SchemaTags.TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_FAIL);
+                    break;
+                case PATH_COMMENTS:
+                case PATH_COMMENTS_ITEM:
+                    selectionArgsMap.put(SchemaComments.COLUMN_UID + "=?", values.getAsString(SchemaComments.COLUMN_UID));
+                    db = mHelper.getWritableDatabase();
+                    rowId = db.insertWithOnConflict(SchemaComments.TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_FAIL);
+                    break;
 
-            default:
-                throw new IllegalArgumentException("Unknown uri: " + uri);
+                default:
+                    throw new IllegalArgumentException("Unknown uri: " + uri);
+            }
+        } catch (SQLiteConstraintException e) {
+            String selection = null;
+            String selectionArgs = null;
+            // try update
+            for (Map.Entry<String, String> aEntry : selectionArgsMap.entrySet()) {
+                selection = aEntry.getKey();
+                selectionArgs = aEntry.getValue();
+                break;
+            }
+            update(uri, values, selection, new String[]{selectionArgs});
+            Cursor curr = query(uri, new String[]{BaseColumns._ID}, selection, new String[]{selectionArgs}, null);
+            if (curr.moveToFirst()) {
+                rowId = curr.getLong(curr.getColumnIndex(BaseColumns._ID));
+            }
+            curr.close();
         }
-
         validateInsert(rowId);
         getContext().getContentResolver().notifyChange(uri, null);
         return Uri.withAppendedPath(uri, Long.toString(rowId));
@@ -294,7 +321,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "co.samepinch.android.app.db";
-        static final int DATABASE_VERSION = 92;
+        static final int DATABASE_VERSION = 100;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -303,7 +330,6 @@ public class SPContentProvider extends ContentProvider {
         @Override
         public void onOpen(SQLiteDatabase db) {
             super.onOpen(db);
-
         }
 
         @Override

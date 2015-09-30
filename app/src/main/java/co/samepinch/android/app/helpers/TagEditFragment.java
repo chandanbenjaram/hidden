@@ -93,7 +93,7 @@ public class TagEditFragment extends Fragment {
         ButterKnife.bind(this, this.mView);
 
         String tagId = getArguments().getString(AppConstants.APP_INTENT.KEY_TAG.getValue());
-        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + " LIKE ?", new String[]{"%" + tagId + "%"}, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tagId}, null);
         if (!cursor.moveToFirst()) {
             getActivity().finish();
         }
@@ -126,6 +126,10 @@ public class TagEditFragment extends Fragment {
         }
 
         callForRemoteTagData(mTagName);
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
         return this.mView;
     }
 
@@ -146,23 +150,32 @@ public class TagEditFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // update preferences metadata
-                Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTagName}, null);
-                if (!cursor.moveToFirst()) {
-                    return;
-                }
-                String imgUrl = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE));
-                if (StringUtils.isNotBlank(imgUrl)) {
-                    // get window HW
-                    Point size = new Point();
-                    getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+                Cursor cursor = null;
+                try {
+                    // update preferences metadata
+                    cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{mTagName}, null);
+                    if (!cursor.moveToFirst()) {
+                        return;
+                    }
+                    String imgUrl = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_IMAGE));
+                    if (StringUtils.isNotBlank(imgUrl)) {
+                        // get window HW
+                        Point size = new Point();
+                        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
 
-                    // load background view
-                    SIMView tagImgView = new SIMView(getActivity().getApplicationContext());
-                    tagImgView.populateImageViewWithAdjustedAspect(imgUrl, new Integer[]{size.x, size.y});
+                        // load background view
+                        SIMView tagImgView = new SIMView(getActivity().getApplicationContext());
+                        tagImgView.populateImageViewWithAdjustedAspect(imgUrl, new Integer[]{size.x, size.y});
 
-                    mBGContainer.removeAllViewsInLayout();
-                    mBGContainer.addView(tagImgView);
+                        mBGContainer.removeAllViewsInLayout();
+                        mBGContainer.addView(tagImgView);
+                    }
+                } catch (Exception e) {
+                    // muted
+                } finally {
+                    if (cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
                 }
             }
         });

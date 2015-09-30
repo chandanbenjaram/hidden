@@ -184,9 +184,9 @@ public class PostsPullService extends IntentService {
 
     private static void appendTagOps(Post post, ArrayList<ContentProviderOperation> ops) {
         for (String tag : post.getTags()) {
-            ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
-                    .withValue(SchemaTags.COLUMN_NAME, tag)
-                    .build());
+//            ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
+//                    .withValue(SchemaTags.COLUMN_NAME, tag)
+//                    .build());
         }
     }
 

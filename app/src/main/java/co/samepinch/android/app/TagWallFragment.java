@@ -1,6 +1,7 @@
 package co.samepinch.android.app;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -135,6 +136,16 @@ public class TagWallFragment extends Fragment {
                 callForRemotePosts(false);
             }
         });
+
+        Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
+        if(cursor.getCount() == 0){
+            ContentValues values = new ContentValues();
+            values.put(SchemaTags.COLUMN_NAME, tag);
+            getActivity().getContentResolver().insert(SchemaTags.CONTENT_URI, values);
+        }
+        if(cursor !=null && !cursor.isClosed()){
+            cursor.close();
+        }
 
         setUpMetaData();
         setupRecyclerView();
@@ -319,7 +330,7 @@ public class TagWallFragment extends Fragment {
                 try {
 //                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
 //                    mTagsToManageRVAdapter.changeCursor(cursor);
-                    Log.d(TAG, "refreshed...");
+                    Log.d(TAG, "");
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }
