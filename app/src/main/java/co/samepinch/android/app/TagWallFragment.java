@@ -20,8 +20,11 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
@@ -81,6 +84,9 @@ public class TagWallFragment extends Fragment {
         View view = inflater.inflate(R.layout.tags_wall_view, container, false);
         ButterKnife.bind(this, view);
 
+        // clear session data
+        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_POSTS_LIST_TAG.getValue());
+
         ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -90,6 +96,8 @@ public class TagWallFragment extends Fragment {
                 getActivity().onBackPressed();
             }
         });
+        mToolbarLayout.setExpandedTitleTextAppearance(R.style.TransparentText);
+
         // tag name
         mTag = getArguments().getString(K.KEY_TAG.name());
         mToolbarLayout.setTitle(mTag);
@@ -105,45 +113,36 @@ public class TagWallFragment extends Fragment {
         cursor.close();
 
         // recyclers
-        // custom recycler
-        RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
-            @Override
-            public void scrollBy(int x, int y) {
-                try {
-                    super.scrollBy(x, y);
-                } catch (NullPointerException nlp) {
-                    // muted
-                }
-            }
-        };
-
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
+                callForRemotePosts(true);
             }
         });
 
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                callForRemotePosts(mTag);
+                callForRemotePosts(false);
             }
         });
 
-        setUpPostsRecyclerView(new String[]{"%" + mTag + "%"});
-        callForRemoteTagData(mTag);
-        callForRemotePosts(mTag);
+        setupRecyclerView();
+        callForRemoteTagData();
+        callForRemotePosts(false);
         return view;
     }
 
 
-    private void setUpPostsRecyclerView(String[] tags) {
+    private void setupRecyclerView() {
+        final String tag = getArguments().getString(K.KEY_TAG.name());
+
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", tags, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
         if (cursor.getCount() < 1) {
-            callForRemotePosts(mTag);
+            callForRemotePosts(false);
         }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
@@ -155,7 +154,9 @@ public class TagWallFragment extends Fragment {
         mRecyclerView.setAdapter(wrapperAdapter);
     }
 
-    private void callForRemoteTagData(String tag) {
+    private void callForRemoteTagData() {
+        final String tag = getArguments().getString(K.KEY_TAG.name());
+
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
         iArgs.putString(KEY_NAME.getValue(), tag);
@@ -167,16 +168,20 @@ public class TagWallFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    private void callForRemotePosts(String tag) {
+    private void callForRemotePosts(boolean isPaginating) {
+        final String tag = getArguments().getString(K.KEY_TAG.name());
+
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-//        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
-//        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-//            iArgs.putString(e.getKey(), e.getValue().toString());
-//        }
-        iArgs.putString(KEY_KEY.getValue(), StringUtils.removeStart(tag, "#"));
         iArgs.putString(KEY_BY.getValue(), KEY_POSTS_TAG.getValue());
+        iArgs.putString(KEY_KEY.getValue(), tag.replaceFirst("#", ""));
+        if (isPaginating) {
+            Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+            Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_TAG.getValue());
+            for (Map.Entry<String, String> e : entries.entrySet()) {
+                iArgs.putString(e.getKey(), e.getValue().toString());
+            }
+        }
 
         // call for intent
         Intent mServiceIntent =
@@ -220,9 +225,17 @@ public class TagWallFragment extends Fragment {
                         mRefreshLayout.setRefreshing(false);
                     }
 
-                    setUpPostsRecyclerView(new String[]{"%" + mTag + "%"});
+                    Map<String, String> eMData = event.getMetaData();
+                    if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_TAG.getValue())) {
+                        return;
+                    }
+
+                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+                    pref.setValue(AppConstants.API.PREF_POSTS_LIST_TAG.getValue(), event.getMetaData());
+
+                    setupRecyclerView();
                 } catch (Exception e) {
-                    // muted
+                    e.printStackTrace();
                 }
             }
         });

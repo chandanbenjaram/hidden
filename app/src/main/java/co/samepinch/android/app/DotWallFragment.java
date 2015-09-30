@@ -12,17 +12,17 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -47,8 +47,10 @@ import butterknife.ButterKnife;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.ImageUtils;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener;
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.DotDetailsService;
+import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
@@ -58,14 +60,16 @@ import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqNoBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_USER;
 import static co.samepinch.android.app.helpers.AppConstants.K;
 
 public class DotWallFragment extends Fragment {
-    public static final String LOG_TAG = "DotWallFragment";
-
-    PostCursorRecyclerViewAdapter mViewAdapter;
-    LinearLayoutManager mLayoutManager;
+    public static final String TAG = "DotWallFragment";
 
     @Bind(R.id.dot_wall_image)
     SIMView mDotImage;
@@ -106,8 +110,14 @@ public class DotWallFragment extends Fragment {
     @Bind(R.id.dot_wall_switch)
     ViewSwitcher mVS;
 
-    @Bind(R.id.holder_recyclerview)
-    LinearLayout mRVHolder;
+    @Bind(R.id.swipeRefreshLayout)
+    SwipeRefreshLayout mRefreshLayout;
+
+    @Bind(R.id.recyclerView)
+    RecyclerView mRecyclerView;
+
+    PostCursorRecyclerViewAdapter mViewAdapter;
+    LinearLayoutManager mLayoutManager;
 
     private LocalHandler mHandler;
 
@@ -128,6 +138,9 @@ public class DotWallFragment extends Fragment {
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
+        if (mRefreshLayout.isRefreshing()) {
+            mRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
@@ -153,13 +166,16 @@ public class DotWallFragment extends Fragment {
         View view = inflater.inflate(R.layout.dot_wall, container, false);
         ButterKnife.bind(this, view);
 
+        // clear session data
+        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_POSTS_LIST_USER.getValue());
+
         // grab user
-        String dotUid = getArguments().getString(K.KEY_DOT.name());
+        final String dotUid = getArguments().getString(K.KEY_DOT.name());
         Cursor cursor = getActivity().getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
         if (!cursor.moveToFirst()) {
             getActivity().finish();
         }
-        User user = Utils.cursorToUserEntity(cursor);
+        final User user = Utils.cursorToUserEntity(cursor);
         cursor.close();
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -179,32 +195,108 @@ public class DotWallFragment extends Fragment {
         setUpMetaData(user);
 
         // user posts
-        mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        // custom recycler
-        RecyclerView rv = new RecyclerView(getActivity().getApplicationContext()) {
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
-            public void scrollBy(int x, int y) {
-                try {
-                    super.scrollBy(x, y);
-                } catch (NullPointerException nlp) {
-                    // muted
-                }
+            public void onLoadMore(RecyclerView rv, int current_page) {
+                callForRemotePosts(true);
             }
-        };
-        rv.setLayoutManager(mLayoutManager);
-        mRVHolder.addView(rv);
-        setupRecyclerView(rv);
+        });
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                callForRemotePosts(false);
+            }
+        });
+
+        setupRecyclerView();
+
+        // refresh
+        callForRemoteDOTData();
+        callForRemotePosts(false);
+        return view;
+    }
+
+    private void setupRecyclerView() {
+        final String dotUid = getArguments().getString(K.KEY_DOT.name());
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
+        if (cursor.getCount() < 1) {
+            callForRemotePosts(false);
+        }
+        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+
+        // ANIMATIONS
+        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
+        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
+        wrapperAdapter.setDuration(300);
+        wrapperAdapter.setFirstOnly(Boolean.FALSE);
+        mRecyclerView.setAdapter(wrapperAdapter);
+    }
+
+    private void callForRemoteDOTData() {
+        final String dotUid = getArguments().getString(K.KEY_DOT.name());
 
         //update user details
         Bundle iArgs = new Bundle();
         iArgs.putString(AppConstants.K.DOT.name(), dotUid);
         Intent intent =
-                new Intent(view.getContext(), DotDetailsService.class);
+                new Intent(getActivity(), DotDetailsService.class);
         intent.putExtras(iArgs);
         getActivity().startService(intent);
-
-        return view;
     }
+
+    private void callForRemotePosts(boolean isPaginating) {
+        final String dotUid = getArguments().getString(K.KEY_DOT.name());
+
+        // construct context from preferences if any?
+        Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_USER.getValue());
+        iArgs.putString(KEY_KEY.getValue(), dotUid);
+        if (isPaginating) {
+            Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+            Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_USER.getValue());
+            for (Map.Entry<String, String> e : entries.entrySet()) {
+                iArgs.putString(e.getKey(), e.getValue().toString());
+            }
+        }
+
+        // call for intent
+        Intent mServiceIntent =
+                new Intent(getActivity(), PostsPullService.class);
+        mServiceIntent.putExtras(iArgs);
+        getActivity().startService(mServiceIntent);
+    }
+
+    @Subscribe
+    public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+
+                    Map<String, String> eMData = event.getMetaData();
+                    if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_USER.getValue())) {
+                        return;
+                    }
+
+                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+                    pref.setValue(AppConstants.API.PREF_POSTS_LIST_USER.getValue(), event.getMetaData());
+
+                    setupRecyclerView();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
 
     private void setUpMetaData(final User user) {
         String pinchHandle = String.format(getActivity().getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
@@ -325,10 +417,10 @@ public class DotWallFragment extends Fragment {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Utils.isLoggedIn()){
+                if (Utils.isLoggedIn()) {
                     String command = user.getFollow() == null || !user.getFollow() ? "follow" : "unfollow";
                     new FollowActionTask().execute(new String[]{user.getUid(), command});
-                }else{
+                } else {
                     doLogin();
                 }
             }
@@ -342,14 +434,6 @@ public class DotWallFragment extends Fragment {
         getActivity().finish();
     }
 
-    private void setupRecyclerView(RecyclerView rv) {
-        String dotUid = getArguments().getString(K.KEY_DOT.name());
-        rv.setHasFixedSize(true);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
-        rv.setAdapter(mViewAdapter);
-        rv.setItemAnimator(new DefaultItemAnimator());
-    }
 
     private void applyPalette(Palette palette) {
         int primary = getResources().getColor(R.color.colorPrimary);

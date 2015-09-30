@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +77,9 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         View view = inflater.inflate(R.layout.posts_wall, container, false);
         ButterKnife.bind(this, view);
 
+        // clear session data
+        Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
+
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
@@ -120,11 +122,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
         iArgs.putString(KEY_BY.getValue(), KEY_POSTS_FAV.getValue());
-
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
         if (isPaginating) {
-            for (Map.Entry<String, String> e : pPosts.entrySet()) {
+            Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+            Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
+            for (Map.Entry<String, String> e : entries.entrySet()) {
                 iArgs.putString(e.getKey(), e.getValue().toString());
             }
         }
