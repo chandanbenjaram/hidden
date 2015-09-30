@@ -94,6 +94,9 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         });
         setupRecyclerView();
 
+        // refresh
+        callForRemotePosts(false);
+
         return view;
     }
 
@@ -118,13 +121,13 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
     private void callForRemotePosts(boolean isPaginating) {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
-        if(isPaginating){
+        if (isPaginating) {
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
             for (Map.Entry<String, String> e : pPosts.entrySet()) {
                 iArgs.putString(e.getKey().toString(), e.getValue().toString());
             }
-        }else{
+        } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
         // set posts batch
@@ -172,5 +175,9 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
     @Override
     public void onResumeFragment() {
+    }
+
+    @Override
+    public void onRefreshFragment() {
     }
 }

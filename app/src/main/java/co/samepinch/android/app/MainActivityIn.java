@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -412,6 +413,15 @@ public class MainActivityIn extends AppCompatActivity {
                 new Intent(getApplicationContext(), DotDetailsService.class);
         intent.putExtras(iArgs);
         startService(intent);
+
+        String shouldRefresh = Utils.PreferencesManager.getInstance().getValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
+        if (shouldRefresh != null && Boolean.valueOf(shouldRefresh).booleanValue()) {
+            TabItemAdapter adapter = (TabItemAdapter)mViewPager.getAdapter();
+            adapter.notifyDataSetChanged();
+        } else {
+            Utils.PreferencesManager.getInstance().remove(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
+        }
+
     }
 
     @Override
@@ -533,6 +543,10 @@ public class MainActivityIn extends AppCompatActivity {
             }
             return fragment;
         }
+//
+//        public int getItemPosition(Object object) {
+//            return POSITION_NONE;
+//        }
     }
 
     @Subscribe

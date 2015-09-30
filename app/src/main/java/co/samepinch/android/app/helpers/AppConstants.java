@@ -78,6 +78,8 @@ public class AppConstants {
         KEY_TAGS_PULL_RECOMMENDED("recommended"),
         KEY_MSG_GENERIC_ERR("something went wrong. try again..."),
         KEY_FRESH_DATA_FLAG("freshDataFlag"),
+        KEY_FRESH_WALL_FLAG("freshWallFlag"),
+        KEY_FRESH_FAV_WALL_FLAG("freshFavWallFlag"),
         CHOOSE_PINCH_HANDLE("77"),
         ;
 

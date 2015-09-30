@@ -468,6 +468,8 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 Snackbar.make(getView(), "failed to update. try again...", Snackbar.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
+                Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
+
                 ArrayList<ContentProviderOperation> ops = PostDetailsService.parseResponse(postDetails);
                 try {
                     ContentProviderResult[] result = getActivity().getContentResolver().
@@ -475,7 +477,9 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 } catch (Exception e) {
                     // muted
                 }
-                getActivity().setResult(Activity.RESULT_OK);
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("updated", true);
+                getActivity().setResult(Activity.RESULT_OK, resultIntent);
                 getActivity().finish();
             }
         }
@@ -515,15 +519,15 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         protected void onPostExecute(Boolean status) {
             Utils.dismissSilently(progressDialog);
             if (status) {
-                String postId = getArguments().getString(AppConstants.K.POST.name());
-                int count = getActivity().getContentResolver().delete(SchemaPostDetails.CONTENT_URI, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId});
-
                 Snackbar.make(getView(), "deleted successfully.", Snackbar.LENGTH_SHORT).show();
+                Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
+
+                String postId = getArguments().getString(AppConstants.K.POST.name());
+                getActivity().getContentResolver().delete(SchemaPostDetails.CONTENT_URI, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId});
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("deleted", true);
                 getActivity().setResult(Activity.RESULT_OK, resultIntent);
                 getActivity().finish();
-
             } else {
                 Snackbar.make(getView(), "failed to delete. try again...", Snackbar.LENGTH_SHORT).show();
             }

@@ -111,7 +111,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         // retain this fragment across configuration changes.
         setRetainInstance(true);
@@ -383,7 +383,6 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
             if (postDetails == null || postDetails.getBody() == null) {
                 Snackbar.make(getView(), "failed to post. try again...", Snackbar.LENGTH_SHORT).show();
             } else {
-                Snackbar.make(getView(), "successfully posted.", Snackbar.LENGTH_SHORT).show();
                 ArrayList<ContentProviderOperation> ops = PostDetailsService.parseResponse(postDetails);
                 try {
                     ContentProviderResult[] result = getActivity().getContentResolver().
@@ -392,12 +391,16 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                     // muted
                 }
 
+                Snackbar.make(getView(), "successfully posted.", Snackbar.LENGTH_SHORT).show();
+                Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
+
                 Bundle iArgs = new Bundle();
                 iArgs.putString(AppConstants.K.POST.name(), postDetails.getBody().getUid());
+                iArgs.putBoolean("created", true);
+
                 Intent intent = new Intent(getActivity(), PostDetailActivity.class);
                 intent.putExtras(iArgs);
                 startActivity(intent);
-
                 getActivity().finish();
             }
         }

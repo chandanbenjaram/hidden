@@ -6,4 +6,5 @@ package co.samepinch.android.app.helpers.misc;
 public interface FragmentLifecycle {
     void onPauseFragment();
     void onResumeFragment();
+    void onRefreshFragment();
 }

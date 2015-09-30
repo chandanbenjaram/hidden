@@ -82,17 +82,20 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
+                callForRemotePosts(true);
             }
         });
 
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                callForRemotePosts();
+                callForRemotePosts(false);
             }
         });
         setupRecyclerView();
 
+        // refresh
+        callForRemotePosts(false);
         return view;
     }
 
@@ -101,7 +104,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
         if (cursor.getCount() < 1) {
-            callForRemotePosts();
+            callForRemotePosts(false);
         }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
@@ -113,15 +116,18 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setAdapter(wrapperAdapter);
     }
 
-    private void callForRemotePosts() {
+    private void callForRemotePosts(boolean isPaginating) {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
+        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_FAV.getValue());
+
         Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
         Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
-        for (Map.Entry<String, String> e : pPosts.entrySet()) {
-            iArgs.putString(e.getKey(), e.getValue().toString());
+        if (isPaginating) {
+            for (Map.Entry<String, String> e : pPosts.entrySet()) {
+                iArgs.putString(e.getKey(), e.getValue().toString());
+            }
         }
-        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_FAV.getValue());
 
         // call for intent
         Intent mServiceIntent =
@@ -165,5 +171,9 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Override
     public void onResumeFragment() {
+    }
+
+    @Override
+    public void onRefreshFragment() {
     }
 }
