@@ -10,9 +10,9 @@ android {
         applicationId "co.samepinch.android.app"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 1
+        versionCode 4
         versionName "1.0"
-        renderscriptTargetApi 23
+//        renderscriptTargetApi 23
 //        renderscriptSupportModeEnabled  true
         // Enabling multidex support.
 //        multiDexEnabled true
