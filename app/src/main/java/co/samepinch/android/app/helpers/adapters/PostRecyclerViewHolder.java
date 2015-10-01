@@ -1,9 +1,12 @@
 package co.samepinch.android.app.helpers.adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -26,6 +29,7 @@ import co.samepinch.android.app.PostDetailActivity;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dto.Commenter;
 import co.samepinch.android.data.dto.Post;
 import co.samepinch.android.data.dto.User;
@@ -88,6 +92,10 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void onBindViewHolderImpl(final Cursor cursor) {
+        Long contentId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+        Uri contentUri = ContentUris.withAppendedId(SchemaPosts.CONTENT_URI, contentId);
+        cursor.setNotificationUri( this.mContext.getContentResolver(), contentUri);
+
         mPost = Utils.cursorToPostEntity(cursor);
 
         final User user = mPost.getOwner();

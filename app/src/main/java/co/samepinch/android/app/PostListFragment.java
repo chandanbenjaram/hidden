@@ -1,8 +1,11 @@
 package co.samepinch.android.app;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -31,6 +34,7 @@ import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
+import co.samepinch.android.data.dto.Post;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -105,7 +109,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-        cursor.setNotificationUri(getActivity().getContentResolver(), );
         if (cursor.getCount() < 1) {
             callForRemotePosts(Boolean.FALSE);
         }
@@ -158,13 +161,18 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
-//                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-//                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
-//                    if(oldCursor !=null && !oldCursor.isClosed()){
-//                        oldCursor.close();
-//                    }
 
-                    mViewAdapter.swapCursor(null);
+                    setupRecyclerView();
+//                    mViewAdapter.notifyDataSetChanged();
+////                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+////                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+////                    if(oldCursor !=null && !oldCursor.isClosed()){
+////                        oldCursor.close();
+////                    }
+//////                    setupRecyclerView();
+//////                    mViewAdapter.notifyItemRangeRemoved(0, mViewAdapter.getItemCount());
+////
+//////                    mViewAdapter.notifyDataSetChanged();
                 } catch (Exception e) {
                     //e.printStackTrace();
                     Log.e(TAG, e.getMessage(), e);
@@ -172,7 +180,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
             }
         });
     }
-
 
     @Override
     public void onPauseFragment() {

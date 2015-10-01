@@ -3,6 +3,7 @@ package co.samepinch.android.data.dao;
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -197,7 +198,9 @@ public class SPContentProvider extends ContentProvider {
             curr.close();
         }
         validateInsert(rowId);
-        getContext().getContentResolver().notifyChange(uri, null);
+
+        final Uri itemUri= ContentUris.withAppendedId(uri, rowId);
+        getContext().getContentResolver().notifyChange(itemUri, null);
         return Uri.withAppendedPath(uri, Long.toString(rowId));
     }
 
@@ -321,7 +324,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "co.samepinch.android.app.db";
-        static final int DATABASE_VERSION = 100;
+        static final int DATABASE_VERSION = 101;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);

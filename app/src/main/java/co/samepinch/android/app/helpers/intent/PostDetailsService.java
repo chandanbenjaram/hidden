@@ -26,9 +26,11 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
+import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.Commenter;
+import co.samepinch.android.data.dto.Post;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqNoBody;
@@ -37,6 +39,9 @@ import co.samepinch.android.rest.RespPostDetails;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.POSTS;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class PostDetailsService extends IntentService {
     public static final String TAG = "PostDetailsService";
@@ -98,6 +103,10 @@ public class PostDetailsService extends IntentService {
         appendDOTOps(details, anonyOwner, ops);
         // post details incl. content
         appendPostDetailsOps(details, anonyOwner, ops);
+
+        // post details incl. content
+        appendPostOps(details, anonyOwner, ops);
+
         // post comments
         appendCommentsOps(details, anonyOwner, ops);
 
@@ -150,6 +159,22 @@ public class PostDetailsService extends IntentService {
                 .withValue(SchemaPostDetails.COLUMN_OWNER, (details.getAnonymous() ? anonyOwner.getUid() : postOwner.getUid()))
                 .withValue(SchemaPostDetails.COLUMN_PERMISSIONS, details.getPermissionsForDB())
                 .withValue(SchemaPostDetails.COLUMN_TAGS, details.getTagsForDB()).build());
+    }
+
+    private static void appendPostOps(PostDetails details, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
+        final User postOwner = details.getOwner();
+        ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
+                .withValue(SchemaPosts.COLUMN_UID, details.getUid())
+                .withValue(SchemaPosts.COLUMN_CONTENT, details.getContent())
+                .withValue(SchemaPosts.COLUMN_IMAGES, details.getImagesForDB())
+                .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, details.getCommentCount())
+                .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, details.getUpvoteCount())
+                .withValue(SchemaPosts.COLUMN_VIEWS, details.getViews())
+                .withValue(SchemaPosts.COLUMN_ANONYMOUS, details.getAnonymous())
+                .withValue(SchemaPosts.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
+                .withValue(SchemaPosts.COLUMN_OWNER, (details.getAnonymous() ? anonyOwner.getUid() : postOwner.getUid()))
+                .withValue(SchemaPosts.COLUMN_TAGS, details.getTagsForDB())
+                .build());
     }
 
     private static void appendCommentsOps(PostDetails details, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
