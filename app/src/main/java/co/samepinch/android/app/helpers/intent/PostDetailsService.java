@@ -30,7 +30,6 @@ import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.Commenter;
-import co.samepinch.android.data.dto.Post;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqNoBody;
@@ -39,9 +38,6 @@ import co.samepinch.android.rest.RespPostDetails;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.POSTS;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class PostDetailsService extends IntentService {
     public static final String TAG = "PostDetailsService";

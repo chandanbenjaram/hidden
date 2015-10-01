@@ -1,11 +1,8 @@
 package co.samepinch.android.app;
 
-import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -34,7 +31,6 @@ import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
-import co.samepinch.android.data.dto.Post;
 import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -68,6 +64,14 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         super.onResume();
         // register to event bus
         BusProvider.INSTANCE.getBus().register(this);
+        if (mRecyclerView != null) {
+            Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+            Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+            if (oldCursor != null && !oldCursor.isClosed()) {
+                oldCursor.close();
+            }
+            mRecyclerView.getAdapter().notifyItemRangeChanged(0, mRecyclerView.getAdapter().getItemCount());
+        }
     }
 
     @Override
@@ -113,6 +117,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
             callForRemotePosts(Boolean.FALSE);
         }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        mViewAdapter.setHasStableIds(Boolean.TRUE);
 
         // ANIMATIONS
         ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
@@ -162,7 +167,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
 
-                    setupRecyclerView();
+//                    setupRecyclerView();
 //                    mViewAdapter.notifyDataSetChanged();
 ////                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
 ////                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
@@ -172,7 +177,8 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 //////                    setupRecyclerView();
 //////                    mViewAdapter.notifyItemRangeRemoved(0, mViewAdapter.getItemCount());
 ////
-//////                    mViewAdapter.notifyDataSetChanged();
+//                    mViewAdapter.notifyDataSetChanged();
+//                    mViewAdapter.notifyItemRangeChanged(0, mViewAdapter.getItemCount(), null);
                 } catch (Exception e) {
                     //e.printStackTrace();
                     Log.e(TAG, e.getMessage(), e);

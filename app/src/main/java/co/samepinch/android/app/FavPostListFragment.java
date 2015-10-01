@@ -62,6 +62,14 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         super.onResume();
         // register to event bus
         BusProvider.INSTANCE.getBus().register(this);
+        if (mRecyclerView != null) {
+            Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+            Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+            if (oldCursor != null && !oldCursor.isClosed()) {
+                oldCursor.close();
+            }
+            mRecyclerView.getAdapter().notifyItemRangeChanged(0, mRecyclerView.getAdapter().getItemCount());
+        }
     }
 
     @Override
