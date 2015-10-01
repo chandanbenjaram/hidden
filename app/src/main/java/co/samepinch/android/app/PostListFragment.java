@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        cursor.setNotificationUri(getActivity().getContentResolver(), );
         if (cursor.getCount() < 1) {
             callForRemotePosts(Boolean.FALSE);
         }
@@ -156,10 +158,16 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
+//                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+//                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+//                    if(oldCursor !=null && !oldCursor.isClosed()){
+//                        oldCursor.close();
+//                    }
 
-                    setupRecyclerView();
+                    mViewAdapter.swapCursor(null);
                 } catch (Exception e) {
                     //e.printStackTrace();
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
         });

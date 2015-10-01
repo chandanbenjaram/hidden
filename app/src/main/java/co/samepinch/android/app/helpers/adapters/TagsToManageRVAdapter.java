@@ -15,7 +15,7 @@ public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManage
     final String mCurrUserId;
 
     public TagsToManageRVAdapter(Context context, Cursor cursor, ItemEventListener eventListener, String currUserId) {
-        super(context, cursor);
+        super(cursor);
         this.mContext = context;
         this.mItemEventListener = eventListener;
         this.mCurrUserId = currUserId;
@@ -30,7 +30,7 @@ public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManage
     }
 
     @Override
-    public void onBindViewHolder(final TagToManagerRVHolder viewHolder, Cursor cursor) {
+    public void onBindViewHolderCursor(final TagToManagerRVHolder viewHolder, Cursor cursor) {
         final String tagId = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME));
         viewHolder.onBindViewHolderImpl(mCurrUserId, cursor);
         viewHolder.mTagImg.setOnClickListener(new View.OnClickListener() {

@@ -18,7 +18,7 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
 
 
     public PostDetailsRVAdapter(Context context, Cursor cursor) {
-        super(context, cursor);
+        super(cursor);
         this.context = context;
     }
 
@@ -56,7 +56,7 @@ public class PostDetailsRVAdapter extends CursorRecyclerViewAdapter<PostDetailsR
     }
 
     @Override
-    public void onBindViewHolder(PostDetailsRVHolder viewHolder, Cursor cursor) {
+    public void onBindViewHolderCursor(PostDetailsRVHolder viewHolder, Cursor cursor) {
         viewHolder.onBindViewHolderImpl(cursor);
     }
 

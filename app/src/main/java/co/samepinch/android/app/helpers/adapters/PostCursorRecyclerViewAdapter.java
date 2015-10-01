@@ -12,24 +12,24 @@ import co.samepinch.android.app.R;
  * Created by imaginationcoder on 7/2/15.
  */
 public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<PostRecyclerViewHolder> {
-    private final Context context;
+    final Context mContext;
 
     public PostCursorRecyclerViewAdapter(Context context, Cursor cursor) {
-        super(context, cursor);
-        this.context = context;
+        super(cursor);
+        this.mContext = context;
     }
 
     @Override
     public PostRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context)
+        View v = LayoutInflater.from(mContext)
                 .inflate(R.layout.list_item, parent, false);
         // setup view
-        PostRecyclerViewHolder vh = new PostRecyclerViewHolder(context, v);
+        PostRecyclerViewHolder vh = new PostRecyclerViewHolder(mContext, v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(final PostRecyclerViewHolder vh, Cursor cursor) {
+    public void onBindViewHolderCursor(final PostRecyclerViewHolder vh, Cursor cursor) {
         vh.onBindViewHolderImpl(cursor);
     }
 }

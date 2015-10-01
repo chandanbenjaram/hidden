@@ -432,6 +432,7 @@ public class DotEditFragment extends Fragment {
                         }
                     }, 99);
 
+                    Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
                     return;
                 }
             } catch (Exception e) {

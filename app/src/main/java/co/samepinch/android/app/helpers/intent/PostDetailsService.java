@@ -69,6 +69,7 @@ public class PostDetailsService extends IntentService {
             if (ops != null) {
                 ContentProviderResult[] result = getContentResolver().
                         applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+
                 BusProvider.INSTANCE.getBus().post(new Events.PostDetailsRefreshEvent(null));
             }
         } catch (Exception e) {

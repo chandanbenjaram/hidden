@@ -25,7 +25,7 @@ public class TagsRVAdapter extends CursorRecyclerViewAdapter<TagRVHolder> {
     final Set<String> tagSelections;
 
     public TagsRVAdapter(Context context, Cursor cursor, ItemEventListener itemEventListener, Set<String> tagSelections) {
-        super(context, cursor);
+        super(cursor);
         this.context = context;
         this.itemEventListener = itemEventListener;
         this.tagSelections = (tagSelections == null) ? new HashSet<String>() : tagSelections;
@@ -40,7 +40,7 @@ public class TagsRVAdapter extends CursorRecyclerViewAdapter<TagRVHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final TagRVHolder viewHolder, Cursor cursor) {
+    public void onBindViewHolderCursor(final TagRVHolder viewHolder, Cursor cursor) {
         viewHolder.onBindViewHolderImpl(cursor);
 
         final String tagId = cursor.getString(cursor.getColumnIndex(SchemaTags.COLUMN_NAME));
