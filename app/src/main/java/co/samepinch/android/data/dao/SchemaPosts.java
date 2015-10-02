@@ -13,8 +13,8 @@ public interface SchemaPosts extends BaseColumns {
     // DB related stuff
     String TABLE_NAME = "posts";
     String COLUMN_UID = "uid";
-    String COLUMN_CONTENT = "content";
-    String COLUMN_IMAGES = "images";
+    String COLUMN_WALL_CONTENT = "wall_content";
+    String COLUMN_WALL_IMAGES = "wall_images";
     String COLUMN_COMMENT_COUNT = "comment_count";
     String COLUMN_UPVOTE_COUNT = "upvote_count";
     String COLUMN_VIEWS = "views";
@@ -31,8 +31,8 @@ public interface SchemaPosts extends BaseColumns {
             + " ("
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_UID + " TEXT NOT NULL UNIQUE, "
-            + COLUMN_CONTENT + " TEXT DEFAULT '', "
-            + COLUMN_IMAGES + " TEXT DEFAULT '', "
+            + COLUMN_WALL_CONTENT + " TEXT, "
+            + COLUMN_WALL_IMAGES + " TEXT, "
             + COLUMN_COMMENT_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_VIEWS + " INTEGER DEFAULT 0, "
@@ -55,11 +55,11 @@ public interface SchemaPosts extends BaseColumns {
 //            + " END;";
 
     String[] POST_COLUMNS = new String[]{
-            _ID, COLUMN_UID, COLUMN_CONTENT, COLUMN_COMMENT_COUNT,
+            _ID, COLUMN_UID, COLUMN_WALL_CONTENT, COLUMN_COMMENT_COUNT,
             COLUMN_UPVOTE_COUNT, COLUMN_VIEWS, COLUMN_ANONYMOUS,
             COLUMN_CREATED_AT, COLUMN_COMMENTERS, COLUMN_TAGS,
-            COLUMN_OWNER, COLUMN_IMAGES, COLUMN_SOURCE_KEY,
-            COLUMN_SOURCE_BY
+            COLUMN_OWNER, COLUMN_WALL_IMAGES, COLUMN_SOURCE_KEY,
+            COLUMN_SOURCE_BY, COLUMN_WALL_CONTENT, COLUMN_WALL_IMAGES
     };
 
     String VIEW_CREATE_POST_WITH_DOT_NAME = "VIEW_POST_WITH_DOT";
@@ -68,7 +68,7 @@ public interface SchemaPosts extends BaseColumns {
             + " AS SELECT"
             + " p." + _ID
             + ", p." + COLUMN_UID
-            + ", p." + COLUMN_CONTENT
+            + ", p." + COLUMN_WALL_CONTENT
             + ", p." + COLUMN_COMMENT_COUNT
             + ", p." + COLUMN_UPVOTE_COUNT
             + ", p." + COLUMN_VIEWS
@@ -76,7 +76,7 @@ public interface SchemaPosts extends BaseColumns {
             + ", p." + COLUMN_COMMENTERS
             + ", p." + COLUMN_TAGS
             + ", p." + COLUMN_OWNER
-            + ", p." + COLUMN_IMAGES
+            + ", p." + COLUMN_WALL_IMAGES
             + ", p." + COLUMN_CREATED_AT
             + ", p." + COLUMN_SOURCE_KEY
             + ", p." + COLUMN_SOURCE_BY

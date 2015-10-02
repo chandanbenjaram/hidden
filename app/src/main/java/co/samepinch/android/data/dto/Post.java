@@ -21,8 +21,6 @@ import co.samepinch.android.app.helpers.Utils;
 public class Post {
     @SerializedName("uid")
     String uid;
-    String content;
-    List<String> images;
     @SerializedName("comment_count")
     Integer commentCount;
     @SerializedName("upvote_count")
@@ -38,9 +36,8 @@ public class Post {
     Date createdAt;
     User owner;
 
-    public Post() {
-
-    }
+    String wallContent;
+    List<String> wallImages;
 
     public String getUid() {
         return uid;
@@ -48,14 +45,6 @@ public class Post {
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public Integer getCommentCount() {
@@ -137,7 +126,8 @@ public class Post {
     public void setCommentersFromDB(String commenters) {
         if (commenters != null) {
             Gson g = new Gson();
-            Type token = new TypeToken<List<Commenter>>() {}.getType();
+            Type token = new TypeToken<List<Commenter>>() {
+            }.getType();
             List<Commenter> commentersList = g.fromJson(commenters, token);
             setCommenters(commentersList);
         } else {
@@ -171,28 +161,35 @@ public class Post {
         return StringUtils.arrayToDelimitedString(getTags().toArray(), ",");
     }
 
-    public List<String> getImages() {
-        return images;
+    public String getWallContent() {
+        return wallContent;
     }
 
-    public void setImages(List<String> images) {
-        this.images = images;
+    public void setWallContent(String wallContent) {
+        this.wallContent = wallContent;
     }
 
-    public void setImagesFromDB(String images) {
-        if (images != null) {
-            setImages(Arrays.asList(images.split(",")));
-        } else {
-            setImages(null);
-        }
+    public List<String> getWallImages() {
+        return wallImages;
     }
 
-    public String getImagesForDB() {
-        if (getImages() == null || getImages().isEmpty()) {
+    public String getWallImagesForDB() {
+        if (getWallImages() == null || getWallImages().isEmpty()) {
             return null;
         }
-        return StringUtils.arrayToDelimitedString(getImages().toArray(), ",");
+        return StringUtils.arrayToDelimitedString(getWallImages().toArray(), ",");
     }
 
 
+    public void setWallImages(List<String> wallImages) {
+        this.wallImages = wallImages;
+    }
+
+    public void setWallImagesFromDB(String images) {
+        if (images != null) {
+            setWallImages(Arrays.asList(images.split(",")));
+        } else {
+            setWallImages(null);
+        }
+    }
 }

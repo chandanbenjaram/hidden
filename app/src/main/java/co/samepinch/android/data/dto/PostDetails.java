@@ -46,6 +46,9 @@ public class PostDetails {
     List<String> permissions;
     List<CommentDetails> comments;
 
+    String wallContent;
+    List<String> wallImages;
+
     public List<CommentDetails> getComments() {
         return comments;
     }
@@ -257,5 +260,36 @@ public class PostDetails {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getWallContent() {
+        return wallContent;
+    }
+
+    public void setWallContent(String wallContent) {
+        this.wallContent = wallContent;
+    }
+
+    public List<String> getWallImages() {
+        return wallImages;
+    }
+
+    public void setWallImages(List<String> wallImages) {
+        this.wallImages = wallImages;
+    }
+
+    public void setWallImagesFromDB(String images) {
+        if (images != null) {
+            setWallImages(Arrays.asList(images.split(",")));
+        } else {
+            setWallImages(null);
+        }
+    }
+
+    public String getWallImagesForDB() {
+        if (getWallImages() == null || getWallImages().isEmpty()) {
+            return null;
+        }
+        return StringUtils.arrayToDelimitedString(getWallImages().toArray(), ",");
     }
 }

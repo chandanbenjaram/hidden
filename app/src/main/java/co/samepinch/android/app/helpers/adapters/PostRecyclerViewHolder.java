@@ -40,7 +40,6 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.avatar_image_vs)
     ViewSwitcher mAvatarImgVS;
 
-
     @Bind(R.id.avatar)
     SimpleDraweeView mAvatarView;
 
@@ -110,7 +109,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
         mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), "0"));
         mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), "0"));
         mWallPostDateView.setText(Utils.dateToString(mPost.getCreatedAt()));
-        mWallPostContentView.setText(mPost.getContent());
+        mWallPostContentView.setText(mPost.getWallContent());
         mCommentersCount.setText(String.valueOf(mPost.getCommentCount()));
 
         // hide needed ones
@@ -140,10 +139,10 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
             }
         }
 
-        if (CollectionUtils.isEmpty(mPost.getImages())) {
+        if (CollectionUtils.isEmpty(mPost.getWallImages())) {
             mWallPostImages.setVisibility(View.GONE);
         } else {
-            Utils.setupLoadingImageHolder(mWallPostImages, mPost.getImages().get(0));
+            Utils.setupLoadingImageHolder(mWallPostImages, mPost.getWallImages().get(0));
             mWallPostImages.setVisibility(View.VISIBLE);
         }
 

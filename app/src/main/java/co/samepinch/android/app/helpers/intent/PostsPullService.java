@@ -29,7 +29,6 @@ import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
-import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.Post;
 import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqPosts;
@@ -167,8 +166,8 @@ public class PostsPullService extends IntentService {
     private static void appendPostOps(Bundle iArgs, Post post, User postOwner, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
         ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
                 .withValue(SchemaPosts.COLUMN_UID, post.getUid())
-                .withValue(SchemaPosts.COLUMN_CONTENT, post.getContent())
-                .withValue(SchemaPosts.COLUMN_IMAGES, post.getImagesForDB())
+                .withValue(SchemaPosts.COLUMN_WALL_CONTENT, post.getWallContent())
+                .withValue(SchemaPosts.COLUMN_WALL_IMAGES, post.getWallImagesForDB())
                 .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, post.getCommentCount())
                 .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, post.getUpvoteCount())
                 .withValue(SchemaPosts.COLUMN_VIEWS, post.getViews())

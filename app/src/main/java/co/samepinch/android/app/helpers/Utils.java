@@ -149,11 +149,11 @@ public class Utils {
             post.setUid(cursor.getString(uidIndex));
         }
 
-        if ((contentIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_CONTENT)) != -1) {
-            post.setContent(cursor.getString(contentIndex));
+        if ((contentIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_WALL_CONTENT)) != -1) {
+            post.setWallContent(cursor.getString(contentIndex));
         }
-        if ((imagesIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_IMAGES)) != -1) {
-            post.setImagesFromDB(cursor.getString(imagesIndex));
+        if ((imagesIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_WALL_IMAGES)) != -1) {
+            post.setWallImagesFromDB(cursor.getString(imagesIndex));
         }
 
         if ((commentCountIndex = cursor.getColumnIndex(SchemaPosts.COLUMN_COMMENT_COUNT)) != -1) {

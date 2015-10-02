@@ -19,7 +19,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import co.samepinch.android.app.helpers.AppConstants;
@@ -324,7 +323,7 @@ public class SPContentProvider extends ContentProvider {
     public static class DBHelper extends SQLiteOpenHelper {
         public static final String LOG_TAG = "DBHelper";
         static final String DATABASE_NAME = "co.samepinch.android.app.db";
-        static final int DATABASE_VERSION = 101;
+        static final int DATABASE_VERSION = 102;
 
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);

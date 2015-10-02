@@ -15,6 +15,8 @@ public interface SchemaPostDetails extends BaseColumns {
     String COLUMN_UID = "uid";
     String COLUMN_CONTENT = "content";
     String COLUMN_IMAGES = "images";
+    String COLUMN_WALL_CONTENT = "wall_content";
+    String COLUMN_WALL_IMAGES = "wall_images";
     String COLUMN_LARGE_IMAGES = "large_images";
     String COLUMN_COMMENT_COUNT = "comment_count";
     String COLUMN_UPVOTE_COUNT = "upvote_count";
@@ -32,8 +34,10 @@ public interface SchemaPostDetails extends BaseColumns {
             + " ("
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_UID + " TEXT NOT NULL UNIQUE, "
-            + COLUMN_CONTENT + " TEXT DEFAULT '', "
-            + COLUMN_IMAGES + " TEXT DEFAULT '', "
+            + COLUMN_CONTENT + " TEXT, "
+            + COLUMN_IMAGES + " TEXT, "
+            + COLUMN_WALL_CONTENT + " TEXT, "
+            + COLUMN_WALL_IMAGES + " TEXT, "
             + COLUMN_LARGE_IMAGES + " TEXT DEFAULT '', "
             + COLUMN_COMMENT_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "
@@ -56,7 +60,7 @@ public interface SchemaPostDetails extends BaseColumns {
             COLUMN_UPVOTE_COUNT, COLUMN_UPVOTED, COLUMN_VIEWS, COLUMN_ANONYMOUS,
             COLUMN_CREATED_AT, COLUMN_TAGS, COLUMN_PERMISSIONS,
             COLUMN_OWNER, COLUMN_IMAGES, COLUMN_LARGE_IMAGES,
-            COLUMN_URL
+            COLUMN_URL, COLUMN_WALL_CONTENT, COLUMN_WALL_IMAGES
     };
 
 

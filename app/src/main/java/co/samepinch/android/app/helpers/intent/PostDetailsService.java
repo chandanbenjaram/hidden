@@ -161,8 +161,8 @@ public class PostDetailsService extends IntentService {
         final User postOwner = details.getOwner();
         ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
                 .withValue(SchemaPosts.COLUMN_UID, details.getUid())
-                .withValue(SchemaPosts.COLUMN_CONTENT, details.getContent())
-                .withValue(SchemaPosts.COLUMN_IMAGES, details.getImagesForDB())
+                .withValue(SchemaPosts.COLUMN_WALL_CONTENT, details.getWallContent())
+                .withValue(SchemaPosts.COLUMN_WALL_IMAGES, details.getWallImagesForDB())
                 .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, details.getCommentCount())
                 .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, details.getUpvoteCount())
                 .withValue(SchemaPosts.COLUMN_VIEWS, details.getViews())
