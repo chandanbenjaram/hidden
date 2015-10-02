@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -24,7 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.flipboard.bottomsheet.BottomSheetLayout;
-import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,7 +32,6 @@ import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.SPFragmentPagerAdapter;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
-import co.samepinch.android.app.helpers.pubsubs.Events;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
@@ -286,9 +283,9 @@ public class MainActivity extends AppCompatActivity {
         Intent loginIntent = new Intent(this, LoginActivity.class);
         startActivityForResult(loginIntent, INTENT_LOGIN);
     }
-
-    @Subscribe
-    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
-        Snackbar.make(mBottomsheet, "refreshed", Snackbar.LENGTH_LONG).show();
-    }
+//
+//    @Subscribe
+//    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
+//        Snackbar.make(mBottomsheet, "refreshed", Snackbar.LENGTH_LONG).show();
+//    }
 }

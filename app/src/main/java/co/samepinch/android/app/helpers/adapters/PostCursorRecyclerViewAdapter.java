@@ -6,9 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import co.samepinch.android.app.R;
 
 /**
@@ -19,12 +16,9 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
     final Context mContext;
 
-    final Map<Integer, PostRecyclerViewHolder> itemViews;
-
     public PostCursorRecyclerViewAdapter(Context context, Cursor cursor) {
         super(cursor);
         this.mContext = context;
-        this.itemViews = new HashMap<>();
     }
 
     @Override
@@ -38,13 +32,6 @@ public class PostCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter<Pos
 
     @Override
     public void onBindViewHolderCursor(final PostRecyclerViewHolder vh, Cursor cursor) {
-        itemViews.put(cursor.getPosition(), vh);
         vh.onBindViewHolderImpl(cursor);
-    }
-
-    @Override
-    protected void onContentChanged() {
-//    swapCursor(null);
-//        notifyItemRangeRemoved(0, getItemCount());
     }
 }

@@ -82,16 +82,16 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     public PostRecyclerViewHolder(final Context context, View itemView) {
         super(itemView);
+        setIsRecyclable(Boolean.TRUE);
+
         this.mContext = context;
         ButterKnife.bind(this, itemView);
-        setIsRecyclable(true);
     }
 
     public void onBindViewHolderImpl(final Cursor cursor) {
 //        Long contentId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 //        Uri contentUri = ContentUris.withAppendedId(SchemaPosts.CONTENT_URI, contentId);
 //        cursor.setNotificationUri( this.mContext.getContentResolver(), contentUri);
-
         mPost = Utils.cursorToPostEntity(cursor);
 
         final User user = mPost.getOwner();
@@ -152,7 +152,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     @OnClick({R.id.avatar, R.id.avatar_name, R.id.wall_post_dot, R.id.wall_pinch_handle})
     public void doOpenDotWall() {
-        if(mPost.getAnonymous() !=null && mPost.getAnonymous().booleanValue()){
+        if (mPost.getAnonymous() != null && mPost.getAnonymous().booleanValue()) {
             return;
         }
 

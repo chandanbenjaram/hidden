@@ -272,7 +272,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends android.support.v7.wi
      * @see ContentObserver#onChange(boolean)
      */
     protected void onContentChanged() {
-        System.out.println("CB...changed..." + System.currentTimeMillis());
     }
 
     private class ChangeObserver extends ContentObserver {

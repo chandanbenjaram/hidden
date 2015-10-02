@@ -28,6 +28,7 @@ import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
+import co.samepinch.android.app.helpers.misc.SimpleDividerItemDecoration;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
@@ -110,21 +111,22 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
     }
 
     private void setupRecyclerView() {
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-        if (cursor.getCount() < 1) {
-            callForRemotePosts(Boolean.FALSE);
-        }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
-        mViewAdapter.setHasStableIds(Boolean.TRUE);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // ANIMATIONS
+        mViewAdapter.setHasStableIds(Boolean.TRUE);
+        mRecyclerView.setHasFixedSize(true);
+
+        // STYLE :: ANIMATIONS
         ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
         wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
         wrapperAdapter.setDuration(300);
         wrapperAdapter.setFirstOnly(Boolean.FALSE);
         mRecyclerView.setAdapter(wrapperAdapter);
+
+        // STYLE :: DIVIDER
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
     }
 
 
@@ -140,8 +142,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
-        // set posts batch
-//        iArgs.putString(KEY_POST_COUNT.getValue(), String.valueOf(AppConstants.BATCH_COUNT_POSTS));
         // call for intent
         Intent mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
@@ -151,6 +151,10 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        if (event.getMetaData() == null) {
+            return;
+        }
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -160,25 +164,19 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     }
 
                     Map<String, String> eMData = event.getMetaData();
-                    if ((eMData = event.getMetaData()) != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
+                    if (eMData != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
                         return;
                     }
 
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
-
-//                    setupRecyclerView();
-//                    mViewAdapter.notifyDataSetChanged();
-////                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
-////                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
-////                    if(oldCursor !=null && !oldCursor.isClosed()){
-////                        oldCursor.close();
-////                    }
-//////                    setupRecyclerView();
-//////                    mViewAdapter.notifyItemRangeRemoved(0, mViewAdapter.getItemCount());
-////
-//                    mViewAdapter.notifyDataSetChanged();
-//                    mViewAdapter.notifyItemRangeChanged(0, mViewAdapter.getItemCount(), null);
+                    // refresh complete view
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+                    if (oldCursor != null && !oldCursor.isClosed()) {
+                        oldCursor.close();
+                    }
+                    mRecyclerView.getAdapter().notifyDataSetChanged();
                 } catch (Exception e) {
                     //e.printStackTrace();
                     Log.e(TAG, e.getMessage(), e);

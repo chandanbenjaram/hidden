@@ -27,6 +27,7 @@ import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.misc.FragmentLifecycle;
+import co.samepinch.android.app.helpers.misc.SimpleDividerItemDecoration;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
@@ -110,20 +111,22 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     }
 
     private void setupRecyclerView() {
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
-        if (cursor.getCount() < 1) {
-            callForRemotePosts(false);
-        }
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // ANIMATIONS
+        mViewAdapter.setHasStableIds(Boolean.TRUE);
+        mRecyclerView.setHasFixedSize(true);
+
+        // STYLE :: ANIMATIONS
         ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
         wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
         wrapperAdapter.setDuration(300);
         wrapperAdapter.setFirstOnly(Boolean.FALSE);
         mRecyclerView.setAdapter(wrapperAdapter);
+
+        // STYLE :: DIVIDER
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
     }
 
     private void callForRemotePosts(boolean isPaginating) {
@@ -147,6 +150,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        if (event.getMetaData() == null) {
+            return;
+        }
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -163,7 +170,13 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
 
-                    setupRecyclerView();
+                    // refresh complete view
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+                    if (oldCursor != null && !oldCursor.isClosed()) {
+                        oldCursor.close();
+                    }
+                    mRecyclerView.getAdapter().notifyDataSetChanged();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
