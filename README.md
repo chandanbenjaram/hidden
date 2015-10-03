@@ -25,4 +25,14 @@ Gapps(v2-4) - http://goo.gl/0aPPhx
 Gapps for v5(Lollipop) - http://goo.gl/0zOqQq
 
 
-https://github.com/sourcey/materiallogindemo/blob/master/app/src/main/java/com/sourcey/materiallogindemo/LoginActivity.java
+###RELEASE
+--where release apk
+app/build/outputs/apk
+
+align and verify
+
+
+Android/sdk//build-tools/23.0.0/zipalign -f -v 4 app-release.apk app-release_out.apk
+
+
+Android/sdk//build-tools/23.0.0/zipalign -c -v 4 app-release_out.apk
