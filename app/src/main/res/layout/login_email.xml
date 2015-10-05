@@ -32,7 +32,6 @@
         android:imeOptions="actionSend"
         android:inputType="textPassword"
         android:singleLine="true" />
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,14 +57,22 @@
             android:gravity="center|center_vertical"
             android:text="Sign Up" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_forgot"
-            style="@style/SP_TXT_BTN"
+        <!--<android.support.v7.widget.AppCompatButton-->
+            <!--android:id="@+id/btn_forgot"-->
+            <!--style="@style/SP_TXT_BTN"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center|center_vertical"-->
+            <!--android:gravity="center|center_vertical"-->
+            <!--android:text="Reset"-->
+            <!--android:visibility="gone"/>-->
+        <TextView
+            style="@style/SP_PASSWORD_REST"
+            android:id="@+id/pass_reset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|center_vertical"
             android:gravity="center|center_vertical"
-            android:text="Reset"
-            android:visibility="gone"/>
+            android:text="reset password"/>
     </LinearLayout>
 </RelativeLayout>

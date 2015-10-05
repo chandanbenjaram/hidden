@@ -3,6 +3,7 @@ package co.samepinch.android.app.helpers;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
@@ -14,7 +15,14 @@ import android.widget.EditText;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -24,8 +32,13 @@ import butterknife.OnEditorAction;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.SignupActivity;
 import co.samepinch.android.app.helpers.intent.AuthService;
+import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
+import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.rest.ReqSetBody;
+import co.samepinch.android.rest.Resp;
+import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
@@ -47,9 +60,6 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     @Bind(R.id.btn_signup)
     Button mSignUpButton;
 
-    @Bind(R.id.btn_forgot)
-    Button mForgotButton;
-
     ProgressDialog progressDialog;
 
     @Override
@@ -57,6 +67,12 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         super.onCreate(savedInstanceState);
         // retain this fragment across configuration changes.
         setRetainInstance(true);
+
+        // progress dialog properties
+        progressDialog = new ProgressDialog(getActivity(),
+                R.style.Theme_AppCompat_Dialog);
+        progressDialog.setCancelable(Boolean.TRUE);
+
     }
 
     @Override
@@ -86,12 +102,8 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
             return;
         }
 
-        progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Dialog);
-        progressDialog.setIndeterminate(true);
         progressDialog.setMessage("authenticating...");
         progressDialog.show();
-
         mLoginButton.setEnabled(Boolean.FALSE);
 //        mSignUpButton.setEnabled(Boolean.FALSE);
 //        mForgotButton.setEnabled(Boolean.FALSE);
@@ -134,18 +146,13 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
     @Subscribe
     public void onAuthAccExistsEvent(final Events.AuthAccExistsEvent event) {
         Map<String, String> eventData = event.getMetaData();
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
+        Utils.dismissSilently(progressDialog);
     }
 
     @Subscribe
     public void onAuthAccNotExistsEvent(final Events.AuthAccNotExistsEvent event) {
+        Utils.dismissSilently(progressDialog);
         Map<String, String> eventData = event.getMetaData();
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-
         Bundle iArgs = new Bundle();
         iArgs.putString(KEY_EMAIL.getValue(), mEmailIdView.getText().toString());
 
@@ -154,6 +161,67 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         startActivityForResult(intent, AppConstants.KV.REQUEST_SIGNUP.getIntValue());
     }
 
+    @OnClick(R.id.pass_reset)
+    public void onPassReset() {
+        Utils.dismissSilently(progressDialog);
+        String email = mEmailIdView.getText().toString();
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mEmailIdView.setError("enter a valid email address");
+            return;
+        } else {
+            mEmailIdView.setError(null);
+        }
+        progressDialog.setMessage("resetting password...");
+        progressDialog.show();
+
+        new RestPasswordTask().execute(new String[]{email});
+    }
+
+    private class RestPasswordTask extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... args) {
+            StorageComponent component = DaggerStorageComponent.create();
+            ReqSetBody req = component.provideReqSetBody();
+            // set base args
+            req.setToken(Utils.getNonBlankAppToken());
+            req.setCmd("forgot_password");
+
+            Map<String, String> body = new HashMap<>();
+            body.put("email", args[0]);
+            req.setBody(body);
+
+            //headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            try {
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                if (resp.getBody() != null) {
+                    return resp.getBody().getMessage();
+                }
+            } catch (Exception e) {
+                // muted
+                Resp resp = Utils.parseAsRespSilently(e);
+                if (resp != null && StringUtils.isBlank(resp.getMessage())) {
+                    return resp.getMessage();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Utils.dismissSilently(progressDialog);
+            if (result == null || StringUtils.isBlank(result)) {
+                Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
+            } else {
+                Snackbar.make(mView, result, Snackbar.LENGTH_SHORT).show();
+                getActivity().setResult(Activity.RESULT_OK);
+                getActivity().finish();
+            }
+        }
+    }
 
     @Subscribe
     public void onAuthSuccessEvent(final Events.AuthSuccessEvent event) {

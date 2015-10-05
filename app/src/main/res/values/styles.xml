@@ -142,4 +142,12 @@
         <item name="android:layout_marginTop">@dimen/large_spacer</item>
         <item name="android:layout_marginBottom">@dimen/large_spacer</item>
     </style>
+
+    <style name="SP_PASSWORD_REST">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/blue_500</item>
+        <item name="android:textSize">9sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:singleLine">true</item>
+    </style>
 </resources>
