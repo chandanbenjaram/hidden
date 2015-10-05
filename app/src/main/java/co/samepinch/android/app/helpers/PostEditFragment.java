@@ -75,6 +75,7 @@ import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPostDetails;
+import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.rest.ReqGeneric;
@@ -523,7 +524,10 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
 
                 String postId = getArguments().getString(AppConstants.K.POST.name());
+                // local db clean-up
                 getActivity().getContentResolver().delete(SchemaPostDetails.CONTENT_URI, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId});
+                getActivity().getContentResolver().delete(SchemaPosts.CONTENT_URI, SchemaPosts.COLUMN_UID + "=?", new String[]{postId});
+
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("deleted", true);
                 getActivity().setResult(Activity.RESULT_OK, resultIntent);
