@@ -340,7 +340,7 @@ public class PostDetailActivity extends AppCompatActivity {
         }
 
         List<String> permissions = mPostDetails.getPermissions();
-        if (permissions.contains("flag")) {
+        if (permissions != null && permissions.contains("flag")) {
             if (addDiv) {
 //                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
 //                        layout.addView(divider);
@@ -348,7 +348,6 @@ public class PostDetailActivity extends AppCompatActivity {
 
             TextView flagView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_flag, null);
             layout.addView(flagView);
-
             flagView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
@@ -370,25 +369,19 @@ public class PostDetailActivity extends AppCompatActivity {
                             .show();
                 }
             });
-
-//            new MenuItemClickListener(flagView, "flag", mPostId, mBottomsheet);
-            addDiv = true;
-        }
-
-        if (permissions.contains("un-flag")) {
-            if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-            }
-
-            TextView unFlagView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_unflag, null);
-            layout.addView(unFlagView);
-            new MenuItemClickListener(unFlagView, "unflag", mPostId, mBottomsheet);
             addDiv = true;
         }
 
         mBottomsheet.showWithSheetView(menu);
     }
+
+
+    private void doLogin() {
+        Intent intent = new Intent(PostDetailActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
 
     public void doEditIt(MenuItem item) {
         // TARGET
@@ -514,7 +507,7 @@ public class PostDetailActivity extends AppCompatActivity {
         });
     }
 
-    private static class MenuItemClickListener implements View.OnClickListener {
+    private class MenuItemClickListener implements View.OnClickListener {
         private final View view;
         private final String command;
         private final String postUID;
@@ -535,17 +528,21 @@ public class PostDetailActivity extends AppCompatActivity {
 
         public void callRemote(Bundle body) {
             bottomSheet.dismissSheet();
-            Bundle iArgs = new Bundle();
-            iArgs.putString(AppConstants.K.POST.name(), postUID);
-            iArgs.putString(AppConstants.K.COMMAND.name(), command);
-            if (body != null) {
-                iArgs.putBundle(AppConstants.K.BODY.name(), body);
+            if (Utils.isLoggedIn()) {
+                Bundle iArgs = new Bundle();
+                iArgs.putString(AppConstants.K.POST.name(), postUID);
+                iArgs.putString(AppConstants.K.COMMAND.name(), command);
+                if (body != null) {
+                    iArgs.putBundle(AppConstants.K.BODY.name(), body);
+                }
+                // call for intent
+                Intent intent =
+                        new Intent(view.getContext(), PostMetaUpdateService.class);
+                intent.putExtras(iArgs);
+                view.getContext().startService(intent);
+            }else{
+                doLogin();
             }
-            // call for intent
-            Intent intent =
-                    new Intent(view.getContext(), PostMetaUpdateService.class);
-            intent.putExtras(iArgs);
-            view.getContext().startService(intent);
         }
     }
 }

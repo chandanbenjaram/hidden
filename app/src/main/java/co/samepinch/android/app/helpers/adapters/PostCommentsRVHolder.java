@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 
@@ -21,6 +22,7 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.ActivityFragment;
+import co.samepinch.android.app.LoginActivity;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
@@ -193,18 +195,26 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
                     TextView flagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_flag, null);
                     layout.addView(flagView);
-                    new MenuItemClickListener(flagView, "flag", commentUID, bs);
-                    addDiv = true;
-                }
-
-                if (permissions.contains("un-flag")) {
-                    if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-                    }
-
-                    TextView unFlagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_unflag, null);
-                    layout.addView(unFlagView);
+                    flagView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(final View v) {
+                            new MaterialDialog.Builder(v.getContext())
+                                    .title(R.string.flag_title)
+                                    .items(R.array.flag_choice_arr)
+                                    .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                                        @Override
+                                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence reason) {
+                                            Bundle body = new Bundle();
+                                            body.putString("reason", String.valueOf(reason));
+                                            new MenuItemClickListener(v, "flag", commentUID, bs).callRemote(body);
+                                            return true;
+                                        }
+                                    })
+                                    .negativeText(R.string.flag_btn_cancel)
+                                    .positiveText(R.string.flag_btn_choose)
+                                    .show();
+                        }
+                    });
                     addDiv = true;
                 }
 
@@ -230,16 +240,30 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
         @Override
         public void onClick(View v) {
-            bottomSheet.dismissSheet();
-            Bundle iArgs = new Bundle();
-            iArgs.putString(AppConstants.K.COMMENT.name(), commentUID);
-            iArgs.putString(AppConstants.K.COMMAND.name(), command);
+            callRemote(null);
+        }
 
-            // call for intent
-            Intent intent =
-                    new Intent(view.getContext(), CommentUpdateService.class);
-            intent.putExtras(iArgs);
-            view.getContext().startService(intent);
+        public void callRemote(Bundle body) {
+            bottomSheet.dismissSheet();
+
+            if (Utils.isLoggedIn()) {
+                bottomSheet.dismissSheet();
+                Bundle iArgs = new Bundle();
+                iArgs.putString(AppConstants.K.COMMENT.name(), commentUID);
+                iArgs.putString(AppConstants.K.COMMAND.name(), command);
+                if (body != null) {
+                    iArgs.putBundle(AppConstants.K.BODY.name(), body);
+                }
+                // call for intent
+                Intent intent =
+                        new Intent(view.getContext(), CommentUpdateService.class);
+                intent.putExtras(iArgs);
+                view.getContext().startService(intent);
+            } else {
+                Intent intent = new Intent(view.getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                view.getContext().startActivity(intent);
+            }
         }
     }
 }

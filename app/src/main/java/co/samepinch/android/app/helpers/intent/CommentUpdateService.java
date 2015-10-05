@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
@@ -21,7 +23,7 @@ import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dto.CommentDetails;
-import co.samepinch.android.rest.ReqNoBody;
+import co.samepinch.android.rest.ReqGeneric;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RespCommentDetails;
 import co.samepinch.android.rest.RestClient;
@@ -41,10 +43,18 @@ public class CommentUpdateService extends IntentService {
         Bundle iArgs = intent.getExtras();
         String commentUID = iArgs.getString(AppConstants.K.COMMENT.name());
         String commentUri = StringUtils.join(new String[]{COMMENTS.getValue(), commentUID}, "/");
+        Bundle body = iArgs.getBundle(AppConstants.K.BODY.name());
 
-        ReqNoBody req = new ReqNoBody();
+        ReqGeneric<Map> req = new ReqGeneric();
         req.setToken(Utils.getAppToken(false));
         req.setCmd(iArgs.getString(AppConstants.K.COMMAND.name()));
+        if (body != null) {
+            Map<String, String> bodyMap = new HashMap<>();
+            for (String k : body.keySet()) {
+                bodyMap.put(k, body.getString(k));
+            }
+            req.setBody(bodyMap);
+        }
 
         try {
             //headers
@@ -52,7 +62,7 @@ public class CommentUpdateService extends IntentService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
-            HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
+            HttpEntity<ReqGeneric<Map>> reqEntity = new HttpEntity<>(req, headers);
 
             ResponseEntity<RespCommentDetails> resp = RestClient.INSTANCE.handle().exchange(commentUri, HttpMethod.POST, reqEntity, RespCommentDetails.class);
             CommentDetails commentDetails;
