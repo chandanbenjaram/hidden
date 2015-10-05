@@ -3,17 +3,16 @@ package co.samepinch.android.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MergeCursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,18 +21,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.Bind;
@@ -42,8 +36,7 @@ import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostDetailsRVAdapter;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
-import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
-import co.samepinch.android.app.helpers.module.StorageComponent;
+import co.samepinch.android.app.helpers.intent.PostMetaUpdateService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaComments;
@@ -51,11 +44,7 @@ import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dto.PostDetails;
 import co.samepinch.android.data.dto.User;
-import co.samepinch.android.rest.ReqSetBody;
-import co.samepinch.android.rest.Resp;
-import co.samepinch.android.rest.RestClient;
 
-import static co.samepinch.android.app.helpers.AppConstants.API.POSTS;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_UID;
 
 public class PostDetailActivity extends AppCompatActivity {
@@ -335,13 +324,8 @@ public class PostDetailActivity extends AppCompatActivity {
             }
 
             TextView downVoteView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_downvote, null);
-            downVoteView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    new PostUpNDownVoteTask().execute(new String[]{mPostId, "undoVoting"});
-                }
-            });
             layout.addView(downVoteView);
+            new MenuItemClickListener(downVoteView, "undoVoting", mPostId, mBottomsheet);
             addDiv = true;
         } else {
             if (addDiv) {
@@ -351,14 +335,58 @@ public class PostDetailActivity extends AppCompatActivity {
 
             TextView voteView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_upvote, null);
             layout.addView(voteView);
-            voteView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    new PostUpNDownVoteTask().execute(new String[]{mPostId, "upvote"});
-                }
-            });
+            new MenuItemClickListener(voteView, "upvote", mPostId, mBottomsheet);
             addDiv = true;
         }
+
+        List<String> permissions = mPostDetails.getPermissions();
+        if (permissions.contains("flag")) {
+            if (addDiv) {
+//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
+//                        layout.addView(divider);
+            }
+
+            TextView flagView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_flag, null);
+            layout.addView(flagView);
+
+            flagView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    new MaterialDialog.Builder(v.getContext())
+                            .title(R.string.flag_title)
+                            .items(R.array.flag_choice_arr)
+                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                                @Override
+                                public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence reason) {
+                                    Bundle body = new Bundle();
+                                    body.putString("reason", String.valueOf(reason));
+                                    new MenuItemClickListener(v, "flag", mPostId, mBottomsheet).callRemote(body);
+
+                                    return true;
+                                }
+                            })
+                            .negativeText(R.string.flag_btn_cancel)
+                            .positiveText(R.string.flag_btn_choose)
+                            .show();
+                }
+            });
+
+//            new MenuItemClickListener(flagView, "flag", mPostId, mBottomsheet);
+            addDiv = true;
+        }
+
+        if (permissions.contains("un-flag")) {
+            if (addDiv) {
+//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
+//                        layout.addView(divider);
+            }
+
+            TextView unFlagView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_unflag, null);
+            layout.addView(unFlagView);
+            new MenuItemClickListener(unFlagView, "unflag", mPostId, mBottomsheet);
+            addDiv = true;
+        }
+
         mBottomsheet.showWithSheetView(menu);
     }
 
@@ -409,6 +437,45 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     @Subscribe
+    public void onPostMetaUpdateServiceSuccessEvent(final Events.PostMetaUpdateServiceSuccessEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (event != null && event.getMetaData() != null) {
+                        Snackbar.make(mBottomsheet, event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
+                    }
+
+                    Bundle iArgs = getIntent().getExtras();
+                    // call for intent
+                    Intent detailsIntent =
+                            new Intent(getApplicationContext(), PostDetailsService.class);
+                    detailsIntent.putExtras(iArgs);
+                    startService(detailsIntent);
+                } catch (Exception e) {
+                    // muted
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void PostMetaUpdateServiceFailEvent(final Events.PostMetaUpdateServiceSuccessEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (event != null && event.getMetaData() != null) {
+                        Snackbar.make(mBottomsheet, event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    // muted
+                }
+            }
+        });
+    }
+
+    @Subscribe
     public void onCommentDetailsRefreshEvent(Events.CommentDetailsRefreshEvent event) {
         this.runOnUiThread(new Runnable() {
             @Override
@@ -447,51 +514,38 @@ public class PostDetailActivity extends AppCompatActivity {
         });
     }
 
-    private class PostUpNDownVoteTask extends AsyncTask<String, Integer, Boolean> {
-        @Override
-        protected Boolean doInBackground(String... args) {
-            if (args == null || args.length < 2) {
-                return Boolean.FALSE;
-            }
+    private static class MenuItemClickListener implements View.OnClickListener {
+        private final View view;
+        private final String command;
+        private final String postUID;
+        private final BottomSheetLayout bottomSheet;
 
-            try {
-                StorageComponent component = DaggerStorageComponent.create();
-                ReqSetBody req = component.provideReqSetBody();
-                // set base args
-                req.setToken(Utils.getNonBlankAppToken());
-                req.setCmd(args[1]);
-
-                String postUID = args[0];
-
-                //headers
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
-
-                String postUri = StringUtils.join(new String[]{POSTS.getValue(), postUID}, "/");
-                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, payloadEntity, Resp.class);
-                if (resp.getBody() != null) {
-                    return resp.getBody().getStatus() == 200;
-                }
-            } catch (Exception e) {
-                // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
-            }
-            return Boolean.FALSE;
+        public MenuItemClickListener(View source, String command, String postUID, BottomSheetLayout bs) {
+            this.command = command;
+            this.postUID = postUID;
+            this.view = source;
+            this.bottomSheet = bs;
+            this.view.setOnClickListener(this);
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            // call refresh
-            Intent detailsIntent =
-                    new Intent(getApplicationContext(), PostDetailsService.class);
-            detailsIntent.putExtras(getIntent().getExtras());
-            startService(detailsIntent);
-            if (mBottomsheet.isSheetShowing()) {
-                mBottomsheet.dismissSheet();
+        public void onClick(View v) {
+            callRemote(null);
+        }
+
+        public void callRemote(Bundle body) {
+            bottomSheet.dismissSheet();
+            Bundle iArgs = new Bundle();
+            iArgs.putString(AppConstants.K.POST.name(), postUID);
+            iArgs.putString(AppConstants.K.COMMAND.name(), command);
+            if (body != null) {
+                iArgs.putBundle(AppConstants.K.BODY.name(), body);
             }
+            // call for intent
+            Intent intent =
+                    new Intent(view.getContext(), PostMetaUpdateService.class);
+            intent.putExtras(iArgs);
+            view.getContext().startService(intent);
         }
     }
 }

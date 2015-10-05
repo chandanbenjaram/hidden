@@ -152,6 +152,7 @@ public class AppConstants {
         KEY_DOT,
         Wall,
         POST,
+        BODY,
         DOT,
         COMMENT,
         COMMAND,

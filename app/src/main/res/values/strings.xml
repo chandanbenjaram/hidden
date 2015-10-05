@@ -81,4 +81,9 @@
     <!-- FEEDBACK -->
     <string name="feedback_to">friends@samepinch.co</string>
     <string name="feedback_subject">SamePinch Feedback</string>
+
+    <!-- FLAG -->
+    <string name="flag_title">Flag as</string>
+    <string name="flag_btn_choose">Send</string>
+    <string name="flag_btn_cancel">Cancel</string>
 </resources>

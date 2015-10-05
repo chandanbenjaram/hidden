@@ -2,7 +2,6 @@ package co.samepinch.android.app.helpers.adapters;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,13 +13,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +32,6 @@ import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.Commenter;
 import co.samepinch.android.data.dto.User;
-import co.samepinch.android.rest.ReqNoBody;
-import co.samepinch.android.rest.Resp;
-import co.samepinch.android.rest.RestClient;
 
 /**
  * Created by imaginationcoder on 7/27/15.
@@ -222,50 +212,6 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
                 bs.showWithSheetView(menu);
             }
         });
-    }
-
-    private class CommentActionTask extends AsyncTask<String, Integer, Boolean> {
-        @Override
-        protected Boolean doInBackground(String... args) {
-            if (args == null || args.length < 2) {
-                return Boolean.FALSE;
-            }
-
-            try {
-                ReqNoBody req = new ReqNoBody();
-                req.setToken(Utils.getNonBlankAppToken());
-                req.setCmd(args[1]);
-
-                //headers
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-                HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);
-                String commentUrl = StringUtils.join(new String[]{AppConstants.API.COMMENTS.getValue(), args[0]}, "/");
-
-                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(commentUrl, HttpMethod.POST, payloadEntity, Resp.class);
-                return resp.getBody().getStatus() == 200;
-            } catch (Exception e) {
-                // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-            }
-            return Boolean.FALSE;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-//            Utils.dismissSilently(progressDialog);
-//            if (result != null && result.booleanValue()) {
-//                Snackbar.make(getView(), "commented successfully.", Snackbar.LENGTH_SHORT).show();
-//
-//                Intent resultIntent = new Intent();
-//                getActivity().setResult(Activity.RESULT_OK, resultIntent);
-//                getActivity().finish();
-//            } else {
-//                Snackbar.make(getView(), "error commenting. try again...", Snackbar.LENGTH_SHORT).show();
-//            }
-        }
     }
 
     private static class MenuItemClickListener implements View.OnClickListener {

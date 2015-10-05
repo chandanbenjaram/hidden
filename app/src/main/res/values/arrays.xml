@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="flag_choice_arr">
+        <item>off-topic</item>
+        <item>disturbing</item>
+        <item>defamatory</item>
+        <item>violates rules</item>
+    </string-array>
+</resources>

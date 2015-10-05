@@ -137,4 +137,16 @@ public class Events {
             super(metaData);
         }
     }
+
+    public static class PostMetaUpdateServiceSuccessEvent extends EventBase {
+        public PostMetaUpdateServiceSuccessEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
+    public static class PostMetaUpdateServiceFailEvent extends EventBase {
+        public PostMetaUpdateServiceFailEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
 }
