@@ -288,9 +288,11 @@ public class DotEditFragment extends Fragment {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        saveAction((int) delay / 2);
+                        int nextCheck = (int) delay % 2;
+                        saveAction(nextCheck > 0? nextCheck : 99);
                     }
                 }, delay);
+                return;
             } else {
                 user.setImageKey(imgVal);
             }
