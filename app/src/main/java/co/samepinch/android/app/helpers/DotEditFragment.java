@@ -413,6 +413,7 @@ public class DotEditFragment extends Fragment {
                     User user = gson.fromJson(userStr, User.class);
                     user.setFname(updatedUser.getFname());
                     user.setLname(updatedUser.getLname());
+                    user.setEmail(updatedUser.getEmail());
                     user.setPinchHandle(updatedUser.getPinchHandle());
                     user.setSummary(updatedUser.getSummary());
                     user.setBlog(updatedUser.getBlog());
