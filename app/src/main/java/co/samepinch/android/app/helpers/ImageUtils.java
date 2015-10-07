@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.SPApplication;
 
 /**
  * Created by cbenjaram on 9/18/15.
@@ -13,12 +14,21 @@ public class ImageUtils {
     private static final float BITMAP_SCALE = 0.2f;
     private static final int BLUR_RADIUS = 2;
 
+    private static Bitmap DEFAULT_BITMAP;
+
+    static {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        options.inDither = false;
+        DEFAULT_BITMAP = BitmapFactory.decodeResource(SPApplication.getContext().getResources(),
+                R.drawable.bg_blur_2x, options);
+    }
+
     public static Bitmap blur(Context ctx, Bitmap image) {
         try {
             return fastblur(image, BITMAP_SCALE, BLUR_RADIUS);
         } catch (Exception e) {
-            return BitmapFactory.decodeResource(ctx.getResources(),
-                    R.drawable.bg_blur_2x);
+            return DEFAULT_BITMAP;
         }
     }
 
