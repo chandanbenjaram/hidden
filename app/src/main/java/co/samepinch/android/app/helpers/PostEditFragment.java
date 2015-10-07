@@ -284,6 +284,9 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, rightContent));
         }
 
+        /// newline
+        listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, null));
+
         mListViewAdapter
                 = new ImageOrTextViewAdapter(getActivity(), R.layout.post_create_item, listItems);
         mListView.setAdapter(mListViewAdapter);
