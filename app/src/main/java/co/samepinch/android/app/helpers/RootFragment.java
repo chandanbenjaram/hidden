@@ -75,6 +75,9 @@ public class RootFragment extends Fragment {
             case FRAGMENT_WEBVIEW:
                 fragment = new WebViewFragment();
                 break;
+            case FRAGMENT_IMAGEVIEW:
+                fragment = new ImageViewFragment();
+                break;
             default:
                 throw new IllegalArgumentException("un-known fragment " + targetFragment);
         }

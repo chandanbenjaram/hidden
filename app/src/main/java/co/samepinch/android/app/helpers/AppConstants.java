@@ -148,6 +148,7 @@ public class AppConstants {
         FRAGMENT_DOTEDIT,
         FRAGMENT_SETTINGS,
         FRAGMENT_WEBVIEW,
+        FRAGMENT_IMAGEVIEW,
         KEY_TAG,
         KEY_DOT,
         Wall,
@@ -161,6 +162,7 @@ public class AppConstants {
         via_email_password,
         provider,
         MESSAGE,
-        REMOTE_URL
+        REMOTE_URL,
+        IMAGE_URL
     }
 }

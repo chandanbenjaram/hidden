@@ -1,9 +1,11 @@
 package co.samepinch.android.app.helpers.widget;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
@@ -23,7 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.AppConstants;
 
 /**
  * Created by imaginationcoder on 7/22/15.
@@ -99,6 +104,7 @@ public class SIMView extends RelativeLayout {
     }
 
     public void populateImageViewWithAdjustedAspect(String imgUri, Postprocessor postprocessor, Integer... resizeDimensions) {
+        mImagePath = imgUri;
         if (StringUtils.isBlank(imgUri)) {
             return;
         }
@@ -132,5 +138,20 @@ public class SIMView extends RelativeLayout {
         mSIMView.setDrawingCacheEnabled(true);
         mSIMView.buildDrawingCache(true);
         mSIMView.setAspectRatio(mSIMView.getAspectRatio());
+    }
+
+
+    @OnClick(R.id.sim_id)
+    public void onClick() {
+        Bundle args = new Bundle();
+        // target
+        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_IMAGEVIEW.name());
+        args.putString(AppConstants.K.IMAGE_URL.name(), mImagePath);
+
+        // intent
+        Intent intent = new Intent(mSIMView.getContext(), ActivityFragment.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtras(args);
+        mSIMView.getContext().startActivity(intent);
     }
 }
