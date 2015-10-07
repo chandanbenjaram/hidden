@@ -422,6 +422,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
                     setUpMetadata(currPost);
                     currPost.close();
+                    invalidateOptionsMenu();
                 } catch (Exception e) {
                     // muted
                 }
