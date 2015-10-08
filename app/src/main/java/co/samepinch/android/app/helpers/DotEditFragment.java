@@ -459,13 +459,13 @@ public class DotEditFragment extends Fragment {
                 .negativeText(R.string.change_password_cancel)
                 .autoDismiss(false)
                 .input(R.string.change_password_hint, R.string.change_password_hint_fill, new MaterialDialog.InputCallback() {
-//                    @Override
-//                    public void onInput(MaterialDialog dialog, CharSequence input) {
+                    @Override
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
 //                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(StringUtils.length(input) > 5);
-//                    }
+                    }
                 });
         MaterialDialog dialog = bldr.build();
-        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+//        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
         dialog.show();
     }
 
