@@ -35,6 +35,7 @@ import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FRESH_DATA_FLAG;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
 
 public class FavPostListFragment extends Fragment implements FragmentLifecycle {
@@ -68,7 +69,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mLoadingMore = Boolean.FALSE;
 
         if (mRecyclerView != null) {
-            Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+            Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
             Cursor oldCursor = mViewAdapter.swapCursor(cursor);
             if (oldCursor != null && !oldCursor.isClosed()) {
                 oldCursor.close();
@@ -146,8 +147,9 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
             for (Map.Entry<String, String> e : entries.entrySet()) {
                 iArgs.putString(e.getKey(), e.getValue().toString());
             }
+        } else {
+            iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
-
         // call for intent
         Intent mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
@@ -178,7 +180,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
 
                     // refresh complete view
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
                     Cursor oldCursor = mViewAdapter.swapCursor(cursor);
                     int oldEnd = oldCursor.getCount();
                     int newEnd = cursor.getCount();
