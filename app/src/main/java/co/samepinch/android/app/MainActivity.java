@@ -26,7 +26,6 @@ import com.flipboard.bottomsheet.BottomSheetLayout;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.Utils;
@@ -138,21 +137,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.menuitem_sign_in_id).setVisible(true);
-        menu.findItem(R.id.menuitem_sign_out_id).setVisible(false);
-
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.menuitem_sign_in_id:
-                onLoginEvent();
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+                startActivityForResult(loginIntent, INTENT_LOGIN);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -278,14 +270,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    @OnClick(R.id.login)
-    public void onLoginEvent() {
-        Intent loginIntent = new Intent(this, LoginActivity.class);
-        startActivityForResult(loginIntent, INTENT_LOGIN);
-    }
-//
-//    @Subscribe
-//    public void onPostsRefreshedEvent(Events.PostsRefreshedEvent event) {
-//        Snackbar.make(mBottomsheet, "refreshed", Snackbar.LENGTH_LONG).show();
-//    }
 }

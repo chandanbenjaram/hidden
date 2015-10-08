@@ -11,15 +11,15 @@
         android:adjustViewBounds="true"
         android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/backdrop"
-        android:layout_alignLeft="@+id/backdrop"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/backdrop"
-        android:background="@drawable/bground_gradient_desc"
-        android:gravity="center_horizontal|bottom"
-        android:text="login" />
+    <!--<TextView-->
+        <!--android:id="@+id/login"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignBottom="@+id/backdrop"-->
+        <!--android:layout_alignLeft="@+id/backdrop"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignRight="@+id/backdrop"-->
+        <!--android:background="@drawable/bground_gradient_desc"-->
+        <!--android:gravity="center_horizontal|bottom"-->
+        <!--android:text="login" />-->
 </RelativeLayout>
