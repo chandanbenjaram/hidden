@@ -89,7 +89,7 @@ dependencies {
     compile 'com.kyleduo.switchbutton:library:1.2.9'
     compile 'com.github.fenjuly:ToggleExpandLayout:4388a563ec'
     compile 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:1.2.32@aar'
-    compile('com.afollestad.material-dialogs:core:0.8.1.0@aar') {
+    compile('com.afollestad.material-dialogs:core:0.8.2.0@aar') {
         transitive = true
     }
     // compile 'com.leaking.slideswitch:app:1.0.0'

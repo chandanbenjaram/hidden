@@ -303,7 +303,7 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         if (password.isEmpty() || password.length() < 6) {
-            _passwordText.setError("minimum 6 characters long");
+            _passwordText.setError("minimum 6 characters required");
             valid = false;
         } else {
             _passwordText.setError(null);

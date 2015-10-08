@@ -18,7 +18,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,9 +27,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
@@ -96,6 +97,9 @@ public class DotEditFragment extends Fragment {
 
     @Bind(R.id.input_aboutMe)
     EditText mAboutMe;
+
+    @Bind(R.id.input_change_password)
+    TextView mChangePassword;
 
     @Bind(R.id.input_blogUrl)
     EditText mBlogUrl;
@@ -193,6 +197,10 @@ public class DotEditFragment extends Fragment {
                 (getActivity()).onBackPressed();
             }
         });
+
+        // display change password conditionally
+        mChangePassword.setVisibility(Utils.isLoggedInViaEmailPassword() ? View.VISIBLE : View.GONE);
+
         return view;
     }
 
@@ -450,23 +458,62 @@ public class DotEditFragment extends Fragment {
 
     @OnClick(R.id.input_change_password)
     public void changePasswordClick() {
-        MaterialDialog.Builder bldr = new MaterialDialog.Builder(getContext())
+        View passwordChangeView = LayoutInflater.from(getContext()).inflate(R.layout.change_password, null);
+        final EditText currPassView = (EditText) passwordChangeView.findViewById(R.id.input_password_curr);
+        final EditText newPassView = (EditText) passwordChangeView.findViewById(R.id.input_password_new);
+        final EditText confirmPassView = (EditText) passwordChangeView.findViewById(R.id.input_password_new_confirm);
+
+        new MaterialDialog.Builder(getContext())
+                .theme(Theme.LIGHT)
                 .title(R.string.change_password_title)
-                .content(R.string.change_password_content)
-                .inputRangeRes(1, 156, R.color.red_500)
-                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
-                .positiveText(R.string.change_password_change)
-                .negativeText(R.string.change_password_cancel)
+                .customView(passwordChangeView, Boolean.TRUE)
+                .positiveText(R.string.change_password_positive)
+                .negativeText(R.string.change_password_negative)
                 .autoDismiss(false)
-                .input(R.string.change_password_hint, R.string.change_password_hint_fill, new MaterialDialog.InputCallback() {
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-//                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(StringUtils.length(input) > 5);
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        dialog.dismiss();
                     }
-                });
-        MaterialDialog dialog = bldr.build();
-//        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-        dialog.show();
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        boolean hasErr = false;
+
+                        String curr = currPassView.getText().toString();
+                        String nev = newPassView.getText().toString();
+                        String confirm = confirmPassView.getText().toString();
+
+                        // validate
+                        if (curr.length() < 6) {
+                            currPassView.setError("minimum 6 characters required");
+                            hasErr = true;
+                        }
+                        if (nev.length() < 6) {
+                            newPassView.setError("minimum 6 characters required");
+                            hasErr = true;
+                        }
+                        if (confirm.length() < 6) {
+                            confirmPassView.setError("minimum 6 characters required");
+                            hasErr = true;
+                        }
+
+                        if (nev.length() >= 6 && !StringUtils.equals(nev, confirm)) {
+                            confirmPassView.setError("must match with new password");
+                            hasErr = true;
+                        }
+
+                        if (!hasErr) {
+                            //continue
+                            new ChangePasswordTask().execute(new String[]{curr, nev, confirm});
+                            dialog.dismiss();
+                            progressDialog.setMessage("changing password...");
+                            progressDialog.show();
+                        }
+                    }
+                })
+                .show();
     }
 
     @OnClick(R.id.view_avatar)
@@ -501,6 +548,59 @@ public class DotEditFragment extends Fragment {
         // Add the camera options.
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
         startActivityForResult(chooserIntent, AppConstants.KV.REQUEST_CHOOSE_PICTURE.getIntValue());
+    }
+
+    class ChangePasswordTask extends AsyncTask<String, Integer, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+            Bundle respBundle = new Bundle();
+
+            try {
+                StorageComponent component = DaggerStorageComponent.create();
+                ReqSetBody req = component.provideReqSetBody();
+                // set base args
+                req.setToken(Utils.getNonBlankAppToken());
+                req.setCmd("change_password");
+
+                Map<String, String> body = new HashMap<>();
+                body.put("current_password", args[0]);
+                body.put("password", args[1]);
+                body.put("password_confirmation", args[2]);
+
+                req.setBody(body);
+
+                //headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+                HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
+                ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
+                return resp.getBody().getMessage();
+            } catch (Exception e) {
+                Resp resp = Utils.parseAsRespSilently(e);
+                if (resp != null && StringUtils.isNotBlank(resp.getMessage())) {
+                    return resp.getMessage();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Utils.dismissSilently(progressDialog);
+
+            if (result == null) {
+                Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+            Snackbar.make(getView(), result, Snackbar.LENGTH_LONG).show();
+        }
     }
 
     class ImageUploadTask extends AsyncTask<String, Integer, Bundle> {
@@ -551,6 +651,8 @@ public class DotEditFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Bundle result) {
+            Utils.dismissSilently(progressDialog);
+
             if (result == null || mImageTaskMap.isEmpty()) {
                 return;
             }

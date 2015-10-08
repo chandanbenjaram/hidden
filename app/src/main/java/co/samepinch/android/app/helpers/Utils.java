@@ -633,6 +633,12 @@ public class Utils {
         return Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue());
     }
 
+    public static boolean isLoggedInViaEmailPassword() {
+        String provider = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_PROVIDER.getValue());
+        return StringUtils.equalsIgnoreCase(provider, AppConstants.K.via_email_password.name());
+    }
+
+
     public static boolean isValidUri(String arg0) {
         try {
             if (StringUtils.isBlank(arg0)) {
