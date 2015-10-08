@@ -95,7 +95,11 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
-                callForRemotePosts(Boolean.TRUE);
+                Log.d(TAG, "...onLoadMore..." + mLoadingMore);
+                if (!mLoadingMore) {
+                    mLoadingMore = Boolean.TRUE;
+                    callForRemotePosts(Boolean.TRUE);
+                }
             }
         });
 
@@ -134,11 +138,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
 
     private void callForRemotePosts(boolean isPaginating) {
-        if (mLoadingMore) {
-            return;
-        } else {
-            mLoadingMore = Boolean.TRUE;
-        }
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
         if (isPaginating) {
@@ -150,6 +149,8 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
+
+
         // call for intent
         Intent mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
@@ -186,15 +187,17 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                         oldCursor.close();
                     }
                     if (mLoadingMore) {
+                        // no need to refresh full recycler
                         mRecyclerView.getAdapter().notifyItemRangeInserted(oldEnd, newEnd);
                     } else {
                         mRecyclerView.getAdapter().notifyDataSetChanged();
                     }
-                    mLoadingMore = Boolean.FALSE;
+
                 } catch (Exception e) {
-                    //e.printStackTrace();
-                    Log.e(TAG, e.getMessage(), e);
+                    //muted
                 }
+
+                mLoadingMore = false;
             }
         });
     }

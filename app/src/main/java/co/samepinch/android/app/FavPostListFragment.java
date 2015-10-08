@@ -50,6 +50,8 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     PostCursorRecyclerViewAdapter mViewAdapter;
     LinearLayoutManager mLayoutManager;
 
+    private boolean mLoadingMore;
+
     public static FavPostListFragment newInstance(int page) {
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
@@ -63,6 +65,8 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         super.onResume();
         // register to event bus
         BusProvider.INSTANCE.getBus().register(this);
+        mLoadingMore = Boolean.FALSE;
+
         if (mRecyclerView != null) {
             Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
             Cursor oldCursor = mViewAdapter.swapCursor(cursor);
@@ -93,7 +97,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
-                callForRemotePosts(true);
+                if (!mLoadingMore) {
+                    mLoadingMore = Boolean.TRUE;
+                    callForRemotePosts(Boolean.TRUE);
+                }
             }
         });
 
@@ -173,13 +180,22 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     // refresh complete view
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
                     Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+                    int oldEnd = oldCursor.getCount();
+                    int newEnd = cursor.getCount();
                     if (oldCursor != null && !oldCursor.isClosed()) {
                         oldCursor.close();
                     }
-                    mRecyclerView.getAdapter().notifyDataSetChanged();
+                    if (mLoadingMore) {
+                        // no need to refresh full recycler
+                        mRecyclerView.getAdapter().notifyItemRangeInserted(oldEnd, newEnd);
+                    } else {
+                        mRecyclerView.getAdapter().notifyDataSetChanged();
+                    }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // muted
                 }
+
+                mLoadingMore = false;
             }
         });
     }

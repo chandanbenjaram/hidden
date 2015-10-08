@@ -164,8 +164,8 @@
     <orderEntry type="library" exported="" name="sdk-library-3.6.7" level="project" />
     <orderEntry type="library" exported="" name="disklrucache-2.0.2" level="project" />
     <orderEntry type="library" exported="" name="ab-test-2.0.3" level="project" />
-    <orderEntry type="library" exported="" name="javax.annotation-10.0-b28" level="project" />
     <orderEntry type="library" exported="" name="spring-android-rest-template-2.0.0.M1" level="project" />
+    <orderEntry type="library" exported="" name="javax.annotation-10.0-b28" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="imagepipeline-0.5.3" level="project" />
     <orderEntry type="library" exported="" name="android-exif-extended-1.0.6" level="project" />
