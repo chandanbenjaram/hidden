@@ -18,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.aviary.android.feather.headless.utils.MegaPixels;
 import com.aviary.android.feather.library.Constants;
 import com.aviary.android.feather.sdk.FeatherActivity;
@@ -289,7 +292,7 @@ public class DotEditFragment extends Fragment {
                     @Override
                     public void run() {
                         int nextCheck = (int) delay % 2;
-                        saveAction(nextCheck > 0? nextCheck : 99);
+                        saveAction(nextCheck > 0 ? nextCheck : 99);
                     }
                 }, delay);
                 return;
@@ -443,6 +446,27 @@ public class DotEditFragment extends Fragment {
             }
             Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    @OnClick(R.id.input_change_password)
+    public void changePasswordClick() {
+        MaterialDialog.Builder bldr = new MaterialDialog.Builder(getContext())
+                .title(R.string.change_password_title)
+                .content(R.string.change_password_content)
+                .inputRangeRes(1, 156, R.color.red_500)
+                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .positiveText(R.string.change_password_change)
+                .negativeText(R.string.change_password_cancel)
+                .autoDismiss(false)
+                .input(R.string.change_password_hint, R.string.change_password_hint_fill, new MaterialDialog.InputCallback() {
+//                    @Override
+//                    public void onInput(MaterialDialog dialog, CharSequence input) {
+//                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(StringUtils.length(input) > 5);
+//                    }
+                });
+        MaterialDialog dialog = bldr.build();
+        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+        dialog.show();
     }
 
     @OnClick(R.id.view_avatar)

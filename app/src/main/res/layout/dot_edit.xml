@@ -175,6 +175,16 @@
                         android:hint="My Blog"
                         android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/input_change_password"
+                    style="@style/SP_TXT_BTN"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:text="change password"
+                    android:visibility="visible"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

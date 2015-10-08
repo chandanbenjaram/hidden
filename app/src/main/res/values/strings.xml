@@ -86,4 +86,12 @@
     <string name="flag_title">Flag as</string>
     <string name="flag_btn_choose">Send</string>
     <string name="flag_btn_cancel">Cancel</string>
+
+    <!-- CHANGE PASSWORD -->
+    <string name="change_password_title">Change Password</string>
+    <string name="change_password_content">we recommend choosing a strong password</string>
+    <string name="change_password_hint">type your password here...</string>
+    <string name="change_password_hint_fill"></string>
+    <string name="change_password_change">CHANGE</string>
+    <string name="change_password_cancel">CANCEL</string>
 </resources>
