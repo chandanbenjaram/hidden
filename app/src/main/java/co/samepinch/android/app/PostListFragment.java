@@ -52,6 +52,8 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
     PostCursorRecyclerViewAdapter mViewAdapter;
     LinearLayoutManager mLayoutManager;
 
+    private boolean mLoadingMore;
+
     public static PostListFragment newInstance(int page) {
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
@@ -65,6 +67,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         super.onResume();
         // register to event bus
         BusProvider.INSTANCE.getBus().register(this);
+        mLoadingMore = Boolean.FALSE;
         if (mRecyclerView != null) {
             Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
             Cursor oldCursor = mViewAdapter.swapCursor(cursor);
@@ -131,6 +134,11 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
 
     private void callForRemotePosts(boolean isPaginating) {
+        if (mLoadingMore) {
+            return;
+        } else {
+            mLoadingMore = Boolean.TRUE;
+        }
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
         if (isPaginating) {
@@ -154,7 +162,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         if (event.getMetaData() == null) {
             return;
         }
-
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -173,10 +180,17 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     // refresh complete view
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
                     Cursor oldCursor = mViewAdapter.swapCursor(cursor);
+                    int oldEnd = oldCursor.getCount();
+                    int newEnd = cursor.getCount();
                     if (oldCursor != null && !oldCursor.isClosed()) {
                         oldCursor.close();
                     }
-                    mRecyclerView.getAdapter().notifyDataSetChanged();
+                    if (mLoadingMore) {
+                        mRecyclerView.getAdapter().notifyItemRangeInserted(oldEnd, newEnd);
+                    } else {
+                        mRecyclerView.getAdapter().notifyDataSetChanged();
+                    }
+                    mLoadingMore = Boolean.FALSE;
                 } catch (Exception e) {
                     //e.printStackTrace();
                     Log.e(TAG, e.getMessage(), e);
