@@ -23,8 +23,10 @@ public interface SchemaPosts extends BaseColumns {
     String COLUMN_COMMENTERS = "commenters";
     String COLUMN_TAGS = "tags";
     String COLUMN_OWNER = "dot_uid";
-    String COLUMN_SOURCE_KEY = "source_key";
-    String COLUMN_SOURCE_BY = "source_by";
+    String COLUMN_SRC_WALL = "src_wall";
+    String COLUMN_SRC_TAG = "src_tag";
+    String COLUMN_SRC_SEARCH = "src_search";
+    String COLUMN_SRC_FAV = "src_fav";
 
     String TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + TABLE_NAME
@@ -41,8 +43,10 @@ public interface SchemaPosts extends BaseColumns {
             + COLUMN_COMMENTERS + " TEXT DEFAULT '', "
             + COLUMN_TAGS + " TEXT DEFAULT '', "
             + COLUMN_OWNER + " TEXT NOT NULL, "
-            + COLUMN_SOURCE_KEY + " TEXT DEFAULT '', "
-            + COLUMN_SOURCE_BY + " TEXT DEFAULT '', "
+            + COLUMN_SRC_WALL + " INTEGER DEFAULT 0, "
+            + COLUMN_SRC_TAG + " INTEGER DEFAULT 0, "
+            + COLUMN_SRC_SEARCH + " INTEGER DEFAULT 0, "
+            + COLUMN_SRC_FAV + " INTEGER DEFAULT 0, "
             + "FOREIGN KEY(dot_uid) REFERENCES dots(uid)"
             + ")";
 
@@ -58,8 +62,8 @@ public interface SchemaPosts extends BaseColumns {
             _ID, COLUMN_UID, COLUMN_WALL_CONTENT, COLUMN_COMMENT_COUNT,
             COLUMN_UPVOTE_COUNT, COLUMN_VIEWS, COLUMN_ANONYMOUS,
             COLUMN_CREATED_AT, COLUMN_COMMENTERS, COLUMN_TAGS,
-            COLUMN_OWNER, COLUMN_WALL_IMAGES, COLUMN_SOURCE_KEY,
-            COLUMN_SOURCE_BY, COLUMN_WALL_CONTENT, COLUMN_WALL_IMAGES
+            COLUMN_OWNER, COLUMN_WALL_IMAGES, COLUMN_WALL_CONTENT,
+            COLUMN_WALL_IMAGES, COLUMN_SRC_WALL, COLUMN_SRC_TAG, COLUMN_SRC_SEARCH, COLUMN_SRC_FAV
     };
 
     String VIEW_CREATE_POST_WITH_DOT_NAME = "VIEW_POST_WITH_DOT";
@@ -78,8 +82,10 @@ public interface SchemaPosts extends BaseColumns {
             + ", p." + COLUMN_OWNER
             + ", p." + COLUMN_WALL_IMAGES
             + ", p." + COLUMN_CREATED_AT
-            + ", p." + COLUMN_SOURCE_KEY
-            + ", p." + COLUMN_SOURCE_BY
+            + ", p." + COLUMN_SRC_WALL
+            + ", p." + COLUMN_SRC_TAG
+            + ", p." + COLUMN_SRC_SEARCH
+            + ", p." + COLUMN_SRC_FAV
             + ", d." + SchemaDots.COLUMN_PINCH_HANDLE
             + ", d." + SchemaDots.COLUMN_FNAME
             + ", d." + SchemaDots.COLUMN_LNAME

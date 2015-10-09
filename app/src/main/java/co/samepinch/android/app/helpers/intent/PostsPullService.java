@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +41,10 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_ETAG;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FRESH_DATA_FLAG;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LAST_MODIFIED;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_TAG;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_USER;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_WALL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POST_COUNT;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_STEP;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -87,7 +92,7 @@ public class PostsPullService extends IntentService {
             ArrayList<ContentProviderOperation> ops = parseResponse(iArgs, resp.getBody());
 
             if (ops != null) {
-                if(isFreshData){
+                if (isFreshData) {
                     // clear db
                     ArrayList<ContentProviderOperation> dropOps = new ArrayList<ContentProviderOperation>();
                     dropOps.add(ContentProviderOperation.newDelete(SchemaPosts.CONTENT_URI).build());
@@ -164,8 +169,8 @@ public class PostsPullService extends IntentService {
     }
 
     private static void appendPostOps(Bundle iArgs, Post post, User postOwner, User anonyOwner, ArrayList<ContentProviderOperation> ops) {
-        ops.add(ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI)
-                .withValue(SchemaPosts.COLUMN_UID, post.getUid())
+        ContentProviderOperation.Builder bldr = ContentProviderOperation.newInsert(SchemaPosts.CONTENT_URI);
+        bldr.withValue(SchemaPosts.COLUMN_UID, post.getUid())
                 .withValue(SchemaPosts.COLUMN_WALL_CONTENT, post.getWallContent())
                 .withValue(SchemaPosts.COLUMN_WALL_IMAGES, post.getWallImagesForDB())
                 .withValue(SchemaPosts.COLUMN_COMMENT_COUNT, post.getCommentCount())
@@ -175,10 +180,16 @@ public class PostsPullService extends IntentService {
                 .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
                 .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
                 .withValue(SchemaPosts.COLUMN_OWNER, postOwner != null ? postOwner.getUid() : anonyOwner.getUid())
-                .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB())
-                .withValue(SchemaPosts.COLUMN_SOURCE_BY, iArgs.getString(KEY_BY.getValue(), EMPTY))
-                .withValue(SchemaPosts.COLUMN_SOURCE_KEY, iArgs.getString(KEY_KEY.getValue(), EMPTY))
-                .build());
+                .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB());
+        String srcBy = iArgs.getString(KEY_BY.getValue(), EMPTY);
+        if (StringUtils.isBlank(srcBy) || StringUtils.equals(srcBy, KEY_POSTS_WALL.getValue())) {
+            bldr.withValue(SchemaPosts.COLUMN_SRC_WALL, true);
+        } else if (StringUtils.equals(srcBy, KEY_POSTS_FAV.getValue())) {
+            bldr.withValue(SchemaPosts.COLUMN_SRC_FAV, true);
+        } else if (StringUtils.equals(srcBy, KEY_POSTS_TAG.getValue())) {
+            bldr.withValue(SchemaPosts.COLUMN_SRC_TAG, true);
+        }
+        ops.add(bldr.build());
     }
 
     private static void appendTagOps(Post post, ArrayList<ContentProviderOperation> ops) {

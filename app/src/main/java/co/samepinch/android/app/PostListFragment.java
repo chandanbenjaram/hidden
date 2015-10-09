@@ -77,7 +77,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
             @Override
             public void run() {
                 if (mViewAdapter != null) {
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, null);
                     mViewAdapter.changeCursor(cursor);
                 }
             }
@@ -128,7 +128,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setAdapter(mViewAdapter);
@@ -187,7 +187,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
 
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, null, null, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, null);
                     mViewAdapter.swapCursor(cursor);
                 } catch (Exception e) {
                     //muted

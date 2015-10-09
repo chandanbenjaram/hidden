@@ -78,7 +78,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
             @Override
             public void run() {
                 if (mViewAdapter != null) {
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
                     mViewAdapter.changeCursor(cursor);
                 }
             }
@@ -133,7 +133,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setAdapter(mViewAdapter);
@@ -185,7 +185,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
 
                     // refresh complete view
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
