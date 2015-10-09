@@ -79,7 +79,11 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
             public void run() {
                 if (mViewAdapter != null) {
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
-                    mViewAdapter.changeCursor(cursor);
+                    if (cursor.getCount() > 0) {
+                        mViewAdapter.changeCursor(cursor);
+                    } else {
+                        callForRemotePosts(false);
+                    }
                 }
             }
         });
