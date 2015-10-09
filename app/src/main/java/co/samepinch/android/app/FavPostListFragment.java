@@ -3,6 +3,7 @@ package co.samepinch.android.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,12 +12,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnticipateOvershootInterpolator;
 
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -31,8 +32,6 @@ import co.samepinch.android.app.helpers.misc.SimpleDividerItemDecoration;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FRESH_DATA_FLAG;
@@ -51,14 +50,21 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     PostCursorRecyclerViewAdapter mViewAdapter;
     LinearLayoutManager mLayoutManager;
 
-    private boolean mLoadingMore;
+    private LocalHandler mHandler;
 
     public static FavPostListFragment newInstance(int page) {
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
+
         FavPostListFragment fragment = new FavPostListFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHandler = new LocalHandler(this);
     }
 
     @Override
@@ -66,16 +72,17 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         super.onResume();
         // register to event bus
         BusProvider.INSTANCE.getBus().register(this);
-        mLoadingMore = Boolean.FALSE;
 
-        if (mRecyclerView != null) {
-            Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
-            Cursor oldCursor = mViewAdapter.swapCursor(cursor);
-            if (oldCursor != null && !oldCursor.isClosed()) {
-                oldCursor.close();
+        // refresh
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mViewAdapter != null) {
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
+                    mViewAdapter.changeCursor(cursor);
+                }
             }
-            mRecyclerView.getAdapter().notifyItemRangeChanged(0, mRecyclerView.getAdapter().getItemCount());
-        }
+        });
     }
 
     @Override
@@ -98,10 +105,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
-                if (!mLoadingMore) {
-                    mLoadingMore = Boolean.TRUE;
-                    callForRemotePosts(Boolean.TRUE);
-                }
+                callForRemotePosts(Boolean.TRUE);
             }
         });
 
@@ -114,24 +118,25 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         setupRecyclerView();
 
         // refresh
-        callForRemotePosts(false);
+        // refresh
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callForRemotePosts(false);
+            }
+        });
+
         return view;
     }
 
     private void setupRecyclerView() {
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setHasFixedSize(true);
 
-        // STYLE :: ANIMATIONS
-        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
-        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
-        wrapperAdapter.setDuration(300);
-        wrapperAdapter.setFirstOnly(Boolean.FALSE);
-        mRecyclerView.setAdapter(wrapperAdapter);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
+        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        mViewAdapter.setHasStableIds(Boolean.TRUE);
+        mRecyclerView.setAdapter(mViewAdapter);
 
         // STYLE :: DIVIDER
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
@@ -181,23 +186,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
                     // refresh complete view
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SOURCE_BY + "=?", new String[]{KEY_POSTS_FAV.getValue()}, null);
-                    Cursor oldCursor = mViewAdapter.swapCursor(cursor);
-                    int oldEnd = oldCursor.getCount();
-                    int newEnd = cursor.getCount();
-                    if (oldCursor != null && !oldCursor.isClosed()) {
-                        oldCursor.close();
-                    }
-                    if (mLoadingMore) {
-                        // no need to refresh full recycler
-                        mRecyclerView.getAdapter().notifyItemRangeInserted(oldEnd, newEnd);
-                    } else {
-                        mRecyclerView.getAdapter().notifyDataSetChanged();
-                    }
+                    mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
                 }
-
-                mLoadingMore = false;
             }
         });
     }
@@ -215,5 +207,14 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Override
     public void onRefreshFragment() {
+    }
+
+
+    private static final class LocalHandler extends Handler {
+        private final WeakReference<FavPostListFragment> mActivity;
+
+        public LocalHandler(FavPostListFragment parent) {
+            mActivity = new WeakReference<FavPostListFragment>(parent);
+        }
     }
 }

@@ -32,6 +32,7 @@ import butterknife.OnEditorAction;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.SignupActivity;
 import co.samepinch.android.app.helpers.intent.AuthService;
+import co.samepinch.android.app.helpers.intent.SignOutService;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
@@ -229,9 +230,18 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Utils.dismissSilently(progressDialog);
-                getActivity().setResult(Activity.RESULT_OK);
-                getActivity().finish();
+                try {
+                    Utils.clearDB(getActivity().getContentResolver());
+                    Utils.dismissSilently(progressDialog);
+                    getActivity().setResult(Activity.RESULT_OK);
+                    getActivity().finish();
+                } catch (Exception e) {
+                    // muted
+                    // signout
+                    Intent mServiceIntent =
+                            new Intent(getActivity(), SignOutService.class);
+                    getActivity().startService(mServiceIntent);
+                }
             }
         });
     }

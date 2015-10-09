@@ -2,6 +2,9 @@ package co.samepinch.android.app.helpers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -53,6 +56,7 @@ import co.samepinch.android.data.dao.SchemaComments;
 import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
+import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.data.dto.CommentDetails;
 import co.samepinch.android.data.dto.Commenter;
 import co.samepinch.android.data.dto.Post;
@@ -677,5 +681,17 @@ public class Utils {
             activity.getWindow()
                     .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         }
+    }
+
+    public static void clearDB(ContentResolver cs) throws Exception {
+        // clear db
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        ops.add(ContentProviderOperation.newDelete(SchemaPosts.CONTENT_URI).build());
+        ops.add(ContentProviderOperation.newDelete(SchemaPostDetails.CONTENT_URI).build());
+        ops.add(ContentProviderOperation.newDelete(SchemaDots.CONTENT_URI).build());
+        ops.add(ContentProviderOperation.newDelete(SchemaTags.CONTENT_URI).build());
+        ops.add(ContentProviderOperation.newDelete(SchemaComments.CONTENT_URI).build());
+        ContentProviderResult[] result = cs.
+                applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
     }
 }

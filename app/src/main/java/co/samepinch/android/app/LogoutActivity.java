@@ -73,7 +73,6 @@ public class LogoutActivity extends AppCompatActivity {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 try{
                     // clear db
                     ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();

@@ -49,8 +49,11 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
+import co.samepinch.android.data.dao.SchemaComments;
+import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
+import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
@@ -158,19 +161,15 @@ public class LoginActivity extends AppCompatActivity implements
         }
 
         if (RESULT_OK == resultCode) {
-            // clear db
-            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-            ops.add(ContentProviderOperation.newDelete(SchemaPosts.CONTENT_URI).build());
-            ops.add(ContentProviderOperation.newDelete(SchemaPostDetails.CONTENT_URI).build());
             try {
-                ContentProviderResult[] result = getContentResolver().
-                        applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+                Utils.clearDB(getContentResolver());
             } catch (Exception e) {
                 // muted
+                // signout
+                Intent mServiceIntent =
+                        new Intent(this, SignOutService.class);
+                startService(mServiceIntent);
             }
-
-//            setResult(RESULT_OK);
-//            finish();
         }
     }
 
