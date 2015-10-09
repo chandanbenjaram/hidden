@@ -122,7 +122,6 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         setupRecyclerView();
 
         // refresh
-        // refresh
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -149,8 +148,19 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
     private void callForRemotePosts(boolean isPaginating) {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
-        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_FAV.getValue());
         if (isPaginating) {
+            Object _state = mRecyclerView.getTag();
+            // prevent unnecessary traffic
+            if (_state != null && (_state instanceof Utils.State)) {
+                if (((Utils.State) _state).isPendingLoadMore()) {
+                    return;
+                }
+            }
+
+            Utils.State state = new Utils.State();
+            state.setPendingLoadMore(true);
+            mRecyclerView.setTag(state);
+
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
             for (Map.Entry<String, String> e : entries.entrySet()) {
@@ -159,6 +169,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
+
+        // context
+        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_FAV.getValue());
+        
         // call for intent
         Intent mServiceIntent =
                 new Intent(getActivity(), PostsPullService.class);
@@ -168,18 +182,10 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
-        if (event.getMetaData() == null) {
-            return;
-        }
-
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if (mRefreshLayout.isRefreshing()) {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-
                     Map<String, String> eMData = event.getMetaData();
                     if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
                         return;
@@ -193,6 +199,21 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
+                }finally {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+
+                    Object _state = mRecyclerView.getTag();
+                    // prevent unnecessary traffic
+                    if (_state != null && (_state instanceof Utils.State)) {
+                        ((Utils.State) _state).setPendingLoadMore(false);
+                    } else {
+                        Utils.State state = new Utils.State();
+                        state.setPendingLoadMore(false);
+                        _state = state;
+                    }
+                    mRecyclerView.setTag(_state);
                 }
             }
         });

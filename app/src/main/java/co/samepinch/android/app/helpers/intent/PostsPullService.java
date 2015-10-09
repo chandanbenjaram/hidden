@@ -43,7 +43,6 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LAST_MODIFIED;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_FAV;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_TAG;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_USER;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_WALL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POST_COUNT;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_STEP;
@@ -141,8 +140,6 @@ public class PostsPullService extends IntentService {
             appendDOTOps(postOwner, anonyOwner, ops);
             // post
             appendPostOps(iArgs, post, postOwner, anonyOwner, ops);
-            // tags
-            appendTagOps(post, ops);
         }
         return ops;
 
@@ -191,13 +188,4 @@ public class PostsPullService extends IntentService {
         }
         ops.add(bldr.build());
     }
-
-    private static void appendTagOps(Post post, ArrayList<ContentProviderOperation> ops) {
-        for (String tag : post.getTags()) {
-//            ops.add(ContentProviderOperation.newInsert(SchemaTags.CONTENT_URI)
-//                    .withValue(SchemaTags.COLUMN_NAME, tag)
-//                    .build());
-        }
-    }
-
 }

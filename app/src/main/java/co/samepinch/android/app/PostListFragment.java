@@ -40,6 +40,7 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS
 public class PostListFragment extends Fragment implements FragmentLifecycle {
     public static final String TAG = "PostListFragment";
     public static final String ARG_PAGE = "ARG_PAGE";
+    public static final int PENDING_REFRESH = 108;
 
     @Bind(R.id.swipeRefreshLayout)
     SwipeRefreshLayout mRefreshLayout;
@@ -105,7 +106,12 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
-                callForRemotePosts(Boolean.TRUE);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callForRemotePosts(true);
+                    }
+                });
             }
         });
 
@@ -153,6 +159,18 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
         if (isPaginating) {
+            Object _state = mRecyclerView.getTag();
+            // prevent unnecessary traffic
+            if (_state != null && (_state instanceof Utils.State)) {
+                if (((Utils.State) _state).isPendingLoadMore()) {
+                    return;
+                }
+            }
+
+            Utils.State state = new Utils.State();
+            state.setPendingLoadMore(true);
+            mRecyclerView.setTag(state);
+
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
             for (Map.Entry<String, String> e : pPosts.entrySet()) {
@@ -161,7 +179,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
         }
-
 
         // call for intent
         Intent mServiceIntent =
@@ -172,17 +189,10 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
-        if (event.getMetaData() == null) {
-            return;
-        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if (mRefreshLayout.isRefreshing()) {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-
                     Map<String, String> eMData = event.getMetaData();
                     if (eMData != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
                         return;
@@ -195,6 +205,21 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     mViewAdapter.swapCursor(cursor);
                 } catch (Exception e) {
                     //muted
+                } finally {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+
+                    Object _state = mRecyclerView.getTag();
+                    // prevent unnecessary traffic
+                    if (_state != null && (_state instanceof Utils.State)) {
+                        ((Utils.State) _state).setPendingLoadMore(false);
+                    } else {
+                        Utils.State state = new Utils.State();
+                        state.setPendingLoadMore(false);
+                        _state = state;
+                    }
+                    mRecyclerView.setTag(_state);
                 }
             }
         });

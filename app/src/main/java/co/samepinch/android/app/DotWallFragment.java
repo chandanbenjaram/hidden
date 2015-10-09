@@ -243,15 +243,30 @@ public class DotWallFragment extends Fragment {
 
         // construct context from preferences if any?
         Bundle iArgs = new Bundle();
-        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_USER.getValue());
-        iArgs.putString(KEY_KEY.getValue(), dotUid);
+
         if (isPaginating) {
+            Object _state = mRecyclerView.getTag();
+            // prevent unnecessary traffic
+            if (_state != null && (_state instanceof Utils.State)) {
+                if (((Utils.State) _state).isPendingLoadMore()) {
+                    return;
+                }
+            }
+
+            Utils.State state = new Utils.State();
+            state.setPendingLoadMore(true);
+            mRecyclerView.setTag(state);
+
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_USER.getValue());
             for (Map.Entry<String, String> e : entries.entrySet()) {
                 iArgs.putString(e.getKey(), e.getValue().toString());
             }
         }
+
+        // context
+        iArgs.putString(KEY_BY.getValue(), KEY_POSTS_USER.getValue());
+        iArgs.putString(KEY_KEY.getValue(), dotUid);
 
         // call for intent
         Intent mServiceIntent =
@@ -266,10 +281,6 @@ public class DotWallFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    if (mRefreshLayout.isRefreshing()) {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-
                     Map<String, String> eMData = event.getMetaData();
                     if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_USER.getValue())) {
                         return;
@@ -283,6 +294,21 @@ public class DotWallFragment extends Fragment {
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
+                }finally {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+
+                    Object _state = mRecyclerView.getTag();
+                    // prevent unnecessary traffic
+                    if (_state != null && (_state instanceof Utils.State)) {
+                        ((Utils.State) _state).setPendingLoadMore(false);
+                    } else {
+                        Utils.State state = new Utils.State();
+                        state.setPendingLoadMore(false);
+                        _state = state;
+                    }
+                    mRecyclerView.setTag(_state);
                 }
             }
         });

@@ -694,4 +694,19 @@ public class Utils {
         ContentProviderResult[] result = cs.
                 applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
     }
+
+    public static class State {
+        boolean pendingLoadMore;
+
+        public State() {
+        }
+
+        public boolean isPendingLoadMore() {
+            return pendingLoadMore;
+        }
+
+        public void setPendingLoadMore(boolean pendingLoadMore) {
+            this.pendingLoadMore = pendingLoadMore;
+        }
+    }
 }
