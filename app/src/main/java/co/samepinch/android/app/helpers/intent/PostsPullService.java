@@ -100,7 +100,7 @@ public class PostsPullService extends IntentService {
                     dropOps.add(ContentProviderOperation.newDelete(SchemaComments.CONTENT_URI).build());
 
                     ContentProviderResult[] result = getContentResolver().
-                            applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), ops);
+                            applyBatch(AppConstants.API.CONTENT_AUTHORITY.getValue(), dropOps);
                 }
 
                 ContentProviderResult[] result = getContentResolver().
