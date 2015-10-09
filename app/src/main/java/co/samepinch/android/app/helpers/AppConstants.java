@@ -31,6 +31,8 @@ public class AppConstants {
         URL_RULES("http://www.samepinch.co/rules/"),
         URL_TERMS_COND("http://www.samepinch.co/t&c"),
         URL_SYS_STATUS("http://www.samepinch.co/systemstatus/"),
+        PARSE_APPLICATION_ID("kx7vlz5uxqBOWZ2aJ5FOoSMQayTYHw3Gf6QWmm9R"),
+        PARSE_CLIENT_KEY("iRdEkkVb2t299QiSkRhcdoZmZm6LLhGSrtgqiEtz"),
         ;
         private final String value;
 

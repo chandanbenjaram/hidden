@@ -158,6 +158,8 @@
                 <category android:name="co.samepinch.android.app" />
             </intent-filter>
         </receiver>
+
+        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/header_icon_samepinch_2x"/>
         <!-- PARSE SETTINGS :: END -->
 
     </application>

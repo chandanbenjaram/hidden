@@ -8,6 +8,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 
+import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
 
 /**
@@ -26,7 +27,7 @@ public class SPApplication extends Application {
         Fresco.initialize(mContext);
         FacebookSdk.sdkInitialize(mContext);
 
-        Parse.initialize(this, "kx7vlz5uxqBOWZ2aJ5FOoSMQayTYHw3Gf6QWmm9R", "iRdEkkVb2t299QiSkRhcdoZmZm6LLhGSrtgqiEtz");
+        Parse.initialize(this, AppConstants.API.PARSE_APPLICATION_ID.getValue(), AppConstants.API.PARSE_CLIENT_KEY.getValue());
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 
