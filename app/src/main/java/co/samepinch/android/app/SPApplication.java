@@ -5,6 +5,8 @@ import android.content.Context;
 
 import com.facebook.FacebookSdk;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.parse.Parse;
+import com.parse.ParseInstallation;
 
 import co.samepinch.android.app.helpers.Utils;
 
@@ -23,6 +25,9 @@ public class SPApplication extends Application {
         Utils.PreferencesManager.initializeInstance(mContext);
         Fresco.initialize(mContext);
         FacebookSdk.sdkInitialize(mContext);
+
+        Parse.initialize(this, "kx7vlz5uxqBOWZ2aJ5FOoSMQayTYHw3Gf6QWmm9R", "iRdEkkVb2t299QiSkRhcdoZmZm6LLhGSrtgqiEtz");
+        ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 
     public static Context getContext() {
