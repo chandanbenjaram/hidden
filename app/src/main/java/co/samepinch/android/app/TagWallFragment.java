@@ -13,11 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -40,8 +38,6 @@ import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
@@ -231,22 +227,13 @@ public class TagWallFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        final String tag = getArguments().getString(K.KEY_TAG.name());
-
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
-        if (cursor.getCount() < 1) {
-            callForRemotePosts(false);
-        }
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
-        // ANIMATIONS
-        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
-        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
-        wrapperAdapter.setDuration(300);
-        wrapperAdapter.setFirstOnly(Boolean.FALSE);
-        mRecyclerView.setAdapter(wrapperAdapter);
+        String tag = getArguments().getString(K.KEY_TAG.name());
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
+        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        mRecyclerView.setAdapter(mViewAdapter);
     }
 
     private void callForRemoteTagData() {
@@ -314,9 +301,11 @@ public class TagWallFragment extends Fragment {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_TAG.getValue(), event.getMetaData());
 
-                    setupRecyclerView();
+                    String tag = getArguments().getString(K.KEY_TAG.name());
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
+                    mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // muted
                 }
             }
         });
@@ -330,7 +319,6 @@ public class TagWallFragment extends Fragment {
                 try {
 //                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
 //                    mTagsToManageRVAdapter.changeCursor(cursor);
-                    Log.d(TAG, "");
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }

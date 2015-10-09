@@ -21,7 +21,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -60,8 +59,6 @@ import co.samepinch.android.data.dto.User;
 import co.samepinch.android.rest.ReqNoBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
@@ -219,22 +216,14 @@ public class DotWallFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        final String dotUid = getArguments().getString(K.KEY_DOT.name());
-
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
-        if (cursor.getCount() < 1) {
-            callForRemotePosts(false);
-        }
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
 
-        // ANIMATIONS
-        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mViewAdapter));
-        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
-        wrapperAdapter.setDuration(300);
-        wrapperAdapter.setFirstOnly(Boolean.FALSE);
-        mRecyclerView.setAdapter(wrapperAdapter);
+        String dotUid = getArguments().getString(K.KEY_DOT.name());
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
+        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        mViewAdapter.setHasStableIds(Boolean.TRUE);
+        mRecyclerView.setAdapter(mViewAdapter);
     }
 
     private void callForRemoteDOTData() {
@@ -289,9 +278,11 @@ public class DotWallFragment extends Fragment {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_USER.getValue(), event.getMetaData());
 
-                    setupRecyclerView();
+                    String dotUid = getArguments().getString(K.KEY_DOT.name());
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
+                    mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // muted
                 }
             }
         });

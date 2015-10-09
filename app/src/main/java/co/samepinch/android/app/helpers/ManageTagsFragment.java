@@ -33,8 +33,6 @@ import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.data.dao.SchemaTags;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
-import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
 public class ManageTagsFragment extends Fragment {
     public static final String TAG = "ManageTagsFragment";
@@ -55,15 +53,10 @@ public class ManageTagsFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AppConstants.KV.REQUEST_EDIT_TAG.getIntValue()) {
             if (resultCode == Activity.RESULT_OK) {
-                dataSetChanged();
+                Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
+                mTagsToManageRVAdapter.changeCursor(cursor);
             }
         }
-    }
-
-    @UiThread
-    protected void dataSetChanged() {
-        // setup recyler view
-        setupRecyclerView();
     }
 
     @Override
@@ -134,7 +127,6 @@ public class ManageTagsFragment extends Fragment {
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
         rv.setLayoutManager(gridLayoutManager);
         rv.setHasFixedSize(true);
-
         rv.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -167,13 +159,8 @@ public class ManageTagsFragment extends Fragment {
 
         // adapter
         mTagsToManageRVAdapter = new TagsToManageRVAdapter(getActivity(), cursor, itemEventListener, mCurrUserId);
-
-        // ANIMATIONS
-        ScaleInAnimationAdapter wrapperAdapter = new ScaleInAnimationAdapter(new AlphaInAnimationAdapter(mTagsToManageRVAdapter));
-        wrapperAdapter.setInterpolator(new AnticipateOvershootInterpolator());
-        wrapperAdapter.setDuration(300);
-        wrapperAdapter.setFirstOnly(Boolean.FALSE);
-        rv.setAdapter(wrapperAdapter);
+        mTagsToManageRVAdapter.setHasStableIds(true);
+        rv.setAdapter(mTagsToManageRVAdapter);
     }
 
     @Subscribe
@@ -182,9 +169,9 @@ public class ManageTagsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-//                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
-//                    mTagsToManageRVAdapter.changeCursor(cursor);
-                    dataSetChanged();
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
+                    mTagsToManageRVAdapter.changeCursor(cursor);
+//                    dataSetChanged();
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }
