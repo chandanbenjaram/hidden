@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<com.facebook.drawee.view.SimpleDraweeView-->
-        <!--android:id="@+id/image_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--fresco:placeholderImageScaleType="centerCrop"-->
-        <!--fresco:placeholderImage="@drawable/loading"/>-->
-    <co.samepinch.android.app.helpers.misc.PinchToZoomDraweeView
-        android:id="@+id/image_view"
+    <FrameLayout
+        android:id="@+id/image_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -22,8 +15,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/image_view"
-        android:layout_alignTop="@+id/image_view"
+        android:layout_alignRight="@+id/image_container"
+        android:layout_alignTop="@+id/image_container"
         android:background="@drawable/rounded_corners"
         android:padding="9dp"
         android:src="@drawable/x_mark" />

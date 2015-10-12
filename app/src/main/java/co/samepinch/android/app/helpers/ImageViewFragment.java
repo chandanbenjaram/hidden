@@ -1,6 +1,5 @@
 package co.samepinch.android.app.helpers;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -8,6 +7,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,13 +21,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.misc.PinchToZoomDraweeView;
+import co.samepinch.android.app.helpers.widget.SIMView;
 
 public class ImageViewFragment extends Fragment {
     public static final String TAG = "WebViewFragment";
 
-    @Bind(R.id.image_view)
-    PinchToZoomDraweeView mImage;
+    @Bind(R.id.image_container)
+    FrameLayout mImgContainer;
 
     private LocalHandler mHandler;
 
@@ -45,8 +49,17 @@ public class ImageViewFragment extends Fragment {
             return view;
         }
         try {
-//            mImage.setAspectRatio(1.33f);
-            mImage.setImageURI(Uri.parse(imgUrl));
+            GenericDraweeHierarchyBuilder builder =
+                    new GenericDraweeHierarchyBuilder(getResources());
+            GenericDraweeHierarchy hierarchy = builder
+                    .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
+                    .build();
+
+            // load background view
+            SIMView imgView = new SIMView(getActivity().getApplicationContext());
+            imgView.setImageHierarchy(hierarchy);
+            imgView.populateImageViewWithAdjustedAspect(imgUrl);
+            mImgContainer.addView(imgView);
         } catch (Exception e) {
             handleError("error opening url. closing...");
             return view;
@@ -76,7 +89,7 @@ public class ImageViewFragment extends Fragment {
     }
 
     private void handleError(String errMsg) {
-        Snackbar.make(mImage, errMsg, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mImgContainer, errMsg, Snackbar.LENGTH_SHORT).show();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {

@@ -95,10 +95,14 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         final User user = mPost.getOwner();
         if (Utils.isValidUri(user.getPhoto())) {
-            Utils.setupLoadingImageHolder(mAvatarView, user.getPhoto());
+//            Utils.setupLoadingImageHolder(mAvatarView, user.getPhoto());
+
             mAvatarImgVS.setDisplayedChild(0);
         } else {
             String name = StringUtils.join(StringUtils.substring(user.getFname(), 0, 1), StringUtils.substring(user.getLname(), 0, 1));
+            if (StringUtils.isBlank(name)) {
+                name = (StringUtils.substring(user.getPinchHandle(), 0, 1));
+            }
             mAvatarName.setText(name);
             mAvatarImgVS.setDisplayedChild(1);
         }

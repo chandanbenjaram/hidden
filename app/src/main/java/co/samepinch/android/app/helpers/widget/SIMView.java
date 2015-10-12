@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -99,6 +100,10 @@ public class SIMView extends RelativeLayout {
         mSIMView.setAspectRatio(aspectRatio);
     }
 
+    public void setImageHierarchy(GenericDraweeHierarchy hierarchy){
+        mSIMView.setHierarchy(hierarchy);
+    }
+
     public void setRoundingParams(RoundingParams roundingParams) {
         mSIMView.getHierarchy().setRoundingParams(roundingParams);
     }
@@ -108,6 +113,7 @@ public class SIMView extends RelativeLayout {
         if (StringUtils.isBlank(imgUri)) {
             return;
         }
+//        imgUri = "http://www.aoaophoto.com/Sample/imgs/animation.gif";
         // aspect adjust
         ControllerListener listener = new BaseControllerListener<ImageInfo>() {
             @Override

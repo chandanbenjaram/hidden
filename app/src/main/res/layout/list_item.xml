@@ -34,8 +34,9 @@
                 android:layout_height="@dimen/list_item_avatar_size"
                 android:adjustViewBounds="true"
                 android:background="@drawable/avatar_border"
-                android:clickable="true"
                 fresco:placeholderImageScaleType="fitCenter"
+                fresco:placeholderImage="@drawable/loading"
+                android:clickable="true"
                 fresco:roundAsCircle="true" />
 
             <TextView
