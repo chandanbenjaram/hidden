@@ -12,7 +12,8 @@
         android:text="WALL"
         android:textAllCaps="true"
         android:singleLine="true"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:gravity="center"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,5 +22,6 @@
         android:text="MY STARRED"
         android:singleLine="true"
         android:textAllCaps="true"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:gravity="center"/>
 </ViewSwitcher>

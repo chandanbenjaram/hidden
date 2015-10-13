@@ -19,5 +19,5 @@
         android:layout_alignTop="@+id/image_container"
         android:background="@drawable/rounded_corners"
         android:padding="9dp"
-        android:src="@drawable/x_mark" />
+        android:src="@drawable/cancel" />
 </RelativeLayout>
