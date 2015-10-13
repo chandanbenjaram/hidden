@@ -303,12 +303,12 @@ public class PostDetailActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        intentPickerSheet.setFilter(new IntentPickerSheetView.Filter() {
-            @Override
-            public boolean include(IntentPickerSheetView.ActivityInfo info) {
-                return !info.componentName.getPackageName().startsWith("com.android");
-            }
-        });
+//        intentPickerSheet.setFilter(new IntentPickerSheetView.Filter() {
+//            @Override
+//            public boolean include(IntentPickerSheetView.ActivityInfo info) {
+//                return !info.componentName.getPackageName().startsWith("com.android");
+//            }
+//        });
         mBottomsheet.showWithSheetView(intentPickerSheet);
     }
 

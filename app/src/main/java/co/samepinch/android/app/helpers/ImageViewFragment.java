@@ -57,6 +57,7 @@ public class ImageViewFragment extends Fragment {
 
             // load background view
             SIMView imgView = new SIMView(getActivity().getApplicationContext());
+            imgView.setIsClickDisabled(Boolean.TRUE);
             imgView.setImageHierarchy(hierarchy);
             imgView.populateImageViewWithAdjustedAspect(imgUrl);
             mImgContainer.addView(imgView);

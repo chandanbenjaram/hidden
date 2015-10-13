@@ -40,6 +40,15 @@ public class SIMView extends RelativeLayout {
     SimpleDraweeView mSIMView;
 
     String mImagePath;
+    boolean isClickDisabled;
+
+    public boolean isClickDisabled() {
+        return isClickDisabled;
+    }
+
+    public void setIsClickDisabled(boolean isClickDisabled) {
+        this.isClickDisabled = isClickDisabled;
+    }
 
     public SIMView(Context context) {
         super(context);
@@ -149,6 +158,10 @@ public class SIMView extends RelativeLayout {
 
     @OnClick(R.id.sim_id)
     public void onClick() {
+        if(isClickDisabled()){
+            return;
+        }
+
         Bundle args = new Bundle();
         // target
         args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_IMAGEVIEW.name());
