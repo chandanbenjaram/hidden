@@ -39,7 +39,7 @@ public interface SchemaPosts extends BaseColumns {
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "
             + COLUMN_VIEWS + " INTEGER DEFAULT 0, "
             + COLUMN_ANONYMOUS + " INTEGER DEFAULT 0, "
-            + COLUMN_CREATED_AT + " REAL, "
+            + COLUMN_CREATED_AT + " INTEGER, "
             + COLUMN_COMMENTERS + " TEXT DEFAULT '', "
             + COLUMN_TAGS + " TEXT DEFAULT '', "
             + COLUMN_OWNER + " TEXT NOT NULL, "

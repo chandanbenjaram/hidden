@@ -1,89 +1,54 @@
 package co.samepinch.android.app.helpers;
 
+import android.content.Context;
+import android.text.format.DateUtils;
+
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by cbenjaram on 10/13/15.
  */
 public class TimeUtils {
+    public static final List<Long> times = Arrays.asList(
+            TimeUnit.DAYS.toMillis(365),
+            TimeUnit.DAYS.toMillis(30),
+            TimeUnit.DAYS.toMillis(1),
+            TimeUnit.HOURS.toMillis(1),
+            TimeUnit.MINUTES.toMillis(1),
+            TimeUnit.SECONDS.toMillis(1));
+    public static final List<String> timesString = Arrays.asList("year", "month", "day", "hour", "minute", "second");
 
-    public final static long ONE_SECOND = 1000;
-    public final static long SECONDS = 60;
+    public static String toHuman(Context context, Date arg0) {
+        int gmtOffset = TimeZone.getDefault().getRawOffset();
+        long now = System.currentTimeMillis() + gmtOffset;
 
-    public final static long ONE_MINUTE = ONE_SECOND * 60;
-    public final static long MINUTES = 60;
-
-    public final static long ONE_HOUR = ONE_MINUTE * 60;
-    public final static long HOURS = 24;
-
-    public final static long ONE_DAY = ONE_HOUR * 24;
-
-    public static String millisToLongDHMS(Date arg0) {
-        return arg0 == null ? StringUtils.EMPTY : millisToLongDHMS(arg0.getTime());
+        CharSequence sequence = DateUtils.getRelativeTimeSpanString(arg0.getTime(), now, DateUtils.FORMAT_ABBREV_RELATIVE);
+        return sequence.toString();
     }
 
-    /**
-     * converts time (in milliseconds) to human-readable format
-     * "<w> days, <x> hours, <y> minutes and (z) seconds"
-     */
-    public static String millisToLongDHMS(long duration) {
+    public static String toHuman(long arg0) {
         StringBuffer res = new StringBuffer();
-        long temp = 0;
-        if (duration >= ONE_SECOND) {
-            temp = duration / ONE_DAY;
+        for (int i = 0; i < times.size(); i++) {
+            Long current = times.get(i);
+            long temp = arg0 / current;
             if (temp > 0) {
-                duration -= temp * ONE_DAY;
-                res.append(temp).append(" day").append(temp > 1 ? "s" : "")
-                        .append(duration >= ONE_MINUTE ? ", " : "");
+                res.append(temp).append(StringUtils.SPACE).append(times.get(i)).append(temp > 1 ? "s" : "");
+                break;
             }
-
-            temp = duration / ONE_HOUR;
-            if (temp > 0) {
-                duration -= temp * ONE_HOUR;
-                res.append(temp).append(" hour").append(temp > 1 ? "s" : "")
-                        .append(duration >= ONE_MINUTE ? ", " : "");
-            }
-
-            temp = duration / ONE_MINUTE;
-            if (temp > 0) {
-                duration -= temp * ONE_MINUTE;
-                res.append(temp).append(" minute").append(temp > 1 ? "s" : "");
-            }
-
-            if (!res.toString().equals("") && duration >= ONE_SECOND) {
-                res.append(" and ");
-            }
-
-            temp = duration / ONE_SECOND;
-            if (temp > 0) {
-                res.append(temp).append(" second").append(temp > 1 ? "s" : "");
-            }
-            return res.toString();
-        } else {
-            return "0 second";
         }
-    }
 
-    /**
-     * converts time (in milliseconds) to human-readable format
-     * "<dd:>hh:mm:ss"
-     */
-    public static String millisToShortDHMS(long duration) {
-        String res = "";
-        duration /= ONE_SECOND;
-        int seconds = (int) (duration % SECONDS);
-        duration /= SECONDS;
-        int minutes = (int) (duration % MINUTES);
-        duration /= MINUTES;
-        int hours = (int) (duration % HOURS);
-        int days = (int) (duration / HOURS);
-        if (days == 0) {
-            res = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-        } else {
-            res = String.format("%dd%02d:%02d:%02d", days, hours, minutes, seconds);
+        if ("".equals(res.toString())) {
+            res.append("moments");
         }
-        return res;
+
+        res.append(StringUtils.SPACE).append("ago");
+        return res.toString();
     }
 }

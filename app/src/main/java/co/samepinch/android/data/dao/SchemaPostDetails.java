@@ -45,7 +45,7 @@ public interface SchemaPostDetails extends BaseColumns {
             + COLUMN_VIEWS + " INTEGER DEFAULT 0, "
             + COLUMN_URL + " TEXT DEFAULT '', "
             + COLUMN_ANONYMOUS + " INTEGER DEFAULT 0, "
-            + COLUMN_CREATED_AT + " REAL, "
+            + COLUMN_CREATED_AT + " INTEGER, "
             + COLUMN_TAGS + " TEXT DEFAULT '', "
             + COLUMN_PERMISSIONS + " TEXT DEFAULT '', "
             + COLUMN_OWNER + " TEXT NOT NULL, "

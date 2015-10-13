@@ -36,7 +36,7 @@ public interface SchemaComments extends BaseColumns {
             + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_UID + " TEXT NOT NULL UNIQUE, "
             + COLUMN_TEXT + " TEXT DEFAULT '', "
-            + COLUMN_CREATED_AT + " REAL, "
+            + COLUMN_CREATED_AT + " INTEGER, "
             + COLUMN_ANONYMOUS + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTED + " INTEGER DEFAULT 0, "
             + COLUMN_UPVOTE_COUNT + " INTEGER DEFAULT 0, "

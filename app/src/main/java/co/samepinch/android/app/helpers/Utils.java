@@ -517,20 +517,17 @@ public class Utils {
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue());
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
         try {
             date = sdf.parse(stringDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         return date;
     }
 
     public static String dateToString(long ts) {
-        long localTS = ts - TimeZone.getDefault().getRawOffset();
-        return DateFormatUtils.format(localTS, DEFAULT_DATE_FORMAT.getValue());
+        return DateFormatUtils.format(new Date(ts), DEFAULT_DATE_FORMAT.getValue());
     }
 
     public static String dateToString(Date date) {

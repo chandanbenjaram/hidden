@@ -121,7 +121,6 @@ public class PostsPullService extends IntentService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Log.e(TAG, "error refreshing posts...", e);
         }
         BusProvider.INSTANCE.getBus().post(new Events.PostsRefreshedEvent(metaData));
