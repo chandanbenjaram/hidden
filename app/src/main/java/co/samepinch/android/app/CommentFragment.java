@@ -3,7 +3,6 @@ package co.samepinch.android.app;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -22,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import org.apache.commons.lang3.StringUtils;
@@ -243,6 +241,9 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
         protected void onPostExecute(Boolean result) {
             Utils.dismissSilently(progressDialog);
             if (result != null && result.booleanValue()) {
+                // wall refresh needs to happen
+                Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
+
                 Intent resultIntent = new Intent();
                 getActivity().setResult(Activity.RESULT_OK, resultIntent);
                 getActivity().finish();

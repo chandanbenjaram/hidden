@@ -444,7 +444,7 @@ public class DotEditFragment extends Fragment {
                             getActivity().setResult(Activity.RESULT_OK);
                             getActivity().finish();
                         }
-                    }, 99);
+                    }, 299);
 
                     Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
                     return;

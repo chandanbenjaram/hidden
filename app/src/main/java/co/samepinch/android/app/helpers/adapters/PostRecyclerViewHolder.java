@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -106,9 +105,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
             mAvatarImgVS.setDisplayedChild(1);
         }
         mWallPostDotView.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
-        String pinchHandle = String.format(mContext.getString(R.string.pinch_handle), user.getPinchHandle());
-        mWallPinchHandleView.setText(pinchHandle);
-
+        mWallPinchHandleView.setText(String.format(mContext.getString(R.string.pinch_handle), user.getPinchHandle()));
         mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), "0"));
         mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), "0"));
         mWallPostDateView.setText(Utils.dateToString(mPost.getCreatedAt()));

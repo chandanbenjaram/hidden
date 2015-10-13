@@ -3,19 +3,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_wall"
-            android:icon="@drawable/ic_dashboard"
+            android:icon="@drawable/home"
             android:title="Home" />
         <item
             android:id="@+id/nav_post"
-            android:icon="@drawable/ic_event"
+            android:icon="@drawable/add_circle_outline"
             android:title="Post" />
         <item
             android:id="@+id/nav_tags"
-            android:icon="@drawable/ic_event"
+            android:icon="@drawable/tags"
             android:title="Tags" />
         <item
             android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_headset"
+            android:icon="@drawable/settings"
             android:title="Settings" />
     </group>
 

@@ -88,6 +88,12 @@ public class PostsPullService extends IntentService {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
             ResponseEntity<RespPosts> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS_WITH_FILTER.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
+
+            // get latest anonymous image
+            if (StringUtils.isNotBlank(resp.getBody().getBody().getAnonymousImage())) {
+                Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_ANONYMOUS_IMG.getValue(), resp.getBody().getBody().getAnonymousImage());
+            }
+            // process posts ops
             ArrayList<ContentProviderOperation> ops = parseResponse(iArgs, resp.getBody());
 
             if (ops != null) {

@@ -13,7 +13,7 @@
         android:textAllCaps="true"
         android:singleLine="true"
         android:textSize="14sp"
-        android:gravity="center"/>
+        android:gravity="center_vertical"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,5 +23,5 @@
         android:singleLine="true"
         android:textAllCaps="true"
         android:textSize="14sp"
-        android:gravity="center"/>
+        android:gravity="center_vertical"/>
 </ViewSwitcher>

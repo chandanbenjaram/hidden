@@ -418,8 +418,18 @@ public class MainActivityIn extends AppCompatActivity {
 
         String shouldRefresh = Utils.PreferencesManager.getInstance().getValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
         if (shouldRefresh != null && Boolean.valueOf(shouldRefresh).booleanValue()) {
+
+            // drawer
+            String userStr = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_AUTH_USER.getValue());
+            Gson gson = new Gson();
+            setupDrawerContent(gson.fromJson(userStr, User.class), false);
+
+            // body
             TabItemAdapter adapter = (TabItemAdapter) mViewPager.getAdapter();
             adapter.notifyDataSetChanged();
+
+            // invalidate menu too?
+            invalidateOptionsMenu();
         }
         // remove if there is one
         Utils.PreferencesManager.getInstance().remove(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue());
