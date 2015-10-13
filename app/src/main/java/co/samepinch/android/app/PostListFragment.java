@@ -208,6 +208,18 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                 } finally {
                     if (mRefreshLayout.isRefreshing()) {
                         mRefreshLayout.setRefreshing(false);
+                        mRecyclerView.clearOnScrollListeners();
+                        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
+                            @Override
+                            public void onLoadMore(RecyclerView rv, int current_page) {
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callForRemotePosts(true);
+                                    }
+                                });
+                            }
+                        });
                     }
 
                     Object _state = mRecyclerView.getTag();
