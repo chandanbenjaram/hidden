@@ -36,7 +36,7 @@
                 android:paddingBottom="9dp"
                 android:paddingTop="35dp"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.1">
+                app:layout_collapseParallaxMultiplier="0.5">
                 <include layout="@layout/dot_details" />
             </RelativeLayout>
 

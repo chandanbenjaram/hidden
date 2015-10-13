@@ -120,7 +120,6 @@
 
     </RelativeLayout>
 
-
     <TextView
         android:id="@+id/wall_post_content"
         android:layout_width="match_parent"
@@ -154,12 +153,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/wall_post_images"
         android:layout_centerHorizontal="true" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/commenters_viewpager"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/wall_tags" />
 
     <LinearLayout
         android:id="@+id/wall_post_commenters"

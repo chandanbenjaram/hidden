@@ -34,8 +34,8 @@ import co.samepinch.android.data.dto.User;
  * Created by imaginationcoder on 7/2/15.
  */
 public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
-    @Bind(R.id.layout_post_item)
-    RelativeLayout mLayoutPostItem;
+//    @Bind(R.id.layout_post_item)
+//    RelativeLayout mLayoutPostItem;
 
     @Bind(R.id.avatar_image_vs)
     ViewSwitcher mAvatarImgVS;
@@ -183,7 +183,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
         mContext.startActivity(intent);
     }
 
-    @OnClick({R.id.wall_post_content, R.id.wall_post_images})
+    @OnClick({R.id.wall_post_content, R.id.wall_post_images, R.id.layout_post_item})
     public void doOpenPost() {
         Bundle iArgs = new Bundle();
         iArgs.putString(AppConstants.K.POST.name(), mPost.getUid());
