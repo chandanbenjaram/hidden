@@ -4,27 +4,27 @@
 
     <item
         android:id="@+id/menuitem_post_edit_id"
-        android:icon="@drawable/pencil_blue"
+        android:icon="@drawable/pencil"
         android:orderInCategory="1"
         android:title="Edit"
         android:visible="false"
-        app:icon="@drawable/pencil_blue"
+        app:icon="@drawable/pencil"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menuitem_post_share_id"
-        android:icon="@drawable/icon_share_2x"
+        android:icon="@drawable/social_share"
         android:orderInCategory="2"
         android:title="Share"
-        app:icon="@drawable/icon_share_2x"
+        app:icon="@drawable/social_share"
         app:showAsAction="always" />
 
 
     <item
         android:id="@+id/menuitem_post_menu_id"
-        android:icon="@drawable/icon_more_2x"
+        android:icon="@drawable/more"
         android:orderInCategory="3"
         android:title="Menu"
-        app:icon="@drawable/icon_more_2x"
+        app:icon="@drawable/more"
         app:showAsAction="always" />
 </menu>

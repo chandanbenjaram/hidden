@@ -20,5 +20,5 @@
         android:layout_alignTop="@+id/webview"
         android:background="@drawable/rounded_corners"
         android:padding="9dp"
-        android:src="@drawable/x_mark" />
+        android:src="@drawable/cancel" />
 </RelativeLayout>

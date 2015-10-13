@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -17,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.FrameLayout;
 
 import com.squareup.otto.Subscribe;
@@ -93,9 +91,8 @@ public class ManageTagsFragment extends Fragment {
         toolbar.setTitle("MANAGE TAGS");
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.back_2x);
+        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
         ab.setDisplayHomeAsUpEnabled(true);
-
 
         // setup recyler view
         setupRecyclerView();

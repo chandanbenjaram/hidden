@@ -103,6 +103,7 @@ public class TagWallFragment extends Fragment {
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_blue);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,7 +120,7 @@ public class TagWallFragment extends Fragment {
 
         // recyclers
         mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, AppConstants.KV.LOAD_MORE.getIntValue()) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
                 callForRemotePosts(true);

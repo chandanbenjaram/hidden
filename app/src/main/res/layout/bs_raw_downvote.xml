@@ -8,7 +8,7 @@
     android:fadingEdge="horizontal"
     android:singleLine="true"
     android:gravity="center_vertical"
-    android:drawableLeft="@drawable/icon_upvote_gray_24x24"
+    android:drawableLeft="@drawable/thumb_down_blue"
     android:drawablePadding="32dp"
     android:textAppearance="?attr/textAppearanceLargePopupMenu"
     android:text="dislike"

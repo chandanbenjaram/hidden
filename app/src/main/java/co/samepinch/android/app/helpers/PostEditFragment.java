@@ -152,7 +152,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
 
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
-                mListView.requestFocus();
+//                mListView.requestFocus();
                 mListView.setSelection(mListViewAdapter.getCount() - 1);
 
                 Bundle extra = intent.getExtras();
@@ -243,7 +243,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         toolbar.setTitle("EDIT");
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-//        ab.setHomeAsUpIndicator(R.drawable.back_2x);
+        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
         ab.setDisplayHomeAsUpEnabled(true);
 
 

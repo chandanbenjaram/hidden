@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal">
     <TextView
+        style="@style/SP_TXT_BTN"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/home"
@@ -15,6 +16,7 @@
         android:textSize="14sp"
         android:gravity="center_vertical"/>
     <TextView
+        style="@style/SP_TXT_BTN"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/favorite"

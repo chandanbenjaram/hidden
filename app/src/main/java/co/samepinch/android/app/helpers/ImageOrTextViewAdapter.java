@@ -1,6 +1,5 @@
 package co.samepinch.android.app.helpers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.text.Editable;
@@ -15,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.flipboard.bottomsheet.commons.Util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -97,7 +95,12 @@ public class ImageOrTextViewAdapter extends ArrayAdapter<ImageOrTextViewAdapter.
         ViewSwitcher vs = (ViewSwitcher) convertView.findViewById(R.id.post_create_switch);
         if (currItem.getImageUri() == null) {
             vs.setDisplayedChild(0);
+//            showSoftKeyboard(vh.text);
             vh.text.requestFocus();
+//            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+            vh.text.setSelection(vh.text.getText().length());
         } else {
             vs.setDisplayedChild(1);
         }

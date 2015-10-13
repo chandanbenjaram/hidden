@@ -103,7 +103,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         ButterKnife.bind(this, view);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, AppConstants.KV.LOAD_MORE.getIntValue()) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
                 mHandler.post(new Runnable() {
@@ -209,7 +209,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
                     if (mRefreshLayout.isRefreshing()) {
                         mRefreshLayout.setRefreshing(false);
                         mRecyclerView.clearOnScrollListeners();
-                        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, 5) {
+                        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, AppConstants.KV.LOAD_MORE.getIntValue()) {
                             @Override
                             public void onLoadMore(RecyclerView rv, int current_page) {
                                 mHandler.post(new Runnable() {

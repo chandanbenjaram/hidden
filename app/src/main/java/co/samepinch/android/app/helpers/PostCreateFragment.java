@@ -162,7 +162,6 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         imageStatusMap = new ConcurrentHashMap<>();
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -174,6 +173,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
 
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
         listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
@@ -431,7 +431,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
 
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(processedImageUri, null));
                 mListViewAdapter.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
-                mListView.requestFocus();
+//                mListView.requestFocus();
                 mListView.setSelection(mListViewAdapter.getCount() - 1);
 
                 Bundle extra = intent.getExtras();

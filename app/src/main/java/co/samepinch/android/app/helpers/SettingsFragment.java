@@ -98,7 +98,6 @@ public class SettingsFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,6 +106,7 @@ public class SettingsFragment extends Fragment {
             }
         });
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
         ab.setDisplayHomeAsUpEnabled(true);
 
         try {

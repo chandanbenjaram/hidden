@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
-    android:drawableLeft="@drawable/icon_flag_24x24"
+    android:drawableLeft="@drawable/thumb_up_blue"
     android:drawablePadding="32dp"
     android:duplicateParentState="true"
     android:ellipsize="marquee"

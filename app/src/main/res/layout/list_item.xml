@@ -76,7 +76,8 @@
             android:paddingTop="15dp"
             android:text="PINCH HANDLE"
             android:textColor="@color/grey_700"
-            android:textSize="9sp" />
+            android:textSize="9sp"
+            android:gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/wall_post_views"
@@ -89,7 +90,8 @@
             android:paddingTop="15dp"
             android:text="VIEWS"
             android:textColor="@color/grey_500"
-            android:textSize="10dp" />
+            android:textSize="10dp"
+            android:gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/wall_post_upvote"
@@ -102,7 +104,8 @@
             android:paddingTop="15dp"
             android:text="VOTES"
             android:textColor="@color/grey_500"
-            android:textSize="10dp" />
+            android:textSize="10dp"
+            android:gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/wall_post_date"
@@ -116,7 +119,8 @@
             android:paddingTop="15dp"
             android:text="DATE"
             android:textColor="@color/grey_500"
-            android:textSize="10dp" />
+            android:textSize="10dp"
+            android:gravity="center_vertical"/>
 
     </RelativeLayout>
 

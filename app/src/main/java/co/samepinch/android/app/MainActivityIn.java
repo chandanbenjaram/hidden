@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
@@ -150,7 +151,7 @@ public class MainActivityIn extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
         ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
         ab.setDisplayHomeAsUpEnabled(true);
 
         // handler
@@ -487,7 +488,11 @@ public class MainActivityIn extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_SUBJECT, subject);
                 intent.putExtra(Intent.EXTRA_TEXT, body);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                try {
+                    startActivity(intent);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(MainActivityIn.this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         layout.addView(viaEmail);
@@ -504,7 +509,11 @@ public class MainActivityIn extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
         intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        try {
+            startActivity(intent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(MainActivityIn.this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @OnClick(R.id.fab)
