@@ -24,6 +24,7 @@ import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.PostDetailActivity;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.TimeUtils;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.data.dto.Commenter;
 import co.samepinch.android.data.dto.Post;
@@ -108,7 +109,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
         mWallPinchHandleView.setText(String.format(mContext.getString(R.string.pinch_handle), user.getPinchHandle()));
         mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), "0"));
         mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), "0"));
-        mWallPostDateView.setText(Utils.dateToString(mPost.getCreatedAt()));
+        mWallPostDateView.setText(TimeUtils.millisToLongDHMS(mPost.getCreatedAt()));
         mWallPostContentView.setText(mPost.getWallContent());
         mCommentersCount.setText(String.valueOf(mPost.getCommentCount()));
 

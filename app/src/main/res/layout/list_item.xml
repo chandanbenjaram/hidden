@@ -66,6 +66,19 @@
             android:textColor="@color/blue_500" />
 
         <TextView
+            android:id="@+id/wall_post_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:text="DATE"
+            android:paddingBottom="15dp"
+            android:paddingLeft="2dp"
+            android:textColor="@color/grey_500"
+            android:textSize="10dp"
+            android:gravity="center_vertical"/>
+
+        <TextView
             android:id="@+id/wall_pinch_handle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -93,31 +106,31 @@
             android:textSize="10dp"
             android:gravity="center_vertical"/>
 
+        <!--<TextView-->
+            <!--android:id="@+id/wall_post_upvote"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:layout_toLeftOf="@+id/wall_post_date"-->
+            <!--android:drawableLeft="@drawable/thumb_gray_small"-->
+            <!--android:paddingLeft="2dp"-->
+            <!--android:paddingTop="15dp"-->
+            <!--android:text="VOTES"-->
+            <!--android:textColor="@color/grey_500"-->
+            <!--android:textSize="10dp"-->
+            <!--android:gravity="center_vertical"/>-->
+
         <TextView
             android:id="@+id/wall_post_upvote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_toLeftOf="@+id/wall_post_date"
-            android:drawableLeft="@drawable/thumb_gray_small"
-            android:paddingLeft="2dp"
-            android:paddingTop="15dp"
-            android:text="VOTES"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:gravity="center_vertical"/>
-
-        <TextView
-            android:id="@+id/wall_post_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:drawableLeft="@drawable/timer_small"
+            android:drawableLeft="@drawable/thumb_gray_small"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             android:paddingTop="15dp"
-            android:text="DATE"
+            android:text="VOTES"
             android:textColor="@color/grey_500"
             android:textSize="10dp"
             android:gravity="center_vertical"/>

@@ -66,11 +66,6 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
                     tView.setPadding(5, 0, 5, 0);
                     tView.setText(leftContent);
                     addToView(tView);
-
-//                    DocumentView documentView = new DocumentView(mView.getContext(), DocumentView.PLAIN_TEXT);
-//                    documentView.getDocumentLayoutParams().setTextAlignment(TextAlignment.JUSTIFIED);
-//                    documentView.setText(leftContent);
-//                    addToView(documentView);
                 }
 
 
