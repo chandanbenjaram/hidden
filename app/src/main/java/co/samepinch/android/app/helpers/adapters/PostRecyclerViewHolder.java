@@ -95,8 +95,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         final User user = mPost.getOwner();
         if (Utils.isValidUri(user.getPhoto())) {
-//            Utils.setupLoadingImageHolder(mAvatarView, user.getPhoto());
-
+            Utils.setupLoadingImageHolder(mAvatarView, user.getPhoto());
             mAvatarImgVS.setDisplayedChild(0);
         } else {
             String name = StringUtils.join(StringUtils.substring(user.getFname(), 0, 1), StringUtils.substring(user.getLname(), 0, 1));
@@ -127,16 +126,31 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         List<Commenter> commenters = mPost.getCommenters();
         if (commenters != null) {
+            String anonyImg = Utils.PreferencesManager.getInstance().getValue(AppConstants.API.PREF_ANONYMOUS_IMG.getValue());
+
             int iViewIndex = 0;
+            // 1 less to accomodate text view
+            int totalPlaceholderCnt = mWallPostCommentersLayout.getChildCount() - 1;
+            String commenterImg;
+            View child;
             for (Commenter commenter : commenters) {
-                if (StringUtils.isBlank(commenter.getPhoto())) {
+                // check if more than placeholder image reached
+                if(iViewIndex == totalPlaceholderCnt){
+                    break;
+                }
+
+                if(commenter.getAnonymous() !=null && commenter.getAnonymous().booleanValue()){
+                    commenterImg = anonyImg;
+                }else if(Utils.isValidUri(commenter.getPhoto())){
+                    commenterImg = commenter.getPhoto();
+                }else{
                     continue;
                 }
 
-                View child = mWallPostCommentersLayout.getChildAt(iViewIndex);
+                child = mWallPostCommentersLayout.getChildAt(iViewIndex);
                 if (child instanceof SimpleDraweeView) {
                     SimpleDraweeView cImageView = (SimpleDraweeView) child;
-                    Utils.setupLoadingImageHolder(cImageView, commenter.getPhoto());
+                    Utils.setupLoadingImageHolder(cImageView, commenterImg);
                     cImageView.setVisibility(View.VISIBLE);
                 }
                 iViewIndex += 1;
