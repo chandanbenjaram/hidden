@@ -188,8 +188,8 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             case R.id.menuitem_post_edit:
                 // setup PopUpMenu
                 PopupMenu postAsPopUp = new PopupMenu(getActivity(), getView().findViewById(R.id.menuitem_post_edit));
-                postAsPopUp.getMenu().add("as you");
-                postAsPopUp.getMenu().add("as anonymous");
+                postAsPopUp.getMenu().add(R.string.post_as_you);
+                postAsPopUp.getMenu().add(R.string.post_as_anonymous);
                 postAsPopUp.setOnMenuItemClickListener(this);
                 postAsPopUp.show();
                 break;
@@ -210,12 +210,12 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         delDialogBldr
                 .setMessage(R.string.post_del_pop_desc)
                 .setCancelable(false)
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.post_del_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         deletePost();
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.post_del_negative, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -349,7 +349,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        this.postAsAnonymous = !StringUtils.equals(item.toString(), "as you");
+        this.postAsAnonymous = item.getItemId() == R.string.post_as_anonymous;
         Utils.dismissSilently(progressDialog);
         progressDialog.setMessage("saving...");
         progressDialog.show();

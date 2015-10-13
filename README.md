@@ -25,6 +25,9 @@ Gapps(v2-4) - http://goo.gl/0aPPhx
 Gapps for v5(Lollipop) - http://goo.gl/0zOqQq
 
 
+https://github.com/mihaip/dex-method-counts
+
+
 ###RELEASE
 --where release apk
 app/build/outputs/apk
