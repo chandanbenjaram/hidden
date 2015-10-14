@@ -178,7 +178,7 @@ public class DotWallFragment extends Fragment {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_blue);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_arrow);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -454,8 +454,8 @@ public class DotWallFragment extends Fragment {
 
 
     private void applyPalette(Palette palette) {
-        int primary = getResources().getColor(R.color.colorPrimary);
-        int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+        int primary = SPApplication.getContext().getResources().getColor(R.color.colorPrimary);
+        int primaryDark = SPApplication.getContext().getResources().getColor(R.color.colorPrimaryDark);
 
         if (palette == null) {
             mCollapsingToolbarLayout.setContentScrimColor(primary);

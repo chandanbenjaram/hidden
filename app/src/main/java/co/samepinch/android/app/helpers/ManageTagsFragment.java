@@ -91,7 +91,7 @@ public class ManageTagsFragment extends Fragment {
         toolbar.setTitle("MANAGE TAGS");
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
+        ab.setHomeAsUpIndicator(R.drawable.back_arrow);
         ab.setDisplayHomeAsUpEnabled(true);
 
         // setup recyler view

@@ -243,7 +243,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         toolbar.setTitle("EDIT");
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
+        ab.setHomeAsUpIndicator(R.drawable.back_arrow);
         ab.setDisplayHomeAsUpEnabled(true);
 
 

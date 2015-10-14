@@ -82,7 +82,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_blue);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_arrow);
 
         toolbar.setTitle(StringUtils.EMPTY);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

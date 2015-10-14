@@ -128,7 +128,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
         // Get the ActionBar here to configure the way it behaves.
         final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.menu_blue); // set a custom icon for the default home button
+        ab.setHomeAsUpIndicator(R.drawable.back_arrow); // set a custom icon for the default home button
         ab.setDisplayShowHomeEnabled(true); // show or hide the default home button
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowCustomEnabled(false); // enable overriding the default toolbar layout

@@ -173,7 +173,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
 
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeAsUpIndicator(R.drawable.menu_blue);
+        ab.setHomeAsUpIndicator(R.drawable.back_arrow);
 
         List<ImageOrTextViewAdapter.ImageOrText> listItems = new ArrayList<>();
         listItems.add(new ImageOrTextViewAdapter.ImageOrText(null, ""));
