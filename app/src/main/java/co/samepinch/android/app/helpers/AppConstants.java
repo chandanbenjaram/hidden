@@ -16,7 +16,7 @@ public class AppConstants {
         PREF_POSTS_LIST_USER("posts.lists.user"),
         PREF_POSTS_LIST_TAG("posts.lists.tag"),
         PREF_ANONYMOUS_IMG("anonymous.image"),
-        DEFAULT_DATE_FORMAT("MM/dd/yyyy HH:mma z"),
+        DEFAULT_DATE_FORMAT("MM/dd/yyyy hh:mma Z"),
 
         BASE("https://msocl.herokuapp.com/"),
         GPLAY_LINK("market://details?id=co.samepinch.android.app"),

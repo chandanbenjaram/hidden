@@ -29,7 +29,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -46,6 +45,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -509,31 +509,33 @@ public class Utils {
         }
     }
 
-    public static Date string2Date(String stringDate) {
+    public static Date stringToDate(String stringDate) {
         Date date = null;
         if (stringDate == null) {
             return date;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
         try {
             date = sdf.parse(stringDate);
         } catch (ParseException e) {
-//            e.printStackTrace();
+            // muted
+            e.printStackTrace();
         }
 
         return date;
-    }
-
-    public static String dateToString(long ts) {
-        return DateFormatUtils.format(new Date(ts), DEFAULT_DATE_FORMAT.getValue());
     }
 
     public static String dateToString(Date date) {
         if (date == null) {
             return "";
         }
-        return DateFormatUtils.format(date, DEFAULT_DATE_FORMAT.getValue());
+        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
+        return sdf.format(date);
     }
 
     public static List<String> getImageValues(final String str) {

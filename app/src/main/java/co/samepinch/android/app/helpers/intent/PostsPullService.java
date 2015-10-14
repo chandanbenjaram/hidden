@@ -179,7 +179,7 @@ public class PostsPullService extends IntentService {
                 .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, post.getUpvoteCount())
                 .withValue(SchemaPosts.COLUMN_VIEWS, post.getViews())
                 .withValue(SchemaPosts.COLUMN_ANONYMOUS, post.getAnonymous())
-                .withValue(SchemaPosts.COLUMN_CREATED_AT, post.getCreatedAt().getTime())
+                .withValue(SchemaPosts.COLUMN_CREATED_AT, Utils.stringToDate(post.getCreatedAtStr()).getTime())
                 .withValue(SchemaPosts.COLUMN_COMMENTERS, post.getCommentersForDB())
                 .withValue(SchemaPosts.COLUMN_OWNER, postOwner != null ? postOwner.getUid() : anonyOwner.getUid())
                 .withValue(SchemaPosts.COLUMN_TAGS, post.getTagsForDB());

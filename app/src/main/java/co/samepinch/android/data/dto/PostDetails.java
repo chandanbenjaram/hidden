@@ -148,7 +148,7 @@ public class PostDetails {
     public Date getCreatedAt() {
         if (createdAt == null) {
             //TODO
-            setCreatedAt(Utils.string2Date(createdAtStr));
+            setCreatedAt(Utils.stringToDate(createdAtStr));
         }
         return createdAt;
     }
