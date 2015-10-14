@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -78,7 +79,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
             @Override
             public void run() {
                 if (mViewAdapter != null) {
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, BaseColumns._ID  + " ASC");
                     if (cursor.getCount() > 0) {
                         mViewAdapter.changeCursor(cursor);
                     } else {
@@ -136,7 +137,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, BaseColumns._ID  + " ASC");
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setAdapter(mViewAdapter);
@@ -195,7 +196,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     pref.setValue(AppConstants.API.PREF_POSTS_LIST_FAV.getValue(), event.getMetaData());
 
                     // refresh complete view
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, null);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_FAV + "=?", new String[]{"1"}, BaseColumns._ID  + " ASC");
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted

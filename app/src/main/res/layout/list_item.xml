@@ -70,7 +70,7 @@
 
         <TextView
             android:id="@+id/wall_post_date"
-            style="@style/SP_TEXT.BODY.DISABLED"
+            style="@style/SP_TEXT.BODY.DISABLED.EXTRA_SMALL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -97,7 +97,7 @@
 
         <TextView
             android:id="@+id/wall_post_views"
-            style="@style/SP_TEXT.BODY.DISABLED"
+            style="@style/SP_TEXT.BODY.DISABLED.EXTRA_SMALL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -108,23 +108,9 @@
             android:paddingTop="15dp"
             android:text="VIEWS" />
 
-        <!--<TextView-->
-        <!--android:id="@+id/wall_post_upvote"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:layout_toLeftOf="@+id/wall_post_date"-->
-        <!--android:drawableLeft="@drawable/thumb_gray_small"-->
-        <!--android:paddingLeft="2dp"-->
-        <!--android:paddingTop="15dp"-->
-        <!--android:text="VOTES"-->
-        <!--android:textColor="@color/grey_500"-->
-        <!--android:textSize="10dp"-->
-        <!--android:gravity="center_vertical"/>-->
-
         <TextView
             android:id="@+id/wall_post_upvote"
-            style="@style/SP_TEXT.BODY.DISABLED"
+            style="@style/SP_TEXT.BODY.DISABLED.EXTRA_SMALL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -167,7 +153,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/wall_post_images"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:maxLines="5"
+        android:ellipsize="end"
+        android:singleLine="false"
+        />
 
     <LinearLayout
         android:id="@+id/wall_post_commenters"

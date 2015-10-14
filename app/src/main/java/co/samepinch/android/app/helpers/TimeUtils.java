@@ -5,7 +5,6 @@ import android.text.format.DateUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +26,9 @@ public class TimeUtils {
 
     public static String toHuman(Context context, Date arg0) {
         int gmtOffset = TimeZone.getDefault().getRawOffset();
-        long now = System.currentTimeMillis() + gmtOffset;
+//        long now = System.currentTimeMillis() + gmtOffset;
+
+        long now = System.currentTimeMillis();
 
         CharSequence sequence = DateUtils.getRelativeTimeSpanString(arg0.getTime(), now, DateUtils.FORMAT_ABBREV_RELATIVE);
         return sequence.toString();

@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -553,7 +552,6 @@ public class Utils {
         tagPaint.setTextSize(view.getTextSize());
         tagPaint.setLinearText(false);
         tagPaint.setSubpixelText(false);
-//        final float fontSize = Utils.sp2px(context.getResources(), view.getTextSize());
 
         SpannableStringBuilder spanTxt = new SpannableStringBuilder();
         for (final String tag : tags) {
@@ -583,7 +581,7 @@ public class Utils {
 
                 }
             }, spanTxt.length() - tag.length(), spanTxt.length(), 0);
-            spanTxt.append(" ");
+            spanTxt.append(StringUtils.SPACE);
         }
 
         view.setMovementMethod(LinkMovementMethod.getInstance());
