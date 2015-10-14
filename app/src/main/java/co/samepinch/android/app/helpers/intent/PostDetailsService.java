@@ -167,7 +167,7 @@ public class PostDetailsService extends IntentService {
                 .withValue(SchemaPosts.COLUMN_UPVOTE_COUNT, details.getUpvoteCount())
                 .withValue(SchemaPosts.COLUMN_VIEWS, details.getViews())
                 .withValue(SchemaPosts.COLUMN_ANONYMOUS, details.getAnonymous())
-                .withValue(SchemaPosts.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
+                .withValue(SchemaPosts.COLUMN_CREATED_AT, Utils.stringToDate(details.getCreatedAtStr()).getTime())
                 .withValue(SchemaPosts.COLUMN_OWNER, (details.getAnonymous() ? anonyOwner.getUid() : postOwner.getUid()))
                 .withValue(SchemaPosts.COLUMN_TAGS, details.getTagsForDB())
                 .build());
@@ -184,7 +184,7 @@ public class PostDetailsService extends IntentService {
             //grab comment
             opsBldr = ContentProviderOperation.newInsert(SchemaComments.CONTENT_URI)
                     .withValue(SchemaComments.COLUMN_UID, comments.getUid())
-                    .withValue(SchemaComments.COLUMN_CREATED_AT, comments.getCreatedAt().getTime())
+                    .withValue(SchemaComments.COLUMN_CREATED_AT, Utils.stringToDate(comments.getCreatedAtStr()).getTime())
                     .withValue(SchemaComments.COLUMN_ANONYMOUS, comments.getAnonymous())
                     .withValue(SchemaComments.COLUMN_TEXT, comments.getText())
                     .withValue(SchemaComments.COLUMN_UPVOTE_COUNT, comments.getUpvoteCount())

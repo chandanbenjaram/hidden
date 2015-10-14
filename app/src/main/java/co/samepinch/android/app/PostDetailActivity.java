@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -53,8 +52,8 @@ public class PostDetailActivity extends AppCompatActivity {
     @Bind(R.id.bottomsheet)
     BottomSheetLayout mBottomsheet;
 
-    @Bind(R.id.post_dot)
-    ViewGroup mPostDot;
+//    @Bind(R.id.post_dot)
+//    ViewGroup mPostDot;
 
     @Bind(R.id.post_dot_name)
     TextView mPostDotName;
@@ -115,7 +114,6 @@ public class PostDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_postdetail);
         ButterKnife.bind(this);
 
-        mLayoutManager = new LinearLayoutManager(getApplicationContext());
         // get caller data
         Bundle iArgs = getIntent().getExtras();
         mPostId = iArgs.getString(AppConstants.K.POST.name());
@@ -146,22 +144,15 @@ public class PostDetailActivity extends AppCompatActivity {
         // setup data
         setUpMetadata(currPost);
 
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mViewAdapter = new PostDetailsRVAdapter(this, mergeCursor);
+
         // recycler view setup
         mRV.setHasFixedSize(true);
         mRV.setLayoutManager(mLayoutManager);
 
-        mViewAdapter = new PostDetailsRVAdapter(this, mergeCursor);
         mRV.setAdapter(mViewAdapter);
         mRV.setItemAnimator(new DefaultItemAnimator());
-//        if (iArgs.getBoolean("isScrollDown", false)) {
-//            mRV.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//                @Override
-//                public void onGlobalLayout() {
-//                    mRV.smoothScrollToPosition(mergeCursor.getCount() - 1);
-//                }
-//            });
-//        }
-
 
         // prepare to refresh post details
         Bundle iServiceArgs = new Bundle();
@@ -230,27 +221,31 @@ public class PostDetailActivity extends AppCompatActivity {
             String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
             mPostDotHandle.setText(pinchHandle);
 
-            mPostDot.setOnClickListener(null);
-            if (mPostDetails.getAnonymous() == null || !mPostDetails.getAnonymous())
+            mPostDotName.setOnClickListener(null);
+            if (mPostDetails.getAnonymous() == null || !mPostDetails.getAnonymous()) {
                 // onclick take to dot view
-                mPostDot.setOnClickListener(new View.OnClickListener() {
+                mPostDotName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TARGET
-                        Bundle args = new Bundle();
-                        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
-                        // data
-                        args.putString(AppConstants.K.KEY_DOT.name(), user.getUid());
-
-                        // intent
-                        Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
-                        intent.putExtras(args);
-                        startActivity(intent);
+                        showPostUser(user.getUid());
                     }
                 });
+            }
         }
 
         currDot.close();
+    }
+
+    public void showPostUser(String postUserId) {
+        Bundle args = new Bundle();
+        args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_DOTWALL.name());
+        // data
+        args.putString(AppConstants.K.KEY_DOT.name(), postUserId);
+
+        // intent
+        Intent intent = new Intent(getApplicationContext(), ActivityFragment.class);
+        intent.putExtras(args);
+        startActivity(intent);
     }
 
     @Override
@@ -541,7 +536,7 @@ public class PostDetailActivity extends AppCompatActivity {
                         new Intent(view.getContext(), PostMetaUpdateService.class);
                 intent.putExtras(iArgs);
                 view.getContext().startService(intent);
-            }else{
+            } else {
                 doLogin();
             }
         }
