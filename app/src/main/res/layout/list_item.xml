@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:paddingTop="15dp">
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp"
+    android:background="@android:color/white"
+    >
 
     <RelativeLayout
         android:id="@+id/header"
@@ -26,7 +29,7 @@
             android:id="@+id/avatar_image_vs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="9dp">
+            android:layout_marginLeft="16dp">
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/avatar"
@@ -53,6 +56,7 @@
 
         <TextView
             android:id="@+id/wall_post_dot"
+            style="@style/SP_TEXT.SUB_HEADING.DOT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -62,90 +66,87 @@
             android:paddingBottom="15dp"
             android:paddingLeft="2dp"
             android:text="DOT"
-            android:textAllCaps="true"
-            android:textColor="@color/blue_500" />
+            android:textAllCaps="true" />
 
         <TextView
             android:id="@+id/wall_post_date"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:text="DATE"
+            android:gravity="center_vertical"
             android:paddingBottom="15dp"
             android:paddingLeft="2dp"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:gravity="center_vertical"/>
+            android:paddingRight="5dp"
+            android:text="DATE" />
 
         <TextView
             android:id="@+id/wall_pinch_handle"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_toEndOf="@+id/avatar_image_vs"
             android:layout_toRightOf="@+id/avatar_image_vs"
+            android:gravity="center_vertical"
             android:paddingLeft="2dp"
             android:paddingTop="15dp"
-            android:text="PINCH HANDLE"
-            android:textColor="@color/grey_700"
-            android:textSize="9sp"
-            android:gravity="center_vertical"/>
+            android:text="PINCH HANDLE" />
 
         <TextView
             android:id="@+id/wall_post_views"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_toLeftOf="@+id/wall_post_upvote"
             android:drawableLeft="@drawable/visibility_small"
+            android:gravity="center_vertical"
             android:paddingLeft="2dp"
             android:paddingTop="15dp"
-            android:text="VIEWS"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:gravity="center_vertical"/>
+            android:text="VIEWS" />
 
         <!--<TextView-->
-            <!--android:id="@+id/wall_post_upvote"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_centerInParent="true"-->
-            <!--android:layout_toLeftOf="@+id/wall_post_date"-->
-            <!--android:drawableLeft="@drawable/thumb_gray_small"-->
-            <!--android:paddingLeft="2dp"-->
-            <!--android:paddingTop="15dp"-->
-            <!--android:text="VOTES"-->
-            <!--android:textColor="@color/grey_500"-->
-            <!--android:textSize="10dp"-->
-            <!--android:gravity="center_vertical"/>-->
+        <!--android:id="@+id/wall_post_upvote"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_toLeftOf="@+id/wall_post_date"-->
+        <!--android:drawableLeft="@drawable/thumb_gray_small"-->
+        <!--android:paddingLeft="2dp"-->
+        <!--android:paddingTop="15dp"-->
+        <!--android:text="VOTES"-->
+        <!--android:textColor="@color/grey_500"-->
+        <!--android:textSize="10dp"-->
+        <!--android:gravity="center_vertical"/>-->
 
         <TextView
             android:id="@+id/wall_post_upvote"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:drawableLeft="@drawable/thumb_gray_small"
+            android:gravity="center_vertical"
             android:paddingLeft="2dp"
-            android:paddingRight="2dp"
+            android:paddingRight="5dp"
             android:paddingTop="15dp"
-            android:text="VOTES"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:gravity="center_vertical"/>
+            android:text="VOTES" />
 
     </RelativeLayout>
 
     <TextView
-        style="@style/SP_TEXT.POST.WALL"
         android:id="@+id/wall_post_content"
+        style="@style/SP_TEXT.BODY.WALL_POST"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="15dp"
         android:layout_below="@+id/header"
         android:gravity="center_vertical"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         android:text="CONTENT" />
 
     <com.facebook.drawee.view.SimpleDraweeView
@@ -158,7 +159,6 @@
         android:adjustViewBounds="true"
         android:gravity="center"
         android:padding="5dp"
-        fresco:placeholderImageScaleType="fitCenter"
         fresco:roundAsCircle="false" />
 
     <TextView
@@ -171,10 +171,11 @@
 
     <LinearLayout
         android:id="@+id/wall_post_commenters"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/wall_tags"
-        android:layout_centerHorizontal="true">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/wall_commenter_0"
@@ -184,7 +185,6 @@
             android:layout_margin="@dimen/wall_commenter_margin"
             android:adjustViewBounds="true"
             android:visibility="gone"
-            fresco:placeholderImageScaleType="fitCenter"
             fresco:roundAsCircle="true" />
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -194,7 +194,6 @@
             android:layout_margin="@dimen/wall_commenter_margin"
             android:adjustViewBounds="true"
             android:visibility="gone"
-            fresco:placeholderImageScaleType="fitCenter"
             fresco:roundAsCircle="true" />
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -204,7 +203,6 @@
             android:layout_margin="@dimen/wall_commenter_margin"
             android:adjustViewBounds="true"
             android:visibility="gone"
-            fresco:placeholderImageScaleType="fitCenter"
             fresco:roundAsCircle="true" />
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -214,7 +212,6 @@
             android:layout_margin="@dimen/wall_commenter_margin"
             android:adjustViewBounds="true"
             android:visibility="gone"
-            fresco:placeholderImageScaleType="fitCenter"
             fresco:roundAsCircle="true" />
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -224,17 +221,15 @@
             android:layout_margin="@dimen/wall_commenter_margin"
             android:adjustViewBounds="true"
             android:visibility="gone"
-            fresco:placeholderImageScaleType="fitCenter"
             fresco:roundAsCircle="true" />
 
         <TextView
             android:id="@+id/wall_commenters_count"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            style="@style/SP_TEXT.BODY.DISABLED"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/bubble_gray"
             android:gravity="center"
-            android:text="@string/empty"
-            android:textColor="@color/grey_600"
-            android:textSize="9dp" />
+            android:text="@string/empty" />
     </LinearLayout>
 </RelativeLayout>
