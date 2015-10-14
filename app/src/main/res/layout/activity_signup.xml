@@ -25,7 +25,7 @@
                 android:layout_gravity="center_horizontal"
                 android:adjustViewBounds="true"
                 android:clickable="true"
-                fresco:placeholderImage="@drawable/camera"
+                fresco:placeholderImage="@drawable/camera_outline"
                 fresco:placeholderImageScaleType="fitCenter"
                 fresco:roundAsCircle="true" />
 

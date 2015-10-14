@@ -7,6 +7,7 @@ import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -115,6 +116,10 @@ public class SIMView extends RelativeLayout {
 
     public void setRoundingParams(RoundingParams roundingParams) {
         mSIMView.getHierarchy().setRoundingParams(roundingParams);
+    }
+
+    public void setSIMViewLayoutParams(ViewGroup.LayoutParams layoutParams){
+        mSIMView.setLayoutParams(layoutParams);
     }
 
     public void populateImageViewWithAdjustedAspect(String imgUri, Postprocessor postprocessor, Integer... resizeDimensions) {

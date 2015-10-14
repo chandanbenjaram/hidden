@@ -1,7 +1,7 @@
 package co.samepinch.android.app.helpers;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,13 +11,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.TransitionInflater;
 import android.view.Window;
-import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
+
+import com.facebook.common.util.UriUtil;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.ref.WeakReference;
 
 import co.samepinch.android.app.MainActivity;
 import co.samepinch.android.app.MainActivityIn;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.helpers.widget.SIMView;
+
+import static co.samepinch.android.app.helpers.AppConstants.API.PREF_APP_HELLO_WORLD;
 
 public class RootActivity extends AppCompatActivity {
 
@@ -36,23 +43,60 @@ public class RootActivity extends AppCompatActivity {
         mHandler = new LocalHandler(RootActivity.this);
 
 
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent;
-                if (Utils.isLoggedIn()) {
-                    intent = new Intent(RootActivity.this, MainActivityIn.class);
-                } else {
-                    intent = new Intent(RootActivity.this, MainActivity.class);
+        if (Utils.isAppFirstTime()) {
+            FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);
+            container.removeAllViews();
+
+
+//            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            Uri bgResourceUri = new Uri.Builder()
+                    .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
+                    .path(String.valueOf(R.drawable.welcome))
+                    .build();
+
+            SIMView bgImageView = new SIMView(getApplicationContext());
+            bgImageView.setIsClickDisabled(Boolean.TRUE);
+            bgImageView.populateImageViewWithAdjustedAspect(bgResourceUri.toString());
+            container.addView(bgImageView);
+
+            // reset first time
+            Utils.PreferencesManager.getInstance().setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent;
+                    if (Utils.isLoggedIn()) {
+                        intent = new Intent(RootActivity.this, MainActivityIn.class);
+                    } else {
+                        intent = new Intent(RootActivity.this, MainActivity.class);
+                    }
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                            Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
-                ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
-            }
-        }, 499);
+            }, 599);
+        } else {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent;
+                    if (Utils.isLoggedIn()) {
+                        intent = new Intent(RootActivity.this, MainActivityIn.class);
+                    } else {
+                        intent = new Intent(RootActivity.this, MainActivity.class);
+                    }
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                            Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
+                    ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
+                }
+            }, 0);
+        }
+
 
         setupWindowAnimations();
     }

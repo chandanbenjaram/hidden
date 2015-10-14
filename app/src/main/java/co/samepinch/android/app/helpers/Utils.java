@@ -65,6 +65,7 @@ import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.DEFAULT_DATE_FORMAT;
+import static co.samepinch.android.app.helpers.AppConstants.API.PREF_APP_HELLO_WORLD;
 import static co.samepinch.android.app.helpers.AppConstants.KV.CLIENT_ID;
 import static co.samepinch.android.app.helpers.AppConstants.KV.CLIENT_SECRET;
 import static co.samepinch.android.app.helpers.AppConstants.KV.GRANT_TYPE;
@@ -503,9 +504,14 @@ public class Utils {
         }
 
         public boolean clear() {
-            return mPref.edit()
-                    .clear()
-                    .commit();
+            try{
+                return mPref.edit()
+                        .clear()
+                        .commit();
+            }finally{
+                // add app first time state
+                setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
+            }
         }
     }
 
@@ -632,6 +638,10 @@ public class Utils {
 
     public static boolean isLoggedIn() {
         return Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_AUTH_USER.getValue());
+    }
+
+    public static boolean isAppFirstTime() {
+        return !Utils.PreferencesManager.getInstance().contains(AppConstants.API.PREF_APP_HELLO_WORLD.getValue());
     }
 
     public static boolean isLoggedInViaEmailPassword() {

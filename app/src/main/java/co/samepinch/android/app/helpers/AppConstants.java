@@ -10,6 +10,7 @@ public class AppConstants {
         SHARED_PREFS_NAME("co.samepinch.android.app.pref"),
         ACCESS_TOKEN("access_token"),
         PREF_AUTH_USER("auth.user"),
+        PREF_APP_HELLO_WORLD("app.hello.world"),
         PREF_AUTH_PROVIDER("auth.provider"),
         PREF_POSTS_LIST("posts.lists"),
         PREF_POSTS_LIST_FAV("posts.lists.fav"),
