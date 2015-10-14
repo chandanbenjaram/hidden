@@ -64,6 +64,6 @@
             android:src="@drawable/ic_discuss"
             app:borderWidth="0dp"
             app:layout_anchor="@id/recyclerView"
-            app:layout_anchorGravity="top|right|end" />
+            app:layout_anchorGravity="top|right|end"/>
     </android.support.design.widget.CoordinatorLayout>
 </com.flipboard.bottomsheet.BottomSheetLayout>

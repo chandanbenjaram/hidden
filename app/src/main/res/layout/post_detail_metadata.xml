@@ -18,6 +18,7 @@
         android:weightSum="2">
 
         <TextView
+            style="@style/SP_TEXT.SUB_HEADING"
             android:id="@+id/post_dot_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,12 +27,12 @@
             android:textColor="@color/blue_500" />
 
         <TextView
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:id="@+id/post_dot_handle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/loading"
-            android:textColor="@color/grey_500" />
+            android:text="@string/loading" />
     </LinearLayout>
 
 
