@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.support.v7.graphics.Palette;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -22,6 +23,7 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.SPApplication;
 import co.samepinch.android.app.helpers.ImageUtils;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.widget.SIMView;
@@ -55,6 +57,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
             Map<String, String> imageKV = details.getImages();
             ViewGroup.LayoutParams imageWHParams = null;
 
+            LayoutInflater inflater = (LayoutInflater) SPApplication.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             for (String imgK : imageKArr) {
                 // get left of image
                 String leftContent = StringUtils.substringBefore(rightContent, imgK).replaceAll("::", "");
@@ -62,8 +65,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
                 // grab right remaining chunk
                 rightContent = StringUtils.substringAfter(rightContent, imgK).replaceAll("::", "");
                 if (StringUtils.isNotBlank(leftContent)) {
-                    TextView tView = new TextView(mView.getContext());
-                    tView.setPadding(5, 0, 5, 0);
+                    TextView tView = (TextView) inflater.inflate(R.layout.post_textview, null);
                     tView.setText(leftContent);
                     addToView(tView);
                 }
@@ -82,8 +84,7 @@ public class PostContentRVHolder extends PostDetailsRVHolder {
 
 
             if (StringUtils.isNotBlank(rightContent)) {
-                TextView tView = new TextView(mView.getContext());
-                tView.setPadding(5, 0, 5, 0);
+                TextView tView = (TextView) inflater.inflate(R.layout.post_textview, null);
                 tView.setText(rightContent);
                 addToView(tView);
             }

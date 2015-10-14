@@ -138,17 +138,15 @@
     </RelativeLayout>
 
     <TextView
+        style="@style/SP_TEXT.POST.WALL"
         android:id="@+id/wall_post_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/header"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="15dp"
-        android:ellipsize="end"
+        android:layout_below="@+id/header"
         android:gravity="center_vertical"
-        android:maxLines="3"
-        android:text="CONTENT"
-        android:textColor="@color/grey_900" />
+        android:text="CONTENT" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/wall_post_images"
