@@ -71,7 +71,7 @@ public class PostDetailActivity extends AppCompatActivity {
     @Bind(R.id.post_date)
     TextView mPostDate;
 
-    @Bind(R.id.floating_action_button)
+    @Bind(R.id.fab)
     FloatingActionButton mFAB;
 
     @Bind(R.id.recyclerView)
@@ -334,6 +334,21 @@ public class PostDetailActivity extends AppCompatActivity {
         View menu = LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
         LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
         boolean addDiv = false;
+        if (addDiv) {
+//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
+//                        layout.addView(divider);
+        }
+
+        TextView commentView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_comment, null);
+        layout.addView(commentView);
+        commentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
+        addDiv = true;
+
         if (mPostDetails.getUpvoted() != null && mPostDetails.getUpvoted()) {
             if (addDiv) {
 //                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
@@ -355,6 +370,7 @@ public class PostDetailActivity extends AppCompatActivity {
             new MenuItemClickListener(voteView, "upvote", mPostId, mBottomsheet);
             addDiv = true;
         }
+
 
         List<String> permissions = mPostDetails.getPermissions();
         if (permissions != null && permissions.contains("flag")) {
