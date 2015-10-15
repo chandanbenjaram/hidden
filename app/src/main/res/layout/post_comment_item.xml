@@ -56,13 +56,10 @@
             android:layout_alignBaseline="@id/avatar"
             android:layout_toLeftOf="@+id/comment_date"
             android:gravity="center_vertical"
-            android:paddingRight="5dp"
             android:text="vote"
-            android:drawableLeft="@drawable/icon_upvote_gray_1x"
+            android:drawableLeft="@drawable/thumb_gray_small"
             android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:layout_marginRight="5dp" />
-
+            android:textSize="10dp" />
 
         <TextView
             android:id="@+id/comment_date"
@@ -71,12 +68,11 @@
             android:layout_alignBaseline="@id/avatar"
             android:layout_toLeftOf="@+id/comment_menu"
             android:gravity="center_vertical"
-            android:paddingRight="5dp"
+            android:paddingLeft="2dp"
             android:text="date"
-            android:drawableLeft="@drawable/time_1x"
+            android:drawableLeft="@drawable/timer_small"
             android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:layout_marginRight="5dp" />
+            android:textSize="10dp" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/comment_menu"
@@ -84,10 +80,10 @@
             android:layout_height="14dp"
             android:layout_alignParentRight="true"
             android:adjustViewBounds="true"
-            android:paddingRight="7dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="5dp"
             android:gravity="center_vertical"
-            android:background="@drawable/icon_more_2x"
-            fresco:placeholderImageScaleType="fitCenter" />
+            android:background="@drawable/more" />
 
         <TextView
             android:id="@+id/comment"

@@ -25,6 +25,7 @@ import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.LoginActivity;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.TimeUtils;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.intent.CommentUpdateService;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
@@ -101,24 +102,20 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
             };
         }
 
-        if (StringUtils.isBlank(photo)) {
-            mAvatarName.setVisibility(View.VISIBLE);
-            mAvatar.setVisibility(View.INVISIBLE);
-
-            String name = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
-            mAvatarName.setText(name);
-
-            if (dotClick != null) {
-                mAvatarName.setOnClickListener(dotClick);
-            }
-
-        } else {
+        if (Utils.isValidUri(photo)) {
             mAvatar.setVisibility(View.VISIBLE);
             mAvatarName.setVisibility(View.GONE);
             Utils.setupLoadingImageHolder(mAvatar, photo);
-
             if (dotClick != null) {
                 mAvatar.setOnClickListener(dotClick);
+            }
+        } else {
+            mAvatarName.setVisibility(View.VISIBLE);
+            mAvatar.setVisibility(View.INVISIBLE);
+            String name = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
+            mAvatarName.setText(name);
+            if (dotClick != null) {
+                mAvatarName.setOnClickListener(dotClick);
             }
         }
 
@@ -130,7 +127,7 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
         mCommentUpvote.setText(StringUtils.defaultString(Integer.toString(commentDetails.getUpvoteCount()), "0"));
 
         // setup date
-        mCommentDate.setText(Utils.dateToString(commentDetails.getCreatedAt()));
+        mCommentDate.setText(TimeUtils.toHumanRelativePeriod(commentDetails.getCreatedAt()));
 
         // setup comment
         mComment.setText(commentDetails.getText());
