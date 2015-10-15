@@ -155,8 +155,6 @@
         android:layout_below="@id/wall_post_images"
         android:layout_centerHorizontal="true"
         android:maxLines="5"
-        android:ellipsize="end"
-        android:singleLine="false"
         />
 
     <LinearLayout

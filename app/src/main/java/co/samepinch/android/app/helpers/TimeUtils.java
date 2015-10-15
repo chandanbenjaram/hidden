@@ -17,7 +17,7 @@ public class TimeUtils {
 
     public static String toHumanLocal(Context context, Date arg0) {
         long arg0Time = arg0.getTime();
-        CharSequence sequence = DateUtils.formatDateTime(context, arg0Time, DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_ABBREV_TIME | DateUtils.FORMAT_NUMERIC_DATE);
+        CharSequence sequence = DateUtils.formatDateTime(context, arg0Time, DateUtils.FORMAT_SHOW_TIME| DateUtils.FORMAT_SHOW_DATE|DateUtils.FORMAT_ABBREV_ALL);
         return sequence.toString();
     }
 
