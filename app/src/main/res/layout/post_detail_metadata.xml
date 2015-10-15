@@ -10,8 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
+        android:gravity="center|top"
         android:orientation="horizontal">
+
+        <TextView
+            style="@style/SP_TEXT.BODY.DISABLED"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/by" />
 
         <TextView
             android:id="@+id/post_dot_name"
@@ -20,12 +27,12 @@
             android:layout_height="wrap_content"
             android:text="@string/loading" />
 
-        <TextView
-            android:id="@+id/post_dot_handle"
-            style="@style/SP_TEXT.BODY.DISABLED"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/loading" />
+        <!--<TextView-->
+            <!--android:id="@+id/post_dot_handle"-->
+            <!--style="@style/SP_TEXT.BODY.DISABLED"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/loading" />-->
     </LinearLayout>
 
     <LinearLayout
@@ -33,14 +40,15 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_alignParentBottom="true"
-        android:gravity="center_horizontal"
+        android:gravity="top|center_horizontal"
+        android:divider="@drawable/vertical_divider_1"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:gravity="center|center_horizontal"
+            android:gravity="top|center_horizontal"
             android:orientation="vertical">
 
             <ImageView
@@ -59,7 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center|center_horizontal"
+            android:gravity="top|center_horizontal"
             android:orientation="vertical">
 
             <ImageView
@@ -78,7 +86,26 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center|center_horizontal"
+            android:gravity="top|center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bubble_gray" />
+
+            <TextView
+                android:id="@+id/post_comments_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/loading" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="top|center_horizontal"
             android:orientation="vertical">
 
             <ImageView

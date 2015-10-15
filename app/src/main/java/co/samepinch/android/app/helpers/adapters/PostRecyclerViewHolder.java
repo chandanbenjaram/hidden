@@ -109,7 +109,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
         mWallPinchHandleView.setText(String.format(mContext.getString(R.string.pinch_handle), user.getPinchHandle()));
         mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), "0"));
         mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), "0"));
-        mWallPostDateView.setText(TimeUtils.toHuman(mContext, mPost.getCreatedAt()));
+        mWallPostDateView.setText(TimeUtils.toHumanRelativePeriod(mPost.getCreatedAt()));
         mWallPostContentView.setText(mPost.getWallContent());
         mCommentersCount.setText(String.valueOf(mPost.getCommentCount()));
 

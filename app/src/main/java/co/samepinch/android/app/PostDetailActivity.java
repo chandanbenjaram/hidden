@@ -32,6 +32,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import co.samepinch.android.app.helpers.AppConstants;
+import co.samepinch.android.app.helpers.TimeUtils;
 import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.app.helpers.adapters.PostDetailsRVAdapter;
 import co.samepinch.android.app.helpers.intent.PostDetailsService;
@@ -58,14 +59,14 @@ public class PostDetailActivity extends AppCompatActivity {
     @Bind(R.id.post_dot_name)
     TextView mPostDotName;
 
-    @Bind(R.id.post_dot_handle)
-    TextView mPostDotHandle;
-
     @Bind(R.id.post_vote_count)
     TextView mPostVoteCount;
 
     @Bind(R.id.post_views_count)
     TextView mPostViewsCount;
+
+    @Bind(R.id.post_comments_count)
+    TextView mPostCommentsCount;
 
     @Bind(R.id.post_date)
     TextView mPostDate;
@@ -191,9 +192,28 @@ public class PostDetailActivity extends AppCompatActivity {
             return;
         }
 
-        mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
-        mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
-        mPostDate.setText(Utils.dateToString(mPostDetails.getCreatedAt()));
+        // post date
+        mPostDate.setText(TimeUtils.toHumanLocal(getApplicationContext(), mPostDetails.getCreatedAt()));
+
+        // views count
+        if(mPostDetails.getViews() ==null){
+            mPostViewsCount.setText("-o-");
+        }else{
+            mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
+        }
+
+        // vote count
+        if(mPostDetails.getUpvoteCount() ==null){
+            mPostVoteCount.setText("-o-");
+        }else{
+            mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
+        }
+        // comment count
+        if(mPostDetails.getCommentCount() ==null){
+            mPostCommentsCount.setText("-o-");
+        }else{
+            mPostCommentsCount.setText(String.valueOf(mPostDetails.getCommentCount()));
+        }
 
         String ownerUid = null;
         int ownerUidIndex;
@@ -211,16 +231,18 @@ public class PostDetailActivity extends AppCompatActivity {
 
             String dotName = null;
             if (StringUtils.isBlank(user.getPrefName())) {
-                String fName = StringUtils.defaultString(user.getFname(), "");
-                String lName = StringUtils.defaultString(user.getLname(), "");
-                dotName = fName + " " + lName;
+                String fName = StringUtils.defaultString(user.getFname(), StringUtils.EMPTY);
+                String lName = StringUtils.defaultString(user.getLname(), StringUtils.EMPTY);
+                dotName = StringUtils.join(new String[]{fName, lName}, StringUtils.SPACE);
             } else {
                 dotName = user.getPrefName();
             }
-            mPostDotName.setText(dotName);
-            String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
-            mPostDotHandle.setText(pinchHandle);
+            if(StringUtils.isBlank(dotName)){
+                String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
+                dotName = pinchHandle;
+            }
 
+            mPostDotName.setText(dotName);
             mPostDotName.setOnClickListener(null);
             if (mPostDetails.getAnonymous() == null || !mPostDetails.getAnonymous()) {
                 // onclick take to dot view

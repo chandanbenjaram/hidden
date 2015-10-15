@@ -246,6 +246,10 @@ public class Utils {
             details.setUid(cursor.getString(uidIndex));
         }
 
+        if ((createdAtIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_CREATED_AT)) != -1) {
+            details.setCreatedAt(new Date(cursor.getLong(createdAtIndex)));
+        }
+
         if ((urlIndex = cursor.getColumnIndex(SchemaPostDetails.COLUMN_URL)) != -1) {
             details.setUrl(cursor.getString(urlIndex));
         }

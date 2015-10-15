@@ -70,6 +70,7 @@
     <string name="signin_with_google">Sign in with Google</string>
     <string name="signin_with_fb">Sign in with Facebook</string>
     <string name="loading">-</string>
+    <string name="by">post by\u000A\u000A</string>
     <string name="empty"></string>
     <string name="settings_notifs">Push Notifications</string>
     <string name="settings_notifs_subline">set when you want to get notified</string>

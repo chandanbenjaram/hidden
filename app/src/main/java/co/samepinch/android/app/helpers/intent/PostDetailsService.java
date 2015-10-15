@@ -151,7 +151,7 @@ public class PostDetailsService extends IntentService {
                 .withValue(SchemaPostDetails.COLUMN_UPVOTED, details.getUpvoted())
                 .withValue(SchemaPostDetails.COLUMN_VIEWS, details.getViews())
                 .withValue(SchemaPostDetails.COLUMN_ANONYMOUS, details.getAnonymous())
-                .withValue(SchemaPostDetails.COLUMN_CREATED_AT, details.getCreatedAt().getTime())
+                .withValue(SchemaPostDetails.COLUMN_CREATED_AT, Utils.stringToDate(details.getCreatedAtStr()).getTime())
                 .withValue(SchemaPostDetails.COLUMN_OWNER, (details.getAnonymous() ? anonyOwner.getUid() : postOwner.getUid()))
                 .withValue(SchemaPostDetails.COLUMN_PERMISSIONS, details.getPermissionsForDB())
                 .withValue(SchemaPostDetails.COLUMN_TAGS, details.getTagsForDB()).build());
