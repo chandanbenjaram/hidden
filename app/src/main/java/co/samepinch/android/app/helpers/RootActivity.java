@@ -41,8 +41,6 @@ public class RootActivity extends AppCompatActivity {
 
         setContentView(R.layout.root_activity);
         mHandler = new LocalHandler(RootActivity.this);
-
-
         if (Utils.isAppFirstTime()) {
             FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);
             container.removeAllViews();
