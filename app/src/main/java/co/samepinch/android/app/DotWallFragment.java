@@ -91,13 +91,13 @@ public class DotWallFragment extends Fragment {
     TextView mDotPostsCnt;
 
     @Bind(R.id.dot_wall_blog)
-    ImageView mDotBlog;
+    TextView mDotBlog;
 
     @Bind(R.id.dot_wall_blog_wrapper)
     LinearLayout mDotBlogWrapper;
 
     @Bind(R.id.dot_wall_edit)
-    ImageView mDotEdit;
+    TextView mDotEdit;
 
     @Bind(R.id.dot_wall_edit_wrapper)
     LinearLayout mDotEditWrapper;

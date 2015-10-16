@@ -81,10 +81,16 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/dot_wall_edit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/pencil"/>
+                    android:src="@drawable/pencil" />
+
+                <TextView
+                    android:id="@+id/dot_wall_edit"
+                    style="@style/SP_TEXT.METADATA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="edit" />
             </LinearLayout>
 
             <LinearLayout
@@ -136,10 +142,16 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/dot_wall_blog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/info_outline" />
+                    android:src="@drawable/info_filled" />
+
+                <TextView
+                    android:id="@+id/dot_wall_blog"
+                    style="@style/SP_TEXT.METADATA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="blog" />
             </LinearLayout>
 
         </LinearLayout>

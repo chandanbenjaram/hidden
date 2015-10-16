@@ -111,10 +111,10 @@ public class MainActivityIn extends AppCompatActivity {
     TextView mDotPostsCnt;
 
     @Bind(R.id.dot_wall_blog)
-    ImageView mDotBlog;
+    TextView mDotBlog;
 
     @Bind(R.id.dot_wall_edit)
-    ImageView mDotEdit;
+    TextView mDotEdit;
 
     private LocalHandler mHandler;
 
@@ -302,12 +302,8 @@ public class MainActivityIn extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
-            mDotBlog.setVisibility(View.VISIBLE);
-        } else {
-            mDotBlog.setVisibility(View.GONE);
         }
 
-        mDotEdit.setVisibility(View.VISIBLE);
         if (init) {
             mDotEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
