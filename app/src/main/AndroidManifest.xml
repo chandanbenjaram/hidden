@@ -160,6 +160,15 @@
         </receiver>
 
         <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/header_icon_samepinch_2x"/>
+
+        <receiver android:name=".helpers.misc.SPParsePushBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.OPEN" />
+                <action android:name="com.parse.push.intent.DELETE" />
+            </intent-filter>
+        </receiver>
         <!-- PARSE SETTINGS :: END -->
 
     </application>
