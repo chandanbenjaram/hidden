@@ -65,7 +65,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/comment"
-            app:backgroundTint="@color/white" />
+            android:src="@drawable/comment" />
     </android.support.design.widget.CoordinatorLayout>
 </com.flipboard.bottomsheet.BottomSheetLayout>

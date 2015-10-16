@@ -24,8 +24,8 @@
                 android:layout_height="@dimen/signup_avatar_size"
                 android:layout_gravity="center_horizontal"
                 android:adjustViewBounds="true"
-                android:clickable="true"
-                fresco:placeholderImage="@drawable/camera_outline"
+                android:background="@drawable/avatar_border"
+                fresco:placeholderImage="@drawable/camera_blue"
                 fresco:placeholderImageScaleType="fitCenter"
                 fresco:roundAsCircle="true" />
 

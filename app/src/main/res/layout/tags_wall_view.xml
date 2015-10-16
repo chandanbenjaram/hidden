@@ -10,8 +10,6 @@
         android:layout_height="@dimen/detail_backdrop_height"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
@@ -67,10 +65,8 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"
-        android:src="@drawable/icon_heart_list_2x"
-        app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom|right|end" />
+        android:src="@drawable/new_favorite_outline_gray"/>
 
 </android.support.design.widget.CoordinatorLayout>

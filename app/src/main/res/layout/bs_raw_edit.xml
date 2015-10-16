@@ -8,7 +8,7 @@
     android:fadingEdge="horizontal"
     android:singleLine="true"
     android:gravity="center_vertical"
-    android:drawableLeft="@drawable/pencil_edit"
+    android:drawableLeft="@drawable/pencil"
     android:drawablePadding="32dp"
     android:textAppearance="?attr/textAppearanceLargePopupMenu"
     android:text="edit"

@@ -196,22 +196,22 @@ public class PostDetailActivity extends AppCompatActivity {
         mPostDate.setText(TimeUtils.toHumanLocal(getApplicationContext(), mPostDetails.getCreatedAt()));
 
         // views count
-        if(mPostDetails.getViews() ==null){
+        if (mPostDetails.getViews() == null) {
             mPostViewsCount.setText("-o-");
-        }else{
+        } else {
             mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
         }
 
         // vote count
-        if(mPostDetails.getUpvoteCount() ==null){
+        if (mPostDetails.getUpvoteCount() == null) {
             mPostVoteCount.setText("-o-");
-        }else{
+        } else {
             mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
         }
         // comment count
-        if(mPostDetails.getCommentCount() ==null){
+        if (mPostDetails.getCommentCount() == null) {
             mPostCommentsCount.setText("-o-");
-        }else{
+        } else {
             mPostCommentsCount.setText(String.valueOf(mPostDetails.getCommentCount()));
         }
 
@@ -237,7 +237,7 @@ public class PostDetailActivity extends AppCompatActivity {
             } else {
                 dotName = user.getPrefName();
             }
-            if(StringUtils.isBlank(dotName)){
+            if (StringUtils.isBlank(dotName)) {
                 String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
                 dotName = pinchHandle;
             }
@@ -334,21 +334,6 @@ public class PostDetailActivity extends AppCompatActivity {
         View menu = LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
         LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
         boolean addDiv = false;
-        if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-        }
-
-        TextView commentView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_comment, null);
-        layout.addView(commentView);
-        commentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                
-            }
-        });
-        addDiv = true;
-
         if (mPostDetails.getUpvoted() != null && mPostDetails.getUpvoted()) {
             if (addDiv) {
 //                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);

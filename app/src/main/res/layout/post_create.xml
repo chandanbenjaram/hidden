@@ -42,7 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/white"
-        android:src="@drawable/camera" />
+        android:src="@drawable/camera_outline" />
 
 </android.support.design.widget.CoordinatorLayout>

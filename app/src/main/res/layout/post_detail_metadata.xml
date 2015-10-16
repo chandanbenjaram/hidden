@@ -49,7 +49,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/thumb_gray_new" />
+                android:src="@drawable/new_thumb_up_gray" />
 
             <TextView
                 style="@style/SP_TEXT.METADATA"
@@ -70,7 +70,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/visibility" />
+                android:src="@drawable/new_visibility_gray" />
 
             <TextView
                 style="@style/SP_TEXT.METADATA"
@@ -91,7 +91,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/bubble_gray" />
+                android:src="@drawable/new_bubble_gray" />
 
             <TextView
                 style="@style/SP_TEXT.METADATA"
@@ -112,7 +112,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/timer_gray" />
+                android:src="@drawable/new_time_gray" />
 
             <TextView
                 style="@style/SP_TEXT.METADATA"
