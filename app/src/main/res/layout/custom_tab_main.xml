@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/favorite"
         android:drawablePadding="5dp"
-        android:text="Your Starred"
+        android:text="You Starred"
         android:singleLine="true"
         android:gravity="center_vertical"/>
 </ViewSwitcher>
