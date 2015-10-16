@@ -91,7 +91,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/new_bubble_gray" />
+                android:src="@drawable/new_bubble_full_gray" />
 
             <TextView
                 style="@style/SP_TEXT.METADATA"
@@ -112,7 +112,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/new_time_gray" />
+                android:src="@drawable/new_time_full_gray" />
 
             <TextView
                 style="@style/SP_TEXT.METADATA"
