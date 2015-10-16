@@ -48,7 +48,6 @@
                 style="@style/SP_TEXT.METADATA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
                 android:text="@string/loading" />
         </LinearLayout>
 
@@ -69,7 +68,6 @@
                 style="@style/SP_TEXT.METADATA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
                 android:text="@string/loading" />
         </LinearLayout>
     </LinearLayout>

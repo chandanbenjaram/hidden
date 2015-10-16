@@ -141,36 +141,17 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
                 // prepare menu options
                 View menu = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_menu, bs, false);
                 LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
-                boolean addDiv = false;
-
                 if (commentDetails.getUpvoted() != null && commentDetails.getUpvoted()) {
-//                    if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-//                    }
-
                     TextView downVoteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_downvote, null);
                     layout.addView(downVoteView);
                     new MenuItemClickListener(downVoteView, "undoVoting", commentUID, bs);
-                    addDiv = true;
                 } else {
-//                    if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-//                    }
-
                     TextView voteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_upvote, null);
                     layout.addView(voteView);
                     new MenuItemClickListener(voteView, "upvote", commentUID, bs);
-                    addDiv = true;
                 }
 
                 if (permissions.contains("edit")) {
-//                    if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-//                    }
-
                     final TextView editView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_edit, null);
                     editView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -182,15 +163,9 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
                         }
                     });
                     layout.addView(editView);
-                    addDiv = true;
                 }
 
                 if (permissions.contains("flag")) {
-                    if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-                    }
-
                     TextView flagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_flag, null);
                     layout.addView(flagView);
                     flagView.setOnClickListener(new View.OnClickListener() {
@@ -213,7 +188,6 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
                                     .show();
                         }
                     });
-                    addDiv = true;
                 }
 
 

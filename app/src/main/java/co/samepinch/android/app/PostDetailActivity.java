@@ -333,37 +333,19 @@ public class PostDetailActivity extends AppCompatActivity {
         // prepare menu options
         View menu = LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
         LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
-        boolean addDiv = false;
         if (mPostDetails.getUpvoted() != null && mPostDetails.getUpvoted()) {
-            if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-            }
-
             TextView downVoteView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_downvote, null);
             layout.addView(downVoteView);
             new MenuItemClickListener(downVoteView, "undoVoting", mPostId, mBottomsheet);
-            addDiv = true;
         } else {
-            if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-            }
-
             TextView voteView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_upvote, null);
             layout.addView(voteView);
             new MenuItemClickListener(voteView, "upvote", mPostId, mBottomsheet);
-            addDiv = true;
         }
 
 
         List<String> permissions = mPostDetails.getPermissions();
         if (permissions != null && permissions.contains("flag")) {
-            if (addDiv) {
-//                        View divider = LayoutInflater.from(mView.getContext()).inflate(R.layout.raw_divider, null);
-//                        layout.addView(divider);
-            }
-
             TextView flagView = (TextView) LayoutInflater.from(mBottomsheet.getContext()).inflate(R.layout.bs_raw_flag, null);
             layout.addView(flagView);
             flagView.setOnClickListener(new View.OnClickListener() {
@@ -387,7 +369,6 @@ public class PostDetailActivity extends AppCompatActivity {
                             .show();
                 }
             });
-            addDiv = true;
         }
 
         mBottomsheet.showWithSheetView(menu);

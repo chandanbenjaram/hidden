@@ -15,6 +15,6 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
         android:divider="?android:attr/dividerHorizontal"
-        android:orientation="vertical"
-        android:showDividers="middle"></LinearLayout>
+        android:showDividers="middle"
+        android:orientation="vertical"></LinearLayout>
 </LinearLayout>

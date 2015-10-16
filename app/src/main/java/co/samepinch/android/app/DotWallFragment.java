@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -92,8 +93,14 @@ public class DotWallFragment extends Fragment {
     @Bind(R.id.dot_wall_blog)
     ImageView mDotBlog;
 
+    @Bind(R.id.dot_wall_blog_wrapper)
+    LinearLayout mDotBlogWrapper;
+
     @Bind(R.id.dot_wall_edit)
     ImageView mDotEdit;
+
+    @Bind(R.id.dot_wall_edit_wrapper)
+    LinearLayout mDotEditWrapper;
 
     @Bind(R.id.backdrop)
     ImageView mBackdrop;
@@ -383,6 +390,7 @@ public class DotWallFragment extends Fragment {
         }
 
         if (Utils.isValidUri(user.getBlog())) {
+            mDotBlogWrapper.setVisibility(View.VISIBLE);
             mDotBlog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -390,16 +398,15 @@ public class DotWallFragment extends Fragment {
                     startActivity(intent);
                 }
             });
-            mDotBlog.setVisibility(View.VISIBLE);
         } else {
-            mDotBlog.setVisibility(View.GONE);
+            mDotBlogWrapper.setVisibility(View.GONE);
         }
 
         if (Utils.isLoggedIn()) {
             Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
             String uidOfCurrUser = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
             if (StringUtils.equals(uidOfCurrUser, user.getUid())) {
-                mDotEdit.setVisibility(View.VISIBLE);
+                mDotEditWrapper.setVisibility(View.VISIBLE);
                 mDotEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -413,7 +420,8 @@ public class DotWallFragment extends Fragment {
                         startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
                     }
                 });
-
+            }else{
+                mDotEditWrapper.setVisibility(View.GONE);
             }
         }
 
@@ -424,13 +432,9 @@ public class DotWallFragment extends Fragment {
         }
 
         if (user.getFollow()) {
-            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),
-                    R.drawable.icon_like_postview_active_2x);
-            mFab.setImageBitmap(bitmap);
+            mFab.setImageDrawable(ContextCompat.getDrawable(SPApplication.getContext(), R.drawable.favorite_white));
         } else {
-            Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),
-                    R.drawable.icon_like_postview_2x);
-            mFab.setImageBitmap(bitmap);
+            mFab.setImageDrawable(ContextCompat.getDrawable(SPApplication.getContext(), R.drawable.favorite_circle_blue));
         }
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
