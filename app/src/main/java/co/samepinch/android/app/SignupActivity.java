@@ -46,6 +46,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.intent.ParseSyncService;
 import co.samepinch.android.app.helpers.intent.SignUpService;
 import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
@@ -59,6 +60,7 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PARSE_ACCESS_STATE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
 
@@ -257,6 +259,14 @@ public class SignupActivity extends AppCompatActivity {
 
     @Subscribe
     public void onSignUpSuccessEvent(final Events.SignUpSuccessEvent event) {
+        // call for intent
+        Intent intent =
+                new Intent(getApplicationContext(), ParseSyncService.class);
+        Bundle iArgs = new Bundle();
+        iArgs.putInt(KEY_PARSE_ACCESS_STATE.getValue(), 1);
+        intent.putExtras(iArgs);
+        startService(intent);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

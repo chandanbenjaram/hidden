@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Log;
 
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
@@ -21,7 +20,6 @@ import com.parse.ParsePushBroadcastReceiver;
 
 import java.io.ByteArrayOutputStream;
 
-import co.samepinch.android.app.R;
 import co.samepinch.android.app.SPApplication;
 
 /**
@@ -54,31 +52,34 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
         return super.getLargeIcon(context, intent);
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // track open analytics
+        // ParseAnalytics.trackAppOpenedInBackground(intent);
+        super.onReceive(context, intent);
+    }
+
     public Bitmap fetchImage(ImageRequest imageRequest) {
         // check cache first
-//        Bitmap cached = fetchImageFromCache(imageRequest);
-//        if (cached != null) {
-//            return cached;
-//        }
+        Bitmap cached = fetchImageFromCache(imageRequest);
+        if (cached != null) {
+            return cached;
+        }
 
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
         DataSource<CloseableReference<CloseableImage>> dataSource =
                 imagePipeline.fetchDecodedImage(imageRequest, SPApplication.getContext());
 
         final ByteArrayOutputStream bitmapdata = new ByteArrayOutputStream();
-
         dataSource.subscribe(new BaseBitmapDataSubscriber() {
             @Override
             public void onNewResultImpl(Bitmap bitmap) {
-                Log.i("CB...SUCCESS", bitmap.toString());
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, bitmapdata);
             }
 
             @Override
             public void onFailureImpl(DataSource dataSource) {
                 // No cleanup required here.
-                Log.i("CB...FAILED", dataSource.toString());
-
             }
         }, CallerThreadExecutor.getInstance());
         byte[] bitMapArr = bitmapdata.toByteArray();

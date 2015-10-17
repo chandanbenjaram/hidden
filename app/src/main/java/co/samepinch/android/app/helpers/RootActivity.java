@@ -22,9 +22,12 @@ import java.lang.ref.WeakReference;
 import co.samepinch.android.app.MainActivity;
 import co.samepinch.android.app.MainActivityIn;
 import co.samepinch.android.app.R;
+import co.samepinch.android.app.SPApplication;
+import co.samepinch.android.app.helpers.intent.ParseSyncService;
 import co.samepinch.android.app.helpers.widget.SIMView;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.PREF_APP_HELLO_WORLD;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PARSE_ACCESS_STATE;
 
 public class RootActivity extends AppCompatActivity {
 
@@ -35,12 +38,9 @@ public class RootActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         super.onCreate(savedInstanceState);
 
-//        getWindow().setWindowAnimations(R.anim.fadein);
-//        AnimationUtils.loadAnimation(RootActivity.this);
-//        getWindow().setWindowAnimations(R.anim.fade_in);
-
         setContentView(R.layout.root_activity);
         mHandler = new LocalHandler(RootActivity.this);
+        setupWindowAnimations();
         if (Utils.isAppFirstTime()) {
             FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);
             container.removeAllViews();
@@ -74,8 +74,10 @@ public class RootActivity extends AppCompatActivity {
                             Intent.FLAG_ACTIVITY_CLEAR_TASK |
                             Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
+                    ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
                 }
-            }, 599);
+            }, 999);
         } else {
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -89,14 +91,29 @@ public class RootActivity extends AppCompatActivity {
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                             Intent.FLAG_ACTIVITY_CLEAR_TASK |
                             Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
                     ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
                 }
-            }, 0);
+            }, 299);
         }
 
+        syncStateToParse();
+    }
 
-        setupWindowAnimations();
+    private void syncStateToParse() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // call for intent
+                Intent intent =
+                        new Intent(SPApplication.getContext(), ParseSyncService.class);
+                Bundle iArgs = new Bundle();
+                iArgs.putInt(KEY_PARSE_ACCESS_STATE.getValue(), Utils.isLoggedIn() ? 1 : 0);
+                intent.putExtras(iArgs);
+                startService(intent);
+            }
+        });
     }
 
     private void setupWindowAnimations() {

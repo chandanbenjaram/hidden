@@ -19,6 +19,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
+import co.samepinch.android.app.helpers.intent.ParseSyncService;
 import co.samepinch.android.app.helpers.intent.SignOutService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
@@ -27,6 +28,8 @@ import co.samepinch.android.data.dao.SchemaDots;
 import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
+
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PARSE_ACCESS_STATE;
 
 public class LogoutActivity extends AppCompatActivity {
     public static final String LOG_TAG = "LogoutActivity";
@@ -70,6 +73,14 @@ public class LogoutActivity extends AppCompatActivity {
 
     @Subscribe
     public void onAuthOutEvent(final Events.AuthOutEvent event) {
+        // call for intent
+        Intent intent =
+                new Intent(getApplicationContext(), ParseSyncService.class);
+        Bundle iArgs = new Bundle();
+        iArgs.putInt(KEY_PARSE_ACCESS_STATE.getValue(), 0);
+        intent.putExtras(iArgs);
+        startService(intent);
+
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {

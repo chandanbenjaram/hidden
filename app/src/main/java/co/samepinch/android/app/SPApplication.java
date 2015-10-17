@@ -2,10 +2,13 @@ package co.samepinch.android.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.provider.Settings;
+import android.util.Log;
 
 import com.facebook.FacebookSdk;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.parse.Parse;
+import com.parse.ParseCloud;
 import com.parse.ParseInstallation;
 
 import co.samepinch.android.app.helpers.AppConstants;
@@ -27,6 +30,7 @@ public class SPApplication extends Application {
         Fresco.initialize(mContext);
         FacebookSdk.sdkInitialize(mContext);
 
+        // parse hash
         Parse.initialize(this, AppConstants.API.PARSE_APPLICATION_ID.getValue(), AppConstants.API.PARSE_CLIENT_KEY.getValue());
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }

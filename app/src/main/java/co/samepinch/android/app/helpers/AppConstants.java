@@ -89,6 +89,7 @@ public class AppConstants {
         KEY_FRESH_WALL_FLAG("freshWallFlag"),
         KEY_FRESH_FAV_WALL_FLAG("freshFavWallFlag"),
         CHOOSE_PINCH_HANDLE("77"),
+        KEY_PARSE_ACCESS_STATE("LAST_CONTACT_DATE"),
         ;
 
         private final String value;
