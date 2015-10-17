@@ -54,6 +54,12 @@ public class Events {
         }
     }
 
+    public static class PostDetailsRefreshFailEvent extends EventBase {
+        public PostDetailsRefreshFailEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
     public static class AuthSuccessEvent extends EventBase {
         public AuthSuccessEvent(Map<String, String> metaData) {
             super(metaData);

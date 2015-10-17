@@ -1,6 +1,5 @@
 package co.samepinch.android.app.helpers.misc;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,35 +17,46 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.google.gson.Gson;
 import com.parse.ParsePushBroadcastReceiver;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 
 import co.samepinch.android.app.SPApplication;
+import co.samepinch.android.app.helpers.PushNotificationActivityLauncher;
+import co.samepinch.android.data.dto.PushNotification;
 
 /**
  * Created by imaginationcoder on 10/16/15.
  */
 public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
+    public static final String INTENT_DATA_JSON = "com.parse.Data";
 
     @Override
-    protected void onPushReceive(Context context, Intent intent) {
-        super.onPushReceive(context, intent);
-    }
-
-    @Override
-    protected Class<? extends Activity> getActivity(Context context, Intent intent) {
-        return super.getActivity(context, intent);
+    protected void onPushOpen(Context context, Intent intent) {
+        try {
+            Intent targetIntent = new Intent(context, PushNotificationActivityLauncher.class);
+            targetIntent.putExtras(intent.getExtras());
+            targetIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(targetIntent);
+        } catch (Exception e) {
+            super.onPushOpen(context, intent);
+        }
     }
 
     @Override
     protected Bitmap getLargeIcon(Context context, Intent intent) {
         try {
-            String path = "http://imgsv.imaging.nikon.com/lineup/dslr/d800/img/sample01/img_02.png";
-            ImageRequestBuilder imgReqBldr = ImageRequestBuilder.newBuilderWithSource(Uri.parse(path));
+            PushNotification notification = getAppPushNotification(intent);
+            if (notification == null) {
+                return super.getLargeIcon(context, intent);
+            }
+//                String path = "http://imgsv.imaging.nikon.com/lineup/dslr/d800/img/sample01/img_02.png";
+            ImageRequestBuilder imgReqBldr = ImageRequestBuilder.newBuilderWithSource(Uri.parse(notification.getAlertImage()));
             imgReqBldr.setRequestPriority(Priority.HIGH);
             ImageRequest imageRequest = imgReqBldr.build();
-
             return fetchImage(imageRequest);
         } catch (Exception e) {
             // muted
@@ -55,11 +65,14 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
         return super.getLargeIcon(context, intent);
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // track open analytics
-        // ParseAnalytics.trackAppOpenedInBackground(intent);
-        super.onReceive(context, intent);
+    public static PushNotification getAppPushNotification(Intent intent) {
+        String dataStr = intent.getStringExtra(INTENT_DATA_JSON);
+        if (StringUtils.isNotBlank(dataStr)) {
+            Gson gson = new Gson();
+            return gson.fromJson(dataStr, PushNotification.class);
+        }
+
+        return null;
     }
 
     public Bitmap fetchImage(ImageRequest imageRequest) {
@@ -79,15 +92,35 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
             public void onNewResultImpl(Bitmap bitmap) {
                 if (dataSource.isFinished() && bitmap != null) {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, bitmapdata);
-                    dataSource.close();
+                    if (!dataSource.isClosed()) {
+                        dataSource.close();
+                    }
                 }
             }
 
             @Override
             public void onFailureImpl(DataSource dataSource) {
-                // No cleanup required here.
+                if (!dataSource.isClosed()) {
+                    dataSource.close();
+                }
+            }
+
+            @Override
+            public void onCancellation(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                super.onCancellation(dataSource);
+                if (!dataSource.isClosed()) {
+                    dataSource.close();
+                }
             }
         }, CallerThreadExecutor.getInstance());
+
+        long start = System.currentTimeMillis();
+        long end = start;
+        // max.wait for 60000ms for image download
+        while (!dataSource.isFinished() && (end - start) <= 60000) {
+            // keep waiting
+            end = System.currentTimeMillis();
+        }
         byte[] bitMapArr = bitmapdata.toByteArray();
         Bitmap bitmap = BitmapFactory.decodeByteArray(bitMapArr, 0, bitMapArr.length);
         return bitmap;
@@ -102,8 +135,8 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
             if (imageReference != null) {
                 try {
                     CloseableImage closeableImage = imageReference.get();
-                    if(closeableImage instanceof CloseableStaticBitmap){
-                        return ((CloseableStaticBitmap)closeableImage).getUnderlyingBitmap();
+                    if (closeableImage instanceof CloseableStaticBitmap) {
+                        return ((CloseableStaticBitmap) closeableImage).getUnderlyingBitmap();
                     }
                 } finally {
                     CloseableReference.closeSafely(imageReference);

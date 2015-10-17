@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.Utils;
@@ -77,6 +79,9 @@ public class PostDetailsService extends IntentService {
             // muted
             Resp resp = Utils.parseAsRespSilently(e);
             Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
+            Map<String, String> eventData = new HashMap<>();
+            eventData.put(AppConstants.K.MESSAGE.name(), StringUtils.defaultString(resp.getMessage(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue()));
+            BusProvider.INSTANCE.getBus().post(new Events.PostDetailsRefreshFailEvent(eventData));
         }
     }
 

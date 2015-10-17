@@ -274,6 +274,7 @@ public class PostDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                setResult(RESULT_OK);
                 finish();
                 return true;
 
@@ -430,6 +431,22 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     @Subscribe
+    public void onPostDetailsRefreshFailEvent(final Events.PostDetailsRefreshFailEvent event) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (event != null && event.getMetaData() != null) {
+                        Snackbar.make(mBottomsheet, event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    // muted
+                }
+            }
+        });
+    }
+
+    @Subscribe
     public void onPostMetaUpdateServiceSuccessEvent(final Events.PostMetaUpdateServiceSuccessEvent event) {
         this.runOnUiThread(new Runnable() {
             @Override
@@ -482,6 +499,7 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         });
     }
+
 
     @Subscribe
     public void onCommentDetailsEditEvent(final Events.CommentDetailsEditEvent event) {

@@ -43,6 +43,7 @@
         <activity android:name=".SignupActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".MainActivityIn" />
+        <activity android:name=".helpers.PushNotificationActivityLauncher" />
 
         <provider
             android:name="co.samepinch.android.data.dao.SPContentProvider"
