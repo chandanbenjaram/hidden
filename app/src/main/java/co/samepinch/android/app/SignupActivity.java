@@ -56,11 +56,11 @@ import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_ACCESS_STATE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FNAME;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_LNAME;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PARSE_ACCESS_STATE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PINCH_HANDLE;
 
@@ -263,7 +263,7 @@ public class SignupActivity extends AppCompatActivity {
         Intent intent =
                 new Intent(getApplicationContext(), ParseSyncService.class);
         Bundle iArgs = new Bundle();
-        iArgs.putInt(KEY_PARSE_ACCESS_STATE.getValue(), 1);
+        iArgs.putInt(KEY_APP_ACCESS_STATE.getValue(), 1);
         intent.putExtras(iArgs);
         startService(intent);
 

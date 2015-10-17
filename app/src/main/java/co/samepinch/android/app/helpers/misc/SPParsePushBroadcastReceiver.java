@@ -11,6 +11,7 @@ import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.Priority;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
@@ -42,6 +43,7 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
         try {
             String path = "http://imgsv.imaging.nikon.com/lineup/dslr/d800/img/sample01/img_02.png";
             ImageRequestBuilder imgReqBldr = ImageRequestBuilder.newBuilderWithSource(Uri.parse(path));
+            imgReqBldr.setRequestPriority(Priority.HIGH);
             ImageRequest imageRequest = imgReqBldr.build();
 
             return fetchImage(imageRequest);
@@ -67,14 +69,17 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
 
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        DataSource<CloseableReference<CloseableImage>> dataSource =
+        final DataSource<CloseableReference<CloseableImage>> dataSource =
                 imagePipeline.fetchDecodedImage(imageRequest, SPApplication.getContext());
 
         final ByteArrayOutputStream bitmapdata = new ByteArrayOutputStream();
         dataSource.subscribe(new BaseBitmapDataSubscriber() {
             @Override
             public void onNewResultImpl(Bitmap bitmap) {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, bitmapdata);
+                if (dataSource.isFinished() && bitmap != null) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bitmapdata);
+                    dataSource.close();
+                }
             }
 
             @Override

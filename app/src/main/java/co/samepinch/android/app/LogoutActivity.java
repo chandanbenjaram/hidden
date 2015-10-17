@@ -1,6 +1,5 @@
 package co.samepinch.android.app;
 
-import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Intent;
@@ -29,7 +28,7 @@ import co.samepinch.android.data.dao.SchemaPostDetails;
 import co.samepinch.android.data.dao.SchemaPosts;
 import co.samepinch.android.data.dao.SchemaTags;
 
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PARSE_ACCESS_STATE;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_ACCESS_STATE;
 
 public class LogoutActivity extends AppCompatActivity {
     public static final String LOG_TAG = "LogoutActivity";
@@ -77,7 +76,7 @@ public class LogoutActivity extends AppCompatActivity {
         Intent intent =
                 new Intent(getApplicationContext(), ParseSyncService.class);
         Bundle iArgs = new Bundle();
-        iArgs.putInt(KEY_PARSE_ACCESS_STATE.getValue(), 0);
+        iArgs.putInt(KEY_APP_ACCESS_STATE.getValue(), 0);
         intent.putExtras(iArgs);
         startService(intent);
 

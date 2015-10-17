@@ -414,26 +414,31 @@ public class Utils {
     }
 
     public static String getAppToken(boolean renew) {
-        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-        String token = pref.getValue(AppConstants.API.ACCESS_TOKEN.getValue());
-        if (!renew && token != null) {
-            return token;
+        try {
+            Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+            String token = pref.getValue(AppConstants.API.ACCESS_TOKEN.getValue());
+            if (!renew && token != null) {
+                return token;
+            }
+
+            //time to fetch a token
+            final Map<String, String> payload = new HashMap<>();
+            payload.put(CLIENT_ID.getKey(), CLIENT_ID.getValue());
+            payload.put(CLIENT_SECRET.getKey(), CLIENT_SECRET.getValue());
+            payload.put(SCOPE.getKey(), SCOPE.getValue());
+            payload.put(GRANT_TYPE.getKey(), GRANT_TYPE.getValue());
+
+            ResponseEntity<Map> response = RestClient.INSTANCE.handle().postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
+            Map<String, String> responseEntity = response.getBody();
+            for (Map.Entry<String, String> entry : responseEntity.entrySet()) {
+                pref.setValue(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
+            }
+
+            return pref.getValue(AppConstants.API.ACCESS_TOKEN.getValue());
+        } catch (Exception e) {
+            // muted
         }
-
-        //time to fetch a token
-        final Map<String, String> payload = new HashMap<>();
-        payload.put(CLIENT_ID.getKey(), CLIENT_ID.getValue());
-        payload.put(CLIENT_SECRET.getKey(), CLIENT_SECRET.getValue());
-        payload.put(SCOPE.getKey(), SCOPE.getValue());
-        payload.put(GRANT_TYPE.getKey(), GRANT_TYPE.getValue());
-
-        ResponseEntity<Map> response = RestClient.INSTANCE.handle().postForEntity(AppConstants.API.CLIENTAUTH.getValue(), payload, Map.class);
-        Map<String, String> responseEntity = response.getBody();
-        for (Map.Entry<String, String> entry : responseEntity.entrySet()) {
-            pref.setValue(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
-        }
-
-        return pref.getValue(AppConstants.API.ACCESS_TOKEN.getValue());
+        return StringUtils.EMPTY;
     }
 
     public static class PreferencesManager {
@@ -508,11 +513,11 @@ public class Utils {
         }
 
         public boolean clear() {
-            try{
+            try {
                 return mPref.edit()
                         .clear()
                         .commit();
-            }finally{
+            } finally {
                 // add app first time state
                 setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
             }

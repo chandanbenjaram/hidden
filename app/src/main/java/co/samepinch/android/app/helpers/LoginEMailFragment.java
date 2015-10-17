@@ -43,8 +43,8 @@ import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
 
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_ACCESS_STATE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_EMAIL;
-import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PARSE_ACCESS_STATE;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_PASSWORD;
 
 public class LoginEMailFragment extends android.support.v4.app.Fragment {
@@ -234,7 +234,7 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         Intent intent =
                 new Intent(SPApplication.getContext(), ParseSyncService.class);
         Bundle iArgs = new Bundle();
-        iArgs.putInt(KEY_PARSE_ACCESS_STATE.getValue(), 1);
+        iArgs.putInt(KEY_APP_ACCESS_STATE.getValue(), 1);
         intent.putExtras(iArgs);
         getActivity().startService(intent);
 
