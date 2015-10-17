@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.sp_icon);
         mBackdrop.setImageBitmap(appIcon);
     }
 

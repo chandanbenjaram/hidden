@@ -7,7 +7,7 @@
             android:title="Home" />
         <item
             android:id="@+id/nav_post"
-            android:icon="@drawable/add_circle_outline"
+            android:icon="@drawable/add"
             android:title="Post" />
         <item
             android:id="@+id/nav_tags"
