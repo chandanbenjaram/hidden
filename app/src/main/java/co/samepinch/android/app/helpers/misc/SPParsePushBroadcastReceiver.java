@@ -15,6 +15,7 @@ import com.facebook.imagepipeline.common.Priority;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.image.CloseableStaticBitmap;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.parse.ParsePushBroadcastReceiver;
@@ -101,6 +102,9 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
             if (imageReference != null) {
                 try {
                     CloseableImage closeableImage = imageReference.get();
+                    if(closeableImage instanceof CloseableStaticBitmap){
+                        return ((CloseableStaticBitmap)closeableImage).getUnderlyingBitmap();
+                    }
                 } finally {
                     CloseableReference.closeSafely(imageReference);
                 }
