@@ -22,7 +22,7 @@ android {
     signingConfigs {
         release {
             storeFile file("/tmp/upload/ks/gplay_ks.jks")
-            keyAlias "samepinch_release"
+            keyAlias "co.samepinch.android.app"
             storePassword "123456"
             keyPassword "123456"
         }

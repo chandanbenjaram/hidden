@@ -10,12 +10,12 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.Window;
 import android.widget.FrameLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.common.util.UriUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,10 +44,16 @@ public class RootActivity extends AppCompatActivity {
 
     private LocalHandler mHandler;
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AppEventsLogger.activateApp(this);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate processing...");
-
         supportRequestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         super.onCreate(savedInstanceState);
 
@@ -218,5 +224,14 @@ public class RootActivity extends AppCompatActivity {
         public LocalHandler(RootActivity parent) {
             mActivity = new WeakReference<RootActivity>(parent);
         }
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
     }
 }

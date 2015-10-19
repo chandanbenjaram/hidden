@@ -26,33 +26,38 @@ public class ParseSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // grab current parse state
-        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-
-        // get caller data
-        Bundle iArgs = intent.getExtras();
-        int accessState = iArgs.getInt(KEY_APP_ACCESS_STATE.getValue(), -1);
-
-        // upsert access state
-        installation.put(KEY_APP_ACCESS_STATE.getValue(), accessState);
         try {
-            installation.save();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        // log-in state
-        if (accessState == 1) {
-            Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
-            String currUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
-            ParsePush.subscribeInBackground(currUserId);
-        } else {
-            // non-login state - get rid of all channels
-            List<String> subscribedChannels = installation.getList(CHANNELS);
-            if (subscribedChannels != null) {
-                for (String channel : subscribedChannels) {
-                    ParsePush.unsubscribeInBackground(channel);
+
+            // grab current parse state
+            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+
+            // get caller data
+            Bundle iArgs = intent.getExtras();
+            int accessState = iArgs.getInt(KEY_APP_ACCESS_STATE.getValue(), -1);
+
+            // upsert access state
+            installation.put(KEY_APP_ACCESS_STATE.getValue(), accessState);
+            try {
+                installation.save();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            // log-in state
+            if (accessState == 1) {
+                Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
+                String currUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
+                ParsePush.subscribeInBackground(currUserId);
+            } else {
+                // non-login state - get rid of all channels
+                List<String> subscribedChannels = installation.getList(CHANNELS);
+                if (subscribedChannels != null) {
+                    for (String channel : subscribedChannels) {
+                        ParsePush.unsubscribeInBackground(channel);
+                    }
                 }
             }
+        } catch (Exception e) {
+
         }
     }
 }

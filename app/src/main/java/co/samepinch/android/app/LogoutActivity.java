@@ -72,14 +72,6 @@ public class LogoutActivity extends AppCompatActivity {
 
     @Subscribe
     public void onAuthOutEvent(final Events.AuthOutEvent event) {
-        // call for intent
-        Intent intent =
-                new Intent(getApplicationContext(), ParseSyncService.class);
-        Bundle iArgs = new Bundle();
-        iArgs.putInt(KEY_APP_ACCESS_STATE.getValue(), 0);
-        intent.putExtras(iArgs);
-        startService(intent);
-
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -99,6 +91,15 @@ public class LogoutActivity extends AppCompatActivity {
                     Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
                     pref.clear();
 
+                    // call for parse sync
+                    Intent intent =
+                            new Intent(getApplicationContext(), ParseSyncService.class);
+                    Bundle iArgs = new Bundle();
+                    iArgs.putInt(KEY_APP_ACCESS_STATE.getValue(), 0);
+                    intent.putExtras(iArgs);
+                    startService(intent);
+
+                    // wrap-up activity
                     setResult(RESULT_OK);
                     finish();
                 }catch (Exception e){
