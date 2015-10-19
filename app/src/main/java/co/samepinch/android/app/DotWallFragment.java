@@ -336,12 +336,9 @@ public class DotWallFragment extends Fragment {
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
             mDotImageText.setText(initials);
 
-            Bitmap defaultBg = BitmapFactory.decodeResource(SPApplication.getContext().getResources(),
-                    R.mipmap.ic_launcher, null);
-
-            Bitmap blurredBitmap = ImageUtils.blur(getActivity().getApplicationContext(), defaultBg);
+            Bitmap blurredBitmap = ImageUtils.blur(SPApplication.getContext(), ImageUtils.DEFAULT_BITMAP);
             mBackdrop.setImageBitmap(blurredBitmap);
-            Palette.from(defaultBg).generate(new Palette.PaletteAsyncListener() {
+            Palette.from(ImageUtils.DEFAULT_BITMAP).generate(new Palette.PaletteAsyncListener() {
                 public void onGenerated(Palette palette) {
                     applyPalette(palette);
                 }

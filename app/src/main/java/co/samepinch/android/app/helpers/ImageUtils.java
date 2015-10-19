@@ -14,14 +14,14 @@ public class ImageUtils {
     private static final float BITMAP_SCALE = 0.2f;
     private static final int BLUR_RADIUS = 2;
 
-    private static Bitmap DEFAULT_BITMAP;
+    public static Bitmap DEFAULT_BITMAP;
 
     static {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
         options.inDither = false;
         DEFAULT_BITMAP = BitmapFactory.decodeResource(SPApplication.getContext().getResources(),
-                R.drawable.bg_blur_2x, options);
+                R.mipmap.ic_launcher, options);
     }
 
     public static Bitmap blur(Context ctx, Bitmap image) {
