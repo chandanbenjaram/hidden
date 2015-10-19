@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -330,11 +331,22 @@ public class DotWallFragment extends Fragment {
         String fName = user.getFname();
         String lName = user.getLname();
         // tag map
-        if (StringUtils.isBlank(user.getPhoto())) {
+        if (!Utils.isValidUri(user.getPhoto())) {
             mVS.setDisplayedChild(1);
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
             mDotImageText.setText(initials);
-            applyPalette(null);
+
+            Bitmap defaultBg = BitmapFactory.decodeResource(SPApplication.getContext().getResources(),
+                    R.mipmap.ic_launcher, null);
+
+            Bitmap blurredBitmap = ImageUtils.blur(getActivity().getApplicationContext(), defaultBg);
+            mBackdrop.setImageBitmap(blurredBitmap);
+            Palette.from(defaultBg).generate(new Palette.PaletteAsyncListener() {
+                public void onGenerated(Palette palette) {
+                    applyPalette(palette);
+                }
+            });
+            mBackdrop.setImageBitmap(blurredBitmap);
         } else {
             mVS.setDisplayedChild(0);
             Postprocessor postprocessor = new BasePostprocessor() {
