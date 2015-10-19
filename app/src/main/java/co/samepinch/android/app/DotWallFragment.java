@@ -432,6 +432,8 @@ public class DotWallFragment extends Fragment {
             }else{
                 mDotEditWrapper.setVisibility(View.GONE);
             }
+        }else{
+            mDotEditWrapper.setVisibility(View.GONE);
         }
 
         // conditional show about user section
