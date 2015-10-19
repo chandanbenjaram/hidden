@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
  * Created by imaginationcoder on 10/17/15.
  */
 public class PushNotification {
+    String uid;
+
     @SerializedName("alert")
     String message;
 
@@ -13,6 +15,14 @@ public class PushNotification {
     String alertImage;
 
     Context context;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
     public String getMessage() {
         return message;

@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.FrameLayout;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.UriUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +33,14 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_A
 
 public class RootActivity extends AppCompatActivity {
     public static final String TAG = "RootActivity";
+
+    public static final String DIALOG_TITLE = "Reminder";
+    public static final String DIALOG_UPDATE = "UPDATE";
+    public static final String DIALOG_FORCED_UPDATE = "FORCED_UPDATE";
+    public static final String DIALOG_REVIEW = "REVIEW";
+    public static final String DIALOG_REFERRALS = "REFERRALS";
+    public static final String DIALOG_LOGIN = "LOGIN";
+    public static final String DIALOG_POST = "POST";
 
     private LocalHandler mHandler;
 
@@ -56,6 +66,74 @@ public class RootActivity extends AppCompatActivity {
         });
 
 
+        // has outstanding message?
+        final String pendingDialog = Utils.PreferencesManager.getInstance().getValue(AppConstants.APP_INTENT.KEY_ADMIN_COMMAND.getValue());
+        if (StringUtils.isNotBlank(pendingDialog)) {
+            String pendingDialogMsg;
+            switch (pendingDialog.toUpperCase()) {
+                case DIALOG_UPDATE:
+                    pendingDialogMsg = getApplicationContext().getString(R.string.dialog_update);
+                    break;
+                case DIALOG_FORCED_UPDATE:
+                    pendingDialogMsg = getApplicationContext().getString(R.string.dialog_f_update);
+                    break;
+                case DIALOG_REVIEW:
+                    pendingDialogMsg = getApplicationContext().getString(R.string.dialog_review);
+                    break;
+                case DIALOG_REFERRALS:
+                    pendingDialogMsg = getApplicationContext().getString(R.string.dialog_referrals);
+                    break;
+                case DIALOG_LOGIN:
+                    pendingDialogMsg = getApplicationContext().getString(R.string.dialog_login);
+                    break;
+                case DIALOG_POST:
+                    pendingDialogMsg = getApplicationContext().getString(R.string.dialog_post);
+                    break;
+                default:
+                    pendingDialogMsg = null;
+                    break;
+            }
+
+            if (!StringUtils.equalsIgnoreCase(pendingDialog, DIALOG_FORCED_UPDATE)) {
+                Utils.PreferencesManager.getInstance().remove(AppConstants.APP_INTENT.KEY_ADMIN_COMMAND.getValue());
+            }
+
+            if (StringUtils.isNotBlank(pendingDialog)) {
+                MaterialDialog dialog = new MaterialDialog.Builder(this)
+                        .title(DIALOG_TITLE)
+                        .content(pendingDialogMsg)
+                        .positiveText(R.string.dialog_ok)
+                        .onAny(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                // dialog dismiss
+                                if (materialDialog.isShowing()) {
+                                    materialDialog.dismiss();
+                                }
+
+                                // handle continue action
+                                if (StringUtils.equalsIgnoreCase(pendingDialog, DIALOG_FORCED_UPDATE)) {
+                                    Intent iRate = new Intent(Intent.ACTION_VIEW);
+                                    iRate.setData(Uri.parse(AppConstants.API.GPLAY_LINK.getValue()));
+                                    startActivity(iRate);
+                                    finish();
+                                } else if (StringUtils.equalsIgnoreCase(pendingDialog, DIALOG_REVIEW)) {
+                                    Intent iRate = new Intent(Intent.ACTION_VIEW);
+                                    iRate.setData(Uri.parse(AppConstants.API.GPLAY_LINK.getValue()));
+                                    startActivity(iRate);
+                                } else {
+                                    launchTargetActivity(isFirstLaunch, isLoggedIn);
+                                }
+                            }
+                        })
+                        .show();
+                return;
+            }
+        }
+        launchTargetActivity(isFirstLaunch, isLoggedIn);
+    }
+
+    private void launchTargetActivity(boolean isFirstLaunch, final boolean isLoggedIn) {
         // target activity to launch
         if (isFirstLaunch) {
             FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);

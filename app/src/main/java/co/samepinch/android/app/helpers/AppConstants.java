@@ -88,6 +88,7 @@ public class AppConstants {
         KEY_FRESH_DATA_FLAG("freshDataFlag"),
         KEY_FRESH_WALL_FLAG("freshWallFlag"),
         KEY_FRESH_FAV_WALL_FLAG("freshFavWallFlag"),
+        KEY_ADMIN_COMMAND("admin.command"),
         CHOOSE_PINCH_HANDLE("77"),
         KEY_APP_ACCESS_STATE("APP_ACCESS_STATE"),
         ;

@@ -80,7 +80,8 @@ public class PostDetailsService extends IntentService {
             Resp resp = Utils.parseAsRespSilently(e);
             Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
             Map<String, String> eventData = new HashMap<>();
-            eventData.put(AppConstants.K.MESSAGE.name(), StringUtils.defaultString(resp.getMessage(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue()));
+            String msg = resp == null || resp.getMessage() == null ? AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue() : resp.getMessage();
+            eventData.put(AppConstants.K.MESSAGE.name(), msg);
             BusProvider.INSTANCE.getBus().post(new Events.PostDetailsRefreshFailEvent(eventData));
         }
     }

@@ -101,4 +101,13 @@
     <string name="change_password_hint_fill"></string>
     <string name="change_password_positive">UPDATE</string>
     <string name="change_password_negative">CANCEL</string>
+
+    <!-- ADMIN MESSAGES -->
+    <string name="dialog_update">Upgrade available.\u000A\u000AWe have some cool and greatest features waiting for you in our latest version\u0021</string>
+    <string name="dialog_f_update">You must upgrade SamePinch.\u000A\u000APlease visit Google Play Store to upgrade.</string>
+    <string name="dialog_referrals">Loving SamePinch app\u003F\u000A\u000AYou can help us reach more SamePinch\u0027ers around the globe.\u000AUse \u0022Spread Your Love\u0022 feature when you login.</string>
+    <string name="dialog_review">A quick appreciation means alot to us\u0021\u000A\u000APlease rate SamePinch app.\u000A\u000AWe read every single review and respond appropriately.</string>
+    <string name="dialog_login">Login to organize your posts, likes, topics, etc.\u000A\u000AIt takes a quick moment to create your account incase if you do not have one yet\u0021\u003F</string>
+    <string name="dialog_post">Create a POST.\u000A\u000ASamePinch\u0027ers around the globe are here to help you\u0021\u000A\u000AWhat are you waiting for\u003F</string>
+    <string name="dialog_ok">DISMISS</string>
 </resources>
