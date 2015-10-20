@@ -130,8 +130,8 @@
     <orderEntry type="library" exported="" name="butterknife-7.0.1" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3.1" level="project" />
     <orderEntry type="library" exported="" name="discrete-seekbar-1.0.0" level="project" />
-    <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
+    <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="headless-library-3.9.1.002001001" level="project" />
     <orderEntry type="library" exported="" name="cds-library-3.2.8" level="project" />
     <orderEntry type="library" exported="" name="tracking-library-3.0.3" level="project" />
@@ -166,8 +166,8 @@
     <orderEntry type="library" exported="" name="org.jbundle.util.osgi.wrapped.org.apache.http.client-4.1.2" level="project" />
     <orderEntry type="library" exported="" name="disklrucache-2.0.2" level="project" />
     <orderEntry type="library" exported="" name="ab-test-2.0.3" level="project" />
-    <orderEntry type="library" exported="" name="spring-android-rest-template-2.0.0.M1" level="project" />
     <orderEntry type="library" exported="" name="javax.annotation-10.0-b28" level="project" />
+    <orderEntry type="library" exported="" name="spring-android-rest-template-2.0.0.M1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="android-exif-extended-1.0.6" level="project" />
     <orderEntry type="library" exported="" name="library-1.2.9" level="project" />
