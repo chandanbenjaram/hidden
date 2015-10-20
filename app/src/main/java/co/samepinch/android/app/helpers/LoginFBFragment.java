@@ -154,7 +154,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
                     }
                 });
 
-        String imgQuery = String.format("me", userId);
         Bundle imgReqParams = new Bundle();
         imgReqParams.putString("fields", "picture.width(999)");
 

@@ -45,6 +45,7 @@ public class ManageTagsFragment extends Fragment {
     TagsToManageRVAdapter mTagsToManageRVAdapter;
 
     String mCurrUserId;
+    View mView;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -76,8 +77,8 @@ public class ManageTagsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.manage_tags, container, false);
-        ButterKnife.bind(this, view);
+        mView = inflater.inflate(R.layout.manage_tags, container, false);
+        ButterKnife.bind(this, mView);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -102,7 +103,7 @@ public class ManageTagsFragment extends Fragment {
                 new Intent(getActivity().getApplicationContext(), TagsPullService.class);
         getActivity().startService(tagRefreshIntent);
 
-        return view;
+        return mView;
     }
 
     private void setupRecyclerView() {
@@ -181,7 +182,7 @@ public class ManageTagsFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(getView(), event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
             }
         });
     }

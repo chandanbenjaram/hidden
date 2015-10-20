@@ -226,7 +226,7 @@ public class PostDetails {
     }
 
     public void setLargeImagesFromDB(String largeImagesStr) {
-        if (largeImagesStr != null) {
+        if (largeImagesStr == null) {
             setLargeImages(null);
         } else {
             Gson g = new Gson();

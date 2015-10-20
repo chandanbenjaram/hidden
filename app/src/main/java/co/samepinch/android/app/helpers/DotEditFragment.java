@@ -109,7 +109,8 @@ public class DotEditFragment extends Fragment {
 
     User mUser;
     Map<String, String> mImageTaskMap;
-
+    View mView;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,8 +172,8 @@ public class DotEditFragment extends Fragment {
             getActivity().finish();
         }
 
-        View view = inflater.inflate(R.layout.dot_edit, container, false);
-        ButterKnife.bind(this, view);
+        mView = inflater.inflate(R.layout.dot_edit, container, false);
+        ButterKnife.bind(this, mView);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -201,7 +202,7 @@ public class DotEditFragment extends Fragment {
         // display change password conditionally
         mChangePassword.setVisibility(Utils.isLoggedInViaEmailPassword() ? View.VISIBLE : View.GONE);
 
-        return view;
+        return mView;
     }
 
     @Override
@@ -311,7 +312,7 @@ public class DotEditFragment extends Fragment {
 
         // check if has changes
         if (!hasChanges) {
-            Snackbar.make(getView(), "no changes detected...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mView, "no changes detected...", Snackbar.LENGTH_SHORT).show();
             getActivity().finish();
             return;
         }
@@ -439,7 +440,7 @@ public class DotEditFragment extends Fragment {
                     // local setup
                     mUser = user;
                     setupData(mUser);
-                    Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mView, "updated successfully.", Snackbar.LENGTH_SHORT).show();
 
                     // finish
                     mHandler.postDelayed(new Runnable() {
@@ -454,7 +455,7 @@ public class DotEditFragment extends Fragment {
             } catch (Exception e) {
                 // muted
             }
-            Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -598,10 +599,10 @@ public class DotEditFragment extends Fragment {
             Utils.dismissSilently(progressDialog);
 
             if (result == null) {
-                Snackbar.make(getView(), AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue(), Snackbar.LENGTH_SHORT).show();
                 return;
             }
-            Snackbar.make(getView(), result, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mView, result, Snackbar.LENGTH_LONG).show();
         }
     }
 

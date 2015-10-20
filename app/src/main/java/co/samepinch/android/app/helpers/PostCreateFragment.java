@@ -106,7 +106,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
     boolean mPostAsAnonymous;
 
     private LocalHandler mHandler;
-
+    View mView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -157,8 +157,8 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.post_create, container, false);
-        ButterKnife.bind(this, view);
+        mView = inflater.inflate(R.layout.post_create, container, false);
+        ButterKnife.bind(this, mView);
         imageStatusMap = new ConcurrentHashMap<>();
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -202,7 +202,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         getActivity().startService(tagRefreshIntent);
 
         Utils.showKeyboard((Activity) getContext());
-        return view;
+        return mView;
     }
 
     private void setupRecyclerView(final RecyclerView rv) {
@@ -297,7 +297,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                             } catch (Exception e) {
                                 Log.e(TAG, "err uploading: " + contentItem.getImageUri(), e);
                                 Utils.dismissSilently(progressDialog);
-                                Snackbar.make(getView(), "error uploading images. try again...", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(mView, "error uploading images. try again...", Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -331,7 +331,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
 
             if (errMsg != null) {
                 Utils.dismissSilently(progressDialog);
-                Snackbar.make(getView(), errMsg, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, errMsg, Snackbar.LENGTH_SHORT).show();
                 return;
             }
 
@@ -383,7 +383,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
         protected void onPostExecute(RespPostDetails postDetails) {
             Utils.dismissSilently(progressDialog);
             if (postDetails == null || postDetails.getBody() == null) {
-                Snackbar.make(getView(), "failed to post. try again...", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "failed to post. try again...", Snackbar.LENGTH_SHORT).show();
             } else {
                 ArrayList<ContentProviderOperation> ops = PostDetailsService.parseResponse(postDetails);
                 try {
@@ -393,7 +393,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                     // muted
                 }
 
-                Snackbar.make(getView(), "successfully posted.", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "successfully posted.", Snackbar.LENGTH_SHORT).show();
                 Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
 
                 Bundle iArgs = new Bundle();

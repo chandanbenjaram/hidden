@@ -99,6 +99,8 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
     @Bind(R.id.holder_recyclerview)
     FrameLayout frameLayout;
 
+    View mView;
+
     private static Uri outputFileUri;
     ImageOrTextViewAdapter mListViewAdapter;
     TagsRVAdapter mTagsListAdapter;
@@ -187,7 +189,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         switch (item.getItemId()) {
             case R.id.menuitem_post_edit:
                 // setup PopUpMenu
-                PopupMenu postAsPopUp = new PopupMenu(getActivity(), getView().findViewById(R.id.menuitem_post_edit));
+                PopupMenu postAsPopUp = new PopupMenu(getActivity(), mView.findViewById(R.id.menuitem_post_edit));
                 postAsPopUp.getMenu().add(R.string.post_as_you);
                 postAsPopUp.getMenu().add(R.string.post_as_anonymous);
                 postAsPopUp.setOnMenuItemClickListener(this);
@@ -227,8 +229,8 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.post_create, container, false);
-        ButterKnife.bind(this, view);
+        mView = inflater.inflate(R.layout.post_create, container, false);
+        ButterKnife.bind(this, mView);
         imageStatusMap = new ConcurrentHashMap<>();
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -254,7 +256,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         Cursor cursor = getActivity().getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{postId}, null);
         PostDetails post = cursor.moveToFirst() ? Utils.cursorToPostDetailsEntity(cursor) : null;
         if (post == null) {
-            Snackbar.make(getView(), "problem opening post. try again...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mView, "problem opening post. try again...", Snackbar.LENGTH_SHORT).show();
             getActivity().finish();
         }
 
@@ -310,7 +312,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 new Intent(getActivity().getApplicationContext(), TagsPullService.class);
         getActivity().startService(tagRefreshIntent);
 
-        return view;
+        return mView;
     }
 
     private void setupRecyclerView(final RecyclerView rv, List<String> initTags) {
@@ -418,7 +420,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
 
             if (errMsg != null) {
                 Utils.dismissSilently(progressDialog);
-                Snackbar.make(getView(), errMsg, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, errMsg, Snackbar.LENGTH_SHORT).show();
                 return;
             }
 
@@ -471,9 +473,9 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         protected void onPostExecute(RespPostDetails postDetails) {
             Utils.dismissSilently(progressDialog);
             if (postDetails == null || postDetails.getBody() == null) {
-                Snackbar.make(getView(), "failed to update. try again...", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "failed to update. try again...", Snackbar.LENGTH_SHORT).show();
             } else {
-                Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "updated successfully.", Snackbar.LENGTH_SHORT).show();
                 Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
 
                 ArrayList<ContentProviderOperation> ops = PostDetailsService.parseResponse(postDetails);
@@ -525,7 +527,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
         protected void onPostExecute(Boolean status) {
             Utils.dismissSilently(progressDialog);
             if (status) {
-                Snackbar.make(getView(), "deleted successfully.", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "deleted successfully.", Snackbar.LENGTH_SHORT).show();
                 Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
 
                 String postId = getArguments().getString(AppConstants.K.POST.name());
@@ -538,7 +540,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 getActivity().setResult(Activity.RESULT_OK, resultIntent);
                 getActivity().finish();
             } else {
-                Snackbar.make(getView(), "failed to delete. try again...", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "failed to delete. try again...", Snackbar.LENGTH_SHORT).show();
             }
         }
     }

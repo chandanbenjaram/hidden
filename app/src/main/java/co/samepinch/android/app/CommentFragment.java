@@ -60,6 +60,8 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
     @Bind(R.id.comment_text_id)
     EditText commentTxt;
 
+    View mView;
+    
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +78,8 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = inflater.inflate(R.layout.comment_add_fragment, container, false);
-        ButterKnife.bind(this, view);
+        mView = inflater.inflate(R.layout.comment_add_fragment, container, false);
+        ButterKnife.bind(this, mView);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -104,7 +106,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
         }
 
         commentTxt.requestFocus();
-        return view;
+        return mView;
     }
 
     @OnFocusChange(R.id.comment_text_id)
@@ -248,7 +250,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
                 getActivity().setResult(Activity.RESULT_OK, resultIntent);
                 getActivity().finish();
             } else {
-                Snackbar.make(getView(), "error commenting. try again...", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mView, "error commenting. try again...", Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -312,7 +314,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
                 getActivity().setResult(Activity.RESULT_OK, resultIntent);
                 getActivity().finish();
             } else {
-                Snackbar.make(getView(), "error updating comment. try again...", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mView, "error updating comment. try again...", Snackbar.LENGTH_LONG).show();
             }
         }
     }
