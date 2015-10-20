@@ -104,7 +104,6 @@ public class LogoutActivity extends AppCompatActivity {
                     finish();
                 }catch (Exception e){
                     // muted
-                    e.printStackTrace();
                     mLogoutText.setText("something went wrong. try again.");
                     mTryAgain.setVisibility(View.VISIBLE);
                 }

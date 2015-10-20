@@ -21,18 +21,44 @@ import com.google.gson.Gson;
 import com.parse.ParsePushBroadcastReceiver;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 
 import co.samepinch.android.app.SPApplication;
 import co.samepinch.android.app.helpers.PushNotificationActivityLauncher;
+import co.samepinch.android.app.helpers.Utils;
 import co.samepinch.android.data.dto.PushNotification;
+import co.samepinch.android.rest.ReqNoBody;
+import co.samepinch.android.rest.ReqPosts;
+import co.samepinch.android.rest.RestClient;
 
 /**
  * Created by imaginationcoder on 10/16/15.
  */
 public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String INTENT_DATA_JSON = "com.parse.Data";
+
+    @Override
+    protected void onPushReceive(Context context, Intent intent) {
+        super.onPushReceive(context, intent);
+
+        // background
+        long ts = System.currentTimeMillis();
+        PushNotification notification = getAppPushNotification(intent);
+        if (notification != null && Utils.isValidUri(notification.getAlertImage())) {
+            Bitmap notificationImg = getLargeIcon(context, intent);
+            while (notificationImg == null && System.currentTimeMillis() - ts < 30000) {
+                // simply wait for few seconds
+            }
+        }
+    }
 
     @Override
     protected void onPushOpen(Context context, Intent intent) {
@@ -48,21 +74,22 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected Bitmap getLargeIcon(Context context, Intent intent) {
+        Bitmap response = null;
         try {
             PushNotification notification = getAppPushNotification(intent);
             if (notification == null) {
                 return super.getLargeIcon(context, intent);
             }
-//                String path = "http://imgsv.imaging.nikon.com/lineup/dslr/d800/img/sample01/img_02.png";
-            ImageRequestBuilder imgReqBldr = ImageRequestBuilder.newBuilderWithSource(Uri.parse(notification.getAlertImage()));
+            Uri imgUri = Uri.parse(notification.getAlertImage());
+            ImageRequestBuilder imgReqBldr = ImageRequestBuilder.newBuilderWithSource(imgUri);
             imgReqBldr.setRequestPriority(Priority.HIGH);
             ImageRequest imageRequest = imgReqBldr.build();
-            return fetchImage(imageRequest);
+            response = fetchImage(imageRequest);
         } catch (Exception e) {
-            // muted
+            response = null;
         }
 
-        return super.getLargeIcon(context, intent);
+        return response == null ? super.getLargeIcon(context, intent) : response;
     }
 
     public static PushNotification getAppPushNotification(Intent intent) {
@@ -143,9 +170,7 @@ public class SPParsePushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 }
             }
         } catch (Exception e) {
-            boolean isTrue = e == null;
-            e.printStackTrace();
-
+            // muted
         } finally {
             dataSource.close();
         }

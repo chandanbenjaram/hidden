@@ -116,14 +116,16 @@ dependencies {
     // compile 'com.leaking.slideswitch:app:1.0.0'
     // compile 'com.facebook.rebound:rebound:0.3.8'
     // compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
-
     // misc.
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'org.springframework.android:spring-android-rest-template:2.0.0.M1'
     compile 'com.google.android.gms:play-services-plus:7.5.0'
     compile 'com.google.android.gms:play-services-identity:7.5.0'
 //    compile 'com.google.android.gms:play-services-base:8.1.0'
     compile ('com.facebook.android:facebook-android-sdk:4.1.0')
+
+    compile 'org.springframework.android:spring-android-rest-template:2.0.0.M1'
+//    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
+
 
     /* Uncomment if you enable ProGuard and you want to automatically upload symbols on build.
 parse {

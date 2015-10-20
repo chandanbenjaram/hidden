@@ -40,7 +40,7 @@ public class ParseSyncService extends IntentService {
             try {
                 installation.save();
             } catch (ParseException e) {
-                e.printStackTrace();
+                // muted
             }
             // log-in state
             if (accessState == 1) {
@@ -57,7 +57,7 @@ public class ParseSyncService extends IntentService {
                 }
             }
         } catch (Exception e) {
-
+            // muted
         }
     }
 }

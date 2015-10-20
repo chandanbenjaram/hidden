@@ -501,7 +501,7 @@ public class Utils {
                     outputMap.put(k, _value);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // muted
             }
             return outputMap;
         }
@@ -537,7 +537,6 @@ public class Utils {
             date = sdf.parse(stringDate);
         } catch (ParseException e) {
             // muted
-            e.printStackTrace();
         }
 
         return date;

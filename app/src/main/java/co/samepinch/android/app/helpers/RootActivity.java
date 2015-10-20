@@ -157,7 +157,7 @@ public class RootActivity extends AppCompatActivity {
 
                     Uri bgResourceUri = new Uri.Builder()
                             .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
-                            .pgath(String.valueOf(R.drawable.welcome))
+                            .path(String.valueOf(R.drawable.welcome))
                             .build();
 
                     SIMView bgImageView = new SIMView(getApplicationContext());
