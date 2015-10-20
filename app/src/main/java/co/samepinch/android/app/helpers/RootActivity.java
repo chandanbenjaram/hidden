@@ -48,7 +48,11 @@ public class RootActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AppEventsLogger.activateApp(this);
+        try {
+            AppEventsLogger.activateApp(RootActivity.this);
+        } catch (Exception e) {
+            // muted
+        }
     }
 
     @Override
@@ -226,12 +230,14 @@ public class RootActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
-
-        // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
+        try {
+            // Logs 'app deactivate' App Event.
+            AppEventsLogger.deactivateApp(this);
+        } catch (Exception e) {
+            // muted
+        }
     }
 }

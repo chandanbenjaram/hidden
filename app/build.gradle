@@ -11,7 +11,7 @@ android {
         applicationId "co.samepinch.android.app"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 17
+        versionCode 18
         versionName "1.0"
 //        renderscriptTargetApi 23
 //        renderscriptSupportModeEnabled  true
@@ -22,13 +22,13 @@ android {
     signingConfigs {
         release {
             storeFile file("/tmp/upload/ks/gplay_ks.jks")
-            keyAlias "co.samepinch.android.app"
+            keyAlias "samepinch_release"
             storePassword "123456"
             keyPassword "123456"
         }
         debug {
             storeFile file("/tmp/upload/ks/gplay_ks.jks")
-            keyAlias "co.samepinch.android.app"
+            keyAlias "samepinch_release"
             storePassword "123456"
             keyPassword "123456"
         }
