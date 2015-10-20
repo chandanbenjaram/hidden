@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.generic.RoundingParams;
@@ -302,7 +303,7 @@ public class DotWallFragment extends Fragment {
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
-                }finally {
+                } finally {
                     if (mRefreshLayout.isRefreshing()) {
                         mRefreshLayout.setRefreshing(false);
                     }
@@ -322,8 +323,10 @@ public class DotWallFragment extends Fragment {
         });
     }
 
-
     private void setUpMetaData(final User user) {
+        if (user == null) {
+            return;
+        }
         String pinchHandle = String.format(getActivity().getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
         mCollapsingToolbarLayout.setTitle(pinchHandle);
 
@@ -427,10 +430,10 @@ public class DotWallFragment extends Fragment {
                         startActivityForResult(intent, AppConstants.KV.REQUEST_EDIT_DOT.getIntValue());
                     }
                 });
-            }else{
+            } else {
                 mDotEditWrapper.setVisibility(View.GONE);
             }
-        }else{
+        } else {
             mDotEditWrapper.setVisibility(View.GONE);
         }
 
@@ -494,7 +497,23 @@ public class DotWallFragment extends Fragment {
                     cursor.close();
                     setUpMetaData(user);
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    // muted
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void onDotDetailsRefreshFailEvent(final Events.DotDetailsRefreshFailEvent event) {
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (event != null && event.getMetaData() != null) {
+                        Toast.makeText(getContext(), event.getMetaData().get(AppConstants.K.MESSAGE.name()), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    // muted
                 }
             }
         });

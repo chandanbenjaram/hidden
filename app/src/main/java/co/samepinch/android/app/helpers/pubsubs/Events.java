@@ -144,6 +144,12 @@ public class Events {
         }
     }
 
+    public static class DotDetailsRefreshFailEvent extends EventBase {
+        public DotDetailsRefreshFailEvent(Map<String, String> metaData) {
+            super(metaData);
+        }
+    }
+
     public static class PostMetaUpdateServiceSuccessEvent extends EventBase {
         public PostMetaUpdateServiceSuccessEvent(Map<String, String> metaData) {
             super(metaData);

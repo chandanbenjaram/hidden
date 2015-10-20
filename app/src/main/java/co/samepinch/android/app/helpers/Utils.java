@@ -78,7 +78,7 @@ public class Utils {
     private static final Pattern IMG_PATTERN = Pattern.compile("::(.*?)(::)");
 
     public static User cursorToUserEntity(Cursor cursor) {
-        if (cursor == null) {
+        if (cursor == null || !cursor.moveToFirst()) {
             return null;
         }
 
