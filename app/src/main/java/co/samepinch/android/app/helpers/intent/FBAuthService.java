@@ -62,7 +62,6 @@ public class FBAuthService extends IntentService {
 
             // call remote
             HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(loginReq, headers);
-            ResponseEntity<String> respStr = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, String.class);
             ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS_EXT.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
             User user = resp.getBody().getBody();
             Gson gson = new Gson();
