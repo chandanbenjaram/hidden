@@ -1,33 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
-    <string name="cheese_ipsum"></string>
-    <string name="checkin">Checkin</string>
     <string name="menu_settings">Settings</string>
-    <string name="action_settings">Settings</string>
-    <string name="content_authority_posts">co.samepinch.android.app.posts</string>
-    <string name="content_authority_users">co.samepinch.android.app.users</string>
-
-    <string name="sample_data">"Some data %1$d"</string>
-    <string name="standard_app_bar_menu_title">Standard app bar</string>
-    <string name="tabs_menu_title">Tabs</string>
-    <string name="flexible_space_with_image_menu_title">Flexible space with image</string>
-    <string name="flexible_space_menu_title">Flexible space app bar</string>
-    <string name="navigation_drawer_open" translatable="false" />
-    <string name="navigation_drawer_close" translatable="false" />
-    <string name="sample_email">sample.user@email.com</string>
-    <string name="not_implemented_yet">Not implemented yet</string>
-    <string name="contact_desc">contact photo</string>
     <string name="desc_list_item_left_icon">desc_list_item_icon</string>
-    <string name="image_desc">image_desc</string>
-    <string name="some_folder">Some folder</string>
-    <string name="sample_name">User Name</string>
-    <string name="pop_title">Pop</string>
-    <string name="indie_title">Indie</string>
-    <string name="rock_title">Rock</string>
-    <string name="r8b_title"><![CDATA[R&B]]></string>
-    <string name="not_title_set">No title set</string>
-    <string name="floating_action_button">Floating action button</string>
-
     <!-- SAMEPINCH specifics -->
     <string name="app_name">SamePinch</string>
     <!-- pinch handle-->
@@ -36,13 +10,9 @@
     <string name="enter_comment">enter your comment here\u2026</string>
     <string name="enter_post">type here\u2026</string>
     <string name="select_tags">tag this post with</string>
-    <string name="enter_here">enter here\u2026</string>
-    <string name="enter_comment_actionLabel">Submit</string>
     <string name="profile_picture_desc">Profile picture</string>
     <string name="welcome_title">Welcome to SamePinch</string>
-    <string name="welcome_sub_title">SamePinch is created by idealists who believe in new era of social networking where people engage with others on a wide variety of topics. Imagine a virtual wall where you can post anything you like (even as anonymous) and community is watching, learning and commenting.</string>
     <string name="sign_in_label">Sign in</string>
-    <string name="save_label">Save</string>
     <string name="post_create_label">post</string>
     <string name="post_as_you">as you</string>
     <string name="post_as_anonymous">as anonymous</string>
@@ -54,25 +24,15 @@
     <string name="post_del_positive">OK</string>
     <string name="post_del_negative">Cancel</string>
 
-    <string name="contd_sign_in_label">continue</string>
-    <string name="manage_account_label">Manage account</string>
     <string name="sign_out_label">Sign out</string>
-    <string name="sign_in_email_hint">email@samepinch.co</string>
-
     <!--<string name="fb_app_id">1646195582278585</string>-->
     <string name="facebook_app_id">1636478616583615</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="close">Close</string>
-    <string name="status_signed_out">Signed out</string>
-    <string name="play_services_error">Google Play services is not available.  This application will close.</string>
-    <string name="signin_with_google">Sign in with Google</string>
-    <string name="signin_with_fb">Sign in with Facebook</string>
     <string name="loading">\u2026</string>
     <string name="loading_with_text">Loading\u2026</string>
     <string name="by">post by\u0009</string>
-    <string name="empty"></string>
+    <string name="empty"/>
     <string name="settings_notifs">Push Notifications</string>
     <string name="settings_notifs_subline">set when you want to get notified</string>
     <string name="settings_notifs_posts">Posts I made</string>
@@ -97,9 +57,6 @@
 
     <!-- CHANGE PASSWORD -->
     <string name="change_password_title">Change Password</string>
-    <string name="change_password_content">we recommend choosing a strong password</string>
-    <string name="change_password_hint">type your password here\u2026</string>
-    <string name="change_password_hint_fill"></string>
     <string name="change_password_positive">Update</string>
     <string name="change_password_negative">@android:string/cancel</string>
 

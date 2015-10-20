@@ -43,7 +43,7 @@ android {
             proguardFile 'proguard-fresco.pro'
             proguardFile 'proguard-butterknife.pro'
 
-//            signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
     }
 

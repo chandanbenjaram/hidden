@@ -208,8 +208,8 @@ public class SignupActivity extends AppCompatActivity {
         progressDialog.setMessage("creating your account...");
         progressDialog.show();
 
-        String fName = _fNameText.getText().toString();
-        String lName = _lNameText.getText().toString();
+        String fName = StringUtils.defaultString(_fNameText.getText().toString(), StringUtils.EMPTY);
+        String lName = StringUtils.defaultString(_lNameText.getText().toString(), StringUtils.EMPTY);
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
         String pinchHandle = _pinchHandle.getText().toString();
@@ -290,20 +290,20 @@ public class SignupActivity extends AppCompatActivity {
 
         String pinchHandle = _pinchHandle.getText().toString();
 
-
-        if (fName.isEmpty() || fName.length() < 1) {
-            _fNameText.setError("at least 1 character");
-            valid = false;
-        } else {
-            _fNameText.setError(null);
-        }
-
-        if (lName.isEmpty() || lName.length() < 1) {
-            _lNameText.setError("at least 1 character");
-            valid = false;
-        } else {
-            _lNameText.setError(null);
-        }
+//
+//        if (fName.isEmpty() || fName.length() < 1) {
+//            _fNameText.setError("at least 1 character");
+//            valid = false;
+//        } else {
+//            _fNameText.setError(null);
+//        }
+//
+//        if (lName.isEmpty() || lName.length() < 1) {
+//            _lNameText.setError("at least 1 character");
+//            valid = false;
+//        } else {
+//            _lNameText.setError(null);
+//        }
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _emailText.setError("enter a valid email address");

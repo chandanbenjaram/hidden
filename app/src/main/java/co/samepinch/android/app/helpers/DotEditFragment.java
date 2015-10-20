@@ -325,24 +325,24 @@ public class DotEditFragment extends Fragment {
     public boolean validate() {
         boolean valid = true;
 
-        String fName = mFNameText.getText().toString();
-        String lName = mLNameText.getText().toString();
+//        String fName = mFNameText.getText().toString();
+//        String lName = mLNameText.getText().toString();
         String email = mEmailText.getText().toString();
         String blogUrl = mBlogUrl.getText().toString();
 
-        if (fName.isEmpty() || fName.length() < 1) {
-            mFNameText.setError("at least 1 character");
-            valid = false;
-        } else {
-            mFNameText.setError(null);
-        }
-
-        if (lName.isEmpty() || lName.length() < 1) {
-            mLNameText.setError("at least 1 character");
-            valid = false;
-        } else {
-            mLNameText.setError(null);
-        }
+//        if (fName.isEmpty() || fName.length() < 1) {
+//            mFNameText.setError("at least 1 character");
+//            valid = false;
+//        } else {
+//            mFNameText.setError(null);
+//        }
+//
+//        if (lName.isEmpty() || lName.length() < 1) {
+//            mLNameText.setError("at least 1 character");
+//            valid = false;
+//        } else {
+//            mLNameText.setError(null);
+//        }
 
         if (email.isEmpty() || !Utils.isValidEmail(email)) {
             mEmailText.setError("enter a valid email address");
