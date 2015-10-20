@@ -36,6 +36,9 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <provider android:authorities="com.facebook.app.FacebookContentProvider1234"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true" />
         <activity android:name=".PostDetailActivity" />
         <activity android:name=".ActivityFragment" />
         <activity android:name=".LoginActivity" />

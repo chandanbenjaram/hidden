@@ -17,6 +17,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
+import com.facebook.LoggingBehavior;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
@@ -71,6 +72,8 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
         if (!FacebookSdk.isInitialized()) {
             Fresco.initialize(getActivity().getApplicationContext());
         }
+
+//        FacebookSdk.addLoggingBehavior(LoggingBehavior.REQUESTS);
 
         progressDialog = new ProgressDialog(getActivity(),
                 R.style.Theme_AppCompat_Dialog);

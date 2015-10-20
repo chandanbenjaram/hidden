@@ -12,8 +12,11 @@ import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -61,6 +64,7 @@ import co.samepinch.android.rest.RestClient;
 public class LoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ServerAuthCodeCallbacks {
     public static final String TAG = "LoginActivity";
+    static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
 
     private static final int RC_SIGN_IN = 10;
 
@@ -88,17 +92,22 @@ public class LoginActivity extends AppCompatActivity implements
         progressDialog.setCancelable(Boolean.FALSE);
 
         gSignInButton.setSize(SignInButton.SIZE_WIDE);
-        mGoogleApiClient =
-                new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(Plus.API)
-                        .addScope(new Scope(Scopes.PROFILE))
-                        .addScope(new Scope(Scopes.PLUS_LOGIN))
-                        .build();
+        if (checkPlayServices()) {
+            mGoogleApiClient =
+                    new GoogleApiClient.Builder(this)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .addApi(Plus.API)
+                            .addScope(new Scope(Scopes.PROFILE))
+                            .addScope(new Scope(Scopes.PLUS_LOGIN))
+                            .build();
+        } else {
+            gSignInButton.setVisibility(View.GONE);
+        }
 
         mHandler = new LocalHandler(this);
     }
+
 
     @Override
     protected void onDestroy() {
@@ -125,6 +134,14 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_RECOVER_PLAY_SERVICES) {
+            if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Google Play Services must be installed.",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
         if (requestCode == RC_SIGN_IN) {
             // If the error resolution was not successful we should not resolve further.
             if (resultCode != RESULT_OK) {
@@ -236,14 +253,11 @@ public class LoginActivity extends AppCompatActivity implements
                     connectionResult.startResolutionForResult(this, RC_SIGN_IN);
                     mIsResolving = true;
                 } catch (IntentSender.SendIntentException e) {
-                    Log.e(TAG, "Could not resolve ConnectionResult.", e);
                     mIsResolving = false;
                     mGoogleApiClient.connect();
                 }
             } else {
-                // Could not resolve the connection result, show the user an
-                // error dialog.
-//                showErrorDialog(connectionResult);
+                showErrorDialog(connectionResult.getErrorCode());
             }
         } else {
             // Show the signed-out UI
@@ -256,6 +270,23 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
+    private boolean checkPlayServices() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (status != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
+                return Boolean.TRUE;
+            } else {
+                return Boolean.FALSE;
+
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    void showErrorDialog(int code) {
+        GooglePlayServicesUtil.getErrorDialog(code, this,
+                REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+    }
 //    @Override
 //    public void onResult(People.LoadPeopleResult peopleData) {
 //        switch (peopleData.getStatus().getStatusCode()) {
