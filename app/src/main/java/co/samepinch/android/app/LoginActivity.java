@@ -1,8 +1,6 @@
 package co.samepinch.android.app;
 
 import android.app.ProgressDialog;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
@@ -34,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,11 +49,6 @@ import co.samepinch.android.app.helpers.module.DaggerStorageComponent;
 import co.samepinch.android.app.helpers.module.StorageComponent;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
-import co.samepinch.android.data.dao.SchemaComments;
-import co.samepinch.android.data.dao.SchemaDots;
-import co.samepinch.android.data.dao.SchemaPostDetails;
-import co.samepinch.android.data.dao.SchemaPosts;
-import co.samepinch.android.data.dao.SchemaTags;
 import co.samepinch.android.rest.ReqSetBody;
 import co.samepinch.android.rest.Resp;
 import co.samepinch.android.rest.RestClient;
@@ -272,15 +264,16 @@ public class LoginActivity extends AppCompatActivity implements
 
     private boolean checkPlayServices() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
-                return Boolean.TRUE;
-            } else {
-                return Boolean.FALSE;
-
-            }
-        }
-        return Boolean.FALSE;
+//        if (status != ConnectionResult.SERVICE_MISSING) {
+//            if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
+//                return Boolean.TRUE;
+//            } else {
+//                showErrorDialog(status);
+//                return Boolean.TRUE;
+//
+//            }
+//        }
+        return status != ConnectionResult.SERVICE_MISSING;
     }
 
     void showErrorDialog(int code) {
