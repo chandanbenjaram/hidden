@@ -15,6 +15,8 @@ public class ImageUtils {
     private static final int BLUR_RADIUS = 2;
 
     public static Bitmap DEFAULT_BITMAP;
+    public static volatile Bitmap DEFAULT_BITMAP_BLURRED;
+
 
     static {
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -22,6 +24,14 @@ public class ImageUtils {
         options.inDither = false;
         DEFAULT_BITMAP = BitmapFactory.decodeResource(SPApplication.getContext().getResources(),
                 R.mipmap.ic_launcher, options);
+    }
+
+    public static Bitmap blurredDfltBitmap(){
+        if(DEFAULT_BITMAP_BLURRED == null){
+            DEFAULT_BITMAP_BLURRED = ImageUtils.blur(SPApplication.getContext(), DEFAULT_BITMAP);
+        }
+
+        return DEFAULT_BITMAP_BLURRED;
     }
 
     public static Bitmap blur(Context ctx, Bitmap image) {

@@ -433,10 +433,14 @@ public class DotEditFragment extends Fragment {
                     user.setImageKey(updatedUser.getImageKey());
                     Utils.PreferencesManager.getInstance().setValue(AppConstants.API.PREF_AUTH_USER.getValue(), gson.toJson(user));
 
+                    // flag to refresh wall
+                    Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
+
                     // local setup
                     mUser = user;
                     setupData(mUser);
                     Snackbar.make(getView(), "updated successfully.", Snackbar.LENGTH_SHORT).show();
+
                     // finish
                     mHandler.postDelayed(new Runnable() {
                         @Override
@@ -445,8 +449,6 @@ public class DotEditFragment extends Fragment {
                             getActivity().finish();
                         }
                     }, 299);
-
-                    Utils.PreferencesManager.getInstance().setValue(AppConstants.APP_INTENT.KEY_FRESH_WALL_FLAG.getValue(), Boolean.TRUE.toString());
                     return;
                 }
             } catch (Exception e) {

@@ -244,6 +244,8 @@ public class MainActivityIn extends AppCompatActivity {
             mVS.setDisplayedChild(1);
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
             mDotImageText.setText(initials);
+            Bitmap blurredBitmap = ImageUtils.blurredDfltBitmap();
+            mBackdrop.setImageBitmap(blurredBitmap);
         } else {
             mVS.setDisplayedChild(0);
             Postprocessor postprocessor = new BasePostprocessor() {
