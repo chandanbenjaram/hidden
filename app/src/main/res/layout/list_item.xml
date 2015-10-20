@@ -65,7 +65,7 @@
             android:gravity="center_vertical"
             android:paddingBottom="15dp"
             android:paddingLeft="2dp"
-            android:text="DOT"
+            android:text="@string/hint_dot"
             android:textAllCaps="true" />
 
         <TextView
@@ -80,7 +80,7 @@
             android:paddingBottom="15dp"
             android:paddingLeft="2dp"
             android:paddingRight="5dp"
-            android:text="DATE" />
+            android:text="@string/hint_date" />
 
         <TextView
             android:id="@+id/wall_pinch_handle"
@@ -93,7 +93,7 @@
             android:gravity="center_vertical"
             android:paddingLeft="2dp"
             android:paddingTop="15dp"
-            android:text="PINCH HANDLE" />
+            android:text="@string/hint_pinch_handle_u" />
 
         <TextView
             android:id="@+id/wall_post_views"
@@ -106,7 +106,7 @@
             android:gravity="center_vertical"
             android:paddingLeft="2dp"
             android:paddingTop="15dp"
-            android:text="VIEWS" />
+            android:text="@string/hint_views" />
 
         <TextView
             android:id="@+id/wall_post_upvote"
@@ -120,7 +120,7 @@
             android:paddingLeft="2dp"
             android:paddingRight="5dp"
             android:paddingTop="15dp"
-            android:text="VOTES" />
+            android:text="@string/hint_votes" />
 
     </RelativeLayout>
 
@@ -133,7 +133,7 @@
         android:gravity="center_vertical"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:text="CONTENT" />
+        android:text="@string/hint_content" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/wall_post_images"

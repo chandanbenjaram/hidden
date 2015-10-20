@@ -64,7 +64,7 @@ public class PostDetailsService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
             HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
             ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, RespPostDetails.class);

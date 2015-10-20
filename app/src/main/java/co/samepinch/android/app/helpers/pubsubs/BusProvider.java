@@ -10,7 +10,7 @@ public enum BusProvider {
     INSTANCE;
     private final Bus bus;
 
-    private BusProvider(){
+    BusProvider(){
         bus = new Bus(ThreadEnforcer.ANY);
     }
 

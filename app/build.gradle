@@ -43,8 +43,31 @@ android {
             proguardFile 'proguard-fresco.pro'
             proguardFile 'proguard-butterknife.pro'
 
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
+    }
+
+    lintOptions {
+        abortOnError false
+        checkAllWarnings true
+        // there will be a lot of useless lint warnings if delete this line
+        disable 'AllowBackup'
+        // for most projects accessibility tools support is out of scope
+        disable 'ContentDescription'
+        // a lot of Java libraries have references to Java SE packages
+        disable 'InvalidPackage'
+        // sp can be scaled by the user's font size preference so can break design
+        disable 'SpUsage'
+        // there are no pixel art for the most projects
+        disable 'IconMissingDensityFolder'
+        // it is just reminder
+        disable 'SelectableText'
+        // there are too few projects with RTL support
+        disable 'RtlCompat', 'RtlEnabled', 'RtlHardcoded', 'RtlSymmetry'
+
+        showAll true
+        lintConfig file("lint.xml")
+        checkReleaseBuilds true
     }
 
     packagingOptions {

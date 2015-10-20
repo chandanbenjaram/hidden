@@ -40,7 +40,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -269,7 +268,7 @@ public class DotWallFragment extends Fragment {
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_USER.getValue());
             for (Map.Entry<String, String> e : entries.entrySet()) {
-                iArgs.putString(e.getKey(), e.getValue().toString());
+                iArgs.putString(e.getKey(), e.getValue());
             }
         }
 
@@ -469,6 +468,7 @@ public class DotWallFragment extends Fragment {
     }
 
 
+    @SuppressWarnings("deprecation")
     private void applyPalette(Palette palette) {
         int primary = SPApplication.getContext().getResources().getColor(R.color.colorPrimary);
         int primaryDark = SPApplication.getContext().getResources().getColor(R.color.colorPrimaryDark);
@@ -542,7 +542,7 @@ public class DotWallFragment extends Fragment {
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
                 HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);
                 String userUrl = StringUtils.join(new String[]{AppConstants.API.USERS.getValue(), args[0]}, "/");

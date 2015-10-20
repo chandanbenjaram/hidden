@@ -31,7 +31,7 @@
             android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="almost done."
+            android:text="@string/hint_almost_done"
             android:gravity="center"
             android:paddingTop="24dp"/>
 
@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:capitalize="none"
-                android:hint="CHOOSE YOUR UNIQUE PINCH HANDLE"
+                android:hint="@string/hint_choose_handle"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
 
@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="Clear" />
+                android:text="@string/btn_clear" />
 
 
             <!-- Done Button -->
@@ -73,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="Done" />
+                android:text="@string/btn_done" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

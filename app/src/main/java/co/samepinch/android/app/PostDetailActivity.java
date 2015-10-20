@@ -80,7 +80,6 @@ public class PostDetailActivity extends AppCompatActivity {
     private String mPostId;
     private PostDetails mPostDetails;
     private PostDetailsRVAdapter mViewAdapter;
-    private LinearLayoutManager mLayoutManager;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -145,7 +144,7 @@ public class PostDetailActivity extends AppCompatActivity {
         // setup data
         setUpMetadata(currPost);
 
-        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mViewAdapter = new PostDetailsRVAdapter(this, mergeCursor);
 
         // recycler view setup

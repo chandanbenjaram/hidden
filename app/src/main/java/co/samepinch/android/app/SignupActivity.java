@@ -406,7 +406,7 @@ public class SignupActivity extends AppCompatActivity {
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);

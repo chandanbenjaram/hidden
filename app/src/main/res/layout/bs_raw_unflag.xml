@@ -5,4 +5,4 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:drawableLeft="@drawable/thumb_up_blue"
-    android:text="un-flag" />
+    android:text="@string/hint_unflag" />

@@ -22,7 +22,6 @@ import co.samepinch.android.data.dao.SchemaComments;
  */
 public class CommentsFragment extends ListFragment {
     private ListView mListView;
-    private CursorAdapter mAdapter;
     private String mPostId;
 
     private View mHeaderView;
@@ -52,7 +51,7 @@ public class CommentsFragment extends ListFragment {
             c = getActivity().getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         }
 
-        mAdapter = new CommentsCursorAdapter(getActivity(), c, CursorAdapter.NO_SELECTION);
+        CursorAdapter mAdapter = new CommentsCursorAdapter(getActivity(), c, CursorAdapter.NO_SELECTION);
         mListView.setAdapter(mAdapter);
     }
 

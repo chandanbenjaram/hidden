@@ -1,25 +1,14 @@
 package co.samepinch.android.app.helpers;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,8 +27,6 @@ public class WebViewFragment extends Fragment implements AdvancedWebView.Listene
 
     private LocalHandler mHandler;
 
-    private String mUrl;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +39,7 @@ public class WebViewFragment extends Fragment implements AdvancedWebView.Listene
         View view = inflater.inflate(R.layout.webview, container, false);
         ButterKnife.bind(this, view);
 
-        mUrl = getArguments().getString(AppConstants.K.REMOTE_URL.name(), null);
+        String mUrl = getArguments().getString(AppConstants.K.REMOTE_URL.name(), null);
         if (StringUtils.isBlank(mUrl)) {
             handleError("missing url. closing...");
         }

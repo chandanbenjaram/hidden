@@ -65,7 +65,7 @@
                             android:id="@+id/input_fname"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="First Name"
+                            android:hint="@string/hint_first_name"
                             android:inputType="textCapWords"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
@@ -83,7 +83,7 @@
                             android:id="@+id/input_lname"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Last Name"
+                            android:hint="@string/hint_last_name"
                             android:inputType="textCapWords"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
@@ -112,7 +112,7 @@
                             android:id="@+id/input_email"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Email"
+                            android:hint="@string/hint_email"
                             android:inputType="textEmailAddress"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
@@ -133,7 +133,7 @@
                         android:layout_height="wrap_content"
                         android:capitalize="none"
                         android:enabled="false"
-                        android:hint="Pinch Handle"
+                        android:hint="@string/hint_pinch_handle"
                         android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>
 
@@ -150,7 +150,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="top|left"
-                        android:hint="About Me"
+                        android:hint="@string/hint_about_me"
                         android:imeOptions="actionNone"
                         android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
                         android:lines="1"
@@ -172,7 +172,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:capitalize="none"
-                        android:hint="My Blog"
+                        android:hint="@string/hint_my_blog"
                         android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>
 
@@ -183,7 +183,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:text="change password"
+                    android:text="@string/hint_change_pass"
                     android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>

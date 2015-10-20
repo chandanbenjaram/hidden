@@ -48,7 +48,7 @@ public class SignOutService extends IntentService {
         // remote logout
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(RestClient.INSTANCE.jsonMediaType());
         try {
             ReqSetBody logoutReq = new ReqSetBody();
             logoutReq.setToken(Utils.getNonBlankAppToken());

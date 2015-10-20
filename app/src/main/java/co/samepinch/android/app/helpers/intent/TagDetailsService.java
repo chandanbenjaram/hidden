@@ -53,7 +53,7 @@ public class TagDetailsService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
             HttpEntity<ReqGroups> reqEntity = new HttpEntity<>(req, headers);
             ResponseEntity<RespGroups> resp = RestClient.INSTANCE.handle().exchange(GROUPS.getValue(), HttpMethod.POST, reqEntity, RespGroups.class);

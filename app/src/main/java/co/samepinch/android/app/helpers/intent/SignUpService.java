@@ -56,7 +56,7 @@ public class SignUpService extends IntentService {
         //headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(RestClient.INSTANCE.jsonMediaType());
         try {
             ReqSignUp req = new ReqSignUp();
             // set base args

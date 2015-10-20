@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -67,7 +66,6 @@ public class TagEditFragment extends Fragment {
     SwitchButton aSubscriptionSwitch;
 
     ProgressDialog progressDialog;
-    private LocalHandler mHandler;
     private boolean initSwitchAsChecked;
 
     private String mTagName;
@@ -81,9 +79,6 @@ public class TagEditFragment extends Fragment {
         progressDialog = new ProgressDialog(getActivity(),
                 R.style.Theme_AppCompat_Dialog);
         progressDialog.setCancelable(Boolean.FALSE);
-
-        // a handler
-        mHandler = new LocalHandler(this);
     }
 
     @Override
@@ -221,7 +216,7 @@ public class TagEditFragment extends Fragment {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             try {
                 String aUrl = StringUtils.join(new String[]{AppConstants.API.GROUPS.getValue(), tags[0]}, "/");
                 HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);
@@ -298,7 +293,7 @@ public class TagEditFragment extends Fragment {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             try {
                 String aUrl = StringUtils.join(new String[]{AppConstants.API.GROUPS.getValue(), tags[0]}, "/");
                 HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);

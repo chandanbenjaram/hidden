@@ -4,44 +4,44 @@
         <item
             android:id="@+id/nav_wall"
             android:icon="@drawable/home"
-            android:title="Home" />
+            android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_post"
             android:icon="@drawable/add"
-            android:title="Post" />
+            android:title="@string/menu_post" />
         <item
             android:id="@+id/nav_tags"
             android:icon="@drawable/tags"
-            android:title="Tags" />
+            android:title="@string/menu_tags" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/settings"
-            android:title="Settings" />
+            android:title="@string/menu_settings" />
     </group>
 
     <item android:title="THE APP">
         <menu>
             <item
                 android:id="@+id/nav_spread_it"
-                android:title="Spread Your Love" />
+                android:title="@string/menu_spread" />
             <item
                 android:id="@+id/nav_rate_it"
-                android:title="Rate App" />
+                android:title="@string/menu_rate" />
             <item
                 android:id="@+id/nav_rules"
-                android:title="Rules" />
+                android:title="@string/menu_rules" />
             <item
                 android:id="@+id/nav_t_n_c"
                 android:title="@string/terms_n_cond" />
             <item
                 android:id="@+id/nav_feedback"
-                android:title="Feedback" />
+                android:title="@string/menu_feedback" />
             <item
                 android:id="@+id/nav_sys_status"
-                android:title="System Status" />
+                android:title="@string/menu_sys_status" />
             <item
                 android:id="@+id/nav_sign_out"
-                android:title="Sign Out" />
+                android:title="@string/menu_sign_out" />
         </menu>
     </item>
 </menu>

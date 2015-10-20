@@ -71,7 +71,7 @@ public class AuthService extends IntentService {
         //headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(RestClient.INSTANCE.jsonMediaType());
         try {
             HttpEntity<ReqLogin> payloadEntity = new HttpEntity<>(loginReq.build(), headers);
             ResponseEntity<RespLogin> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, RespLogin.class);
@@ -110,7 +110,7 @@ public class AuthService extends IntentService {
         //headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(RestClient.INSTANCE.jsonMediaType());
         try {
             HttpEntity<ReqSetBody> payloadEntity;
             ResponseEntity<String> resp = null;

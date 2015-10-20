@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:drawableLeft="@drawable/new_thumb_down_gray"
-    android:text="dislike"
+    android:text="@string/hint_dislike"
     />

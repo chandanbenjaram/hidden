@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:drawableLeft="@drawable/flag_gray_new"
-    android:text="flag"
+    android:text="@string/hint_flag"
     />

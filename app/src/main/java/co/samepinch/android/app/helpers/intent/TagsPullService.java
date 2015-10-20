@@ -82,7 +82,7 @@ public class TagsPullService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
             HttpEntity<ReqGroups> reqEntity = new HttpEntity<>(req, headers);
             ResponseEntity<RespTags> resp = RestClient.INSTANCE.handle().exchange(GROUPS.getValue(), HttpMethod.POST, reqEntity, RespTags.class);
@@ -117,7 +117,7 @@ public class TagsPullService extends IntentService {
         //headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
         HttpEntity<ReqGroups> reqEntity = new HttpEntity<>(req, headers);
         ResponseEntity<RespArrGroups> resp = RestClient.INSTANCE.handle().exchange(GROUPS.getValue(), HttpMethod.POST, reqEntity, RespArrGroups.class);

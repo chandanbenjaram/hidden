@@ -303,7 +303,9 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                     });
                 } else {
                     imgKeys.add(imageStatusMap.get(imgId));
-                    content.append("\n::" + imageStatusMap.get(imgId) + "::\n");
+                    content.append("\n::");
+                    content.append(imageStatusMap.get(imgId));
+                    content.append("::\n");
                 }
             }
         }
@@ -364,7 +366,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             try {
                 HttpEntity<ReqGeneric<ReqPostCreate.Body>> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<RespPostDetails> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS.getValue(), HttpMethod.POST, payloadEntity, RespPostDetails.class);

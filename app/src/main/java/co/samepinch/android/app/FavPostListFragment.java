@@ -165,7 +165,7 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> entries = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST_FAV.getValue());
             for (Map.Entry<String, String> e : entries.entrySet()) {
-                iArgs.putString(e.getKey(), e.getValue().toString());
+                iArgs.putString(e.getKey(), e.getValue());
             }
         } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);

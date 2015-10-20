@@ -397,7 +397,7 @@ public class DotEditFragment extends Fragment {
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
 
                 ResponseEntity<RespUserDetails> resp = RestClient.INSTANCE.handle().exchange(USERS.getValue(), HttpMethod.POST, payloadEntity, RespUserDetails.class);
@@ -579,7 +579,7 @@ public class DotEditFragment extends Fragment {
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
@@ -632,7 +632,7 @@ public class DotEditFragment extends Fragment {
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);

@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +44,7 @@ public class CommentUpdateService extends IntentService {
         String commentUri = StringUtils.join(new String[]{COMMENTS.getValue(), commentUID}, "/");
         Bundle body = iArgs.getBundle(AppConstants.K.BODY.name());
 
-        ReqGeneric<Map> req = new ReqGeneric();
+        ReqGeneric<Map<String, String>> req = new ReqGeneric<>();
         req.setToken(Utils.getAppToken(false));
         req.setCmd(iArgs.getString(AppConstants.K.COMMAND.name()));
         if (body != null) {
@@ -60,9 +59,9 @@ public class CommentUpdateService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
-            HttpEntity<ReqGeneric<Map>> reqEntity = new HttpEntity<>(req, headers);
+            HttpEntity<ReqGeneric<Map<String, String>>> reqEntity = new HttpEntity<>(req, headers);
 
             ResponseEntity<RespCommentDetails> resp = RestClient.INSTANCE.handle().exchange(commentUri, HttpMethod.POST, reqEntity, RespCommentDetails.class);
             CommentDetails commentDetails;

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/home"
         android:drawablePadding="5dp"
-        android:text="Wall"
+        android:text="@string/hint_wall"
         android:singleLine="true"
         android:gravity="center_vertical"/>
     <TextView
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/star"
         android:drawablePadding="5dp"
-        android:text="You Starred"
+        android:text="@string/hint_you_starred"
         android:singleLine="true"
         android:gravity="center_vertical"/>
 </ViewSwitcher>

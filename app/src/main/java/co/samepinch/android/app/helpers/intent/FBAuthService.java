@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +48,7 @@ public class FBAuthService extends IntentService {
         //headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(RestClient.INSTANCE.jsonMediaType());
         try {
             eventData.put(AppConstants.K.provider.name(), intent.getStringExtra("provider"));
 

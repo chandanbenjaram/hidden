@@ -52,7 +52,7 @@ public class DotDetailsService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
             HttpEntity<ReqNoBody> reqEntity = new HttpEntity<>(req, headers);
             ResponseEntity<RespUserDetails> resp = RestClient.INSTANCE.handle().exchange(dotUri, HttpMethod.POST, reqEntity, RespUserDetails.class);

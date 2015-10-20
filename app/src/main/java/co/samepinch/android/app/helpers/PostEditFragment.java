@@ -391,7 +391,9 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                     });
                 } else {
                     imgKeys.add(imageStatusMap.get(imgId));
-                    content.append("\n::" + imageStatusMap.get(imgId) + "::\n");
+                    content.append("\n::");
+                    content.append(imageStatusMap.get(imgId));
+                    content.append("::\n");
                 }
             }
         }
@@ -451,7 +453,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             try {
                 String updateUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0].getUid()}, "/");
                 HttpEntity<ReqGeneric<ReqPostCreate.Body>> payloadEntity = new HttpEntity<>(req, headers);
@@ -505,7 +507,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             try {
                 String delUrl = StringUtils.join(new String[]{AppConstants.API.POSTS.getValue(), posts[0]}, "/");
                 HttpEntity<ReqNoBody> payloadEntity = new HttpEntity<>(req, headers);

@@ -41,7 +41,7 @@ public class TagsToManageRVAdapter extends CursorRecyclerViewAdapter<TagToManage
         });
     }
 
-    public static interface ItemEventListener<T> {
+    public interface ItemEventListener<T> {
         void onClick(T t);
     }
 }

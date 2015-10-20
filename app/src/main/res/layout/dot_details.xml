@@ -46,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="2dp"
-                android:text="name" />
+                android:text="@string/hint_wall_name" />
 
             <TextView
                 android:id="@+id/dot_wall_handle"
@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="2dp"
-                android:text="handle" />
+                android:text="@string/hint_wall_handle" />
         </LinearLayout>
 
         <TextView
@@ -85,7 +85,7 @@
                     style="@style/SP_TEXT.METADATA"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="edit"
+                    android:text="@string/hint_edit"
                     android:gravity="center_horizontal"
                     android:drawableTop="@drawable/new_pencil_small_blue"/>
             </LinearLayout>
@@ -104,7 +104,6 @@
                     android:gravity="center_horizontal"
                     android:text="@string/loading"
                     android:drawableTop="@drawable/new_favorite_outline_gray"/>
-                />
             </LinearLayout>
 
             <LinearLayout
@@ -121,7 +120,6 @@
                     android:gravity="center_horizontal"
                     android:text="@string/loading"
                     android:drawableTop="@drawable/ic_add_plus_circle_copy"/>
-                />
             </LinearLayout>
 
             <LinearLayout
@@ -142,7 +140,7 @@
                     style="@style/SP_TEXT.METADATA"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="blog"
+                    android:text="@string/hint_blog"
                     android:gravity="center_horizontal"
                     android:drawableTop="@drawable/new_info_small_blue"/>
             </LinearLayout>

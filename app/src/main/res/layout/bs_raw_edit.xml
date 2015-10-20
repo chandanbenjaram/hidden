@@ -5,4 +5,4 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:drawableLeft="@drawable/new_pencil_gray"
-    android:text="edit" />
+    android:text="@string/hint_edit" />

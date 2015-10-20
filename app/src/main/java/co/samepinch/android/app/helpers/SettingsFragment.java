@@ -212,7 +212,7 @@ public class SettingsFragment extends Fragment {
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
 
                 ResponseEntity<RespUserDetails> resp = RestClient.INSTANCE.handle().exchange(USERS.getValue(), HttpMethod.POST, payloadEntity, RespUserDetails.class);

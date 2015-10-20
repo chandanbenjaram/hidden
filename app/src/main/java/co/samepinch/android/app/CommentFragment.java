@@ -30,7 +30,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -225,7 +224,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.COMMENTS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);
@@ -277,7 +276,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
                 //headers
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.setAccept(RestClient.INSTANCE.jsonMediaType());
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
 
                 String commentUri = StringUtils.join(new String[]{COMMENTS.getValue(), commentUID}, "/");

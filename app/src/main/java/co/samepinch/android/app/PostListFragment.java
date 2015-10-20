@@ -175,7 +175,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
             Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
             Map<String, String> pPosts = pref.getValueAsMap(AppConstants.API.PREF_POSTS_LIST.getValue());
             for (Map.Entry<String, String> e : pPosts.entrySet()) {
-                iArgs.putString(e.getKey().toString(), e.getValue().toString());
+                iArgs.putString(e.getKey(), e.getValue());
             }
         } else {
             iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="THE APP">
+    <item android:title="@string/title_the_app">
         <menu>
             <item
                 android:id="@+id/nav_spread_it"
-                android:title="Spread Your Love" />
+                android:title="@string/menu_spread" />
             <item
                 android:id="@+id/nav_rate_it"
-                android:title="Rate App" />
+                android:title="@string/menu_rate" />
             <item
                 android:id="@+id/nav_rules"
-                android:title="Rules" />
+                android:title="@string/menu_rules" />
             <item
                 android:id="@+id/nav_t_n_c"
                 android:title="@string/terms_n_cond" />
             <item
                 android:id="@+id/nav_feedback"
-                android:title="Feedback" />
+                android:title="@string/menu_feedback" />
             <item
                 android:id="@+id/nav_sys_status"
-                android:title="System Status" />
+                android:title="@string/menu_sys_status" />
         </menu>
     </item>
 </menu>

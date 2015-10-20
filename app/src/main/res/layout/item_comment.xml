@@ -27,7 +27,7 @@
         android:background="@drawable/rounded_corners"
         android:clickable="true"
         android:gravity="center"
-        android:text="NAME"
+        android:text="@string/hint_name"
         android:textColor="@color/blue_500"
         android:textAllCaps="true"
         />
@@ -41,7 +41,7 @@
         android:layout_toEndOf="@+id/avatar"
         android:layout_toRightOf="@+id/avatar"
         android:gravity="center_vertical"
-        android:text="DOT"
+        android:text="@string/hint_dot"
         android:textAllCaps="true"
         android:textColor="@color/blue_500" />
 

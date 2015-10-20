@@ -11,7 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class PostMetaUpdateService extends IntentService {
 
         String postUri = StringUtils.join(new String[]{POSTS.getValue(), postUID}, "/");
 
-        ReqGeneric<Map> req = new ReqGeneric();
+        ReqGeneric<Map<String, String>> req = new ReqGeneric();
         req.setToken(Utils.getAppToken(false));
         req.setCmd(iArgs.getString(AppConstants.K.COMMAND.name()));
         if (body != null) {
@@ -56,9 +55,9 @@ public class PostMetaUpdateService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
 
-            HttpEntity<ReqGeneric<Map>> reqEntity = new HttpEntity<>(req, headers);
+            HttpEntity<ReqGeneric<Map<String, String>>> reqEntity = new HttpEntity<>(req, headers);
             ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(postUri, HttpMethod.POST, reqEntity, Resp.class);
             Map<String, String> eventData = new HashMap<>();
             eventData.put(AppConstants.K.MESSAGE.name(), resp.getBody().getMessage());

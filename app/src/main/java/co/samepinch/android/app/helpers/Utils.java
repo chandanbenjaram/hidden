@@ -561,6 +561,7 @@ public class Utils {
         return imgVals;
     }
 
+    @SuppressWarnings("deprecation")
     public static void markTags(final Context context, TextView view, String[] tags) {
 
         final Paint tagPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

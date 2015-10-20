@@ -4,11 +4,11 @@
     <item
         android:id="@+id/menuitem_comment_as_user"
         android:orderInCategory="199"
-        android:title="as you"
+        android:title="@string/title_as_you"
         app:showAsAction="always" />
     <item
         android:id="@+id/menuitem_comment_as_anonymous"
         android:orderInCategory="399"
-        android:title="as anonymous"
+        android:title="@string/title_as_anonymous"
         app:showAsAction="always" />
 </menu>

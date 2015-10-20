@@ -7,13 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import co.samepinch.android.app.R;
-import co.samepinch.android.app.helpers.ImageOrTextViewAdapter;
 import co.samepinch.android.data.dao.SchemaTags;
 
 /**
@@ -69,7 +66,7 @@ public class TagsRVAdapter extends CursorRecyclerViewAdapter<TagRVHolder> {
         return super.getItemCount();
     }
 
-    public static interface ItemEventListener<T> {
+    public interface ItemEventListener<T> {
         void onChange(T t);
     }
 }

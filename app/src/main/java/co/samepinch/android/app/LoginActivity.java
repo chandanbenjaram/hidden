@@ -266,7 +266,7 @@ public class LoginActivity extends AppCompatActivity implements
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 //        if (status != ConnectionResult.SERVICE_MISSING) {
 //            if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
-//                return Boolean.TRUE;
+//                return Boolean.TRUE;`
 //            } else {
 //                showErrorDialog(status);
 //                return Boolean.TRUE;
@@ -483,7 +483,7 @@ public class LoginActivity extends AppCompatActivity implements
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             try {
                 HttpEntity<ReqSetBody> payloadEntity = new HttpEntity<>(req, headers);
                 ResponseEntity<Resp> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.USERS.getValue(), HttpMethod.POST, payloadEntity, Resp.class);

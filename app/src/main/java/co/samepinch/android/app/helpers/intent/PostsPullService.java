@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +84,7 @@ public class PostsPullService extends IntentService {
             //headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(RestClient.INSTANCE.jsonMediaType());
             HttpEntity<ReqPosts> payloadEntity = new HttpEntity<>(postsReq.build(), headers);
             ResponseEntity<RespPosts> resp = RestClient.INSTANCE.handle().exchange(AppConstants.API.POSTS_WITH_FILTER.getValue(), HttpMethod.POST, payloadEntity, RespPosts.class);
 
