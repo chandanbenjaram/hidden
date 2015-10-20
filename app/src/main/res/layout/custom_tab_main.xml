@@ -17,7 +17,7 @@
         style="@style/SP_TEXT.SUB_HEADING.WALL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/favorite"
+        android:drawableLeft="@drawable/star"
         android:drawablePadding="5dp"
         android:text="You Starred"
         android:singleLine="true"

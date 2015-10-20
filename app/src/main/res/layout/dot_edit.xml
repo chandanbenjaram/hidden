@@ -39,7 +39,7 @@
                     android:adjustViewBounds="true"
                     android:background="@drawable/avatar_border"
                     android:clickable="true"
-                    fresco:placeholderImage="@drawable/icon_camera_add_2x"
+                    fresco:placeholderImage="@drawable/camera_blue"
                     fresco:placeholderImageScaleType="fitCenter"
                     fresco:roundAsCircle="true" />
 
