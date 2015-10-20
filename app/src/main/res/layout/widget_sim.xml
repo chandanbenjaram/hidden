@@ -8,6 +8,6 @@
         android:id="@+id/sim_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        fresco:placeholderImageScaleType="centerCrop"
+        fresco:placeholderImageScaleType="none"
         fresco:placeholderImage="@drawable/loading"/>
 </FrameLayout>

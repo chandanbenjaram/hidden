@@ -26,6 +26,12 @@ android {
             storePassword "123456"
             keyPassword "123456"
         }
+        debug {
+            storeFile file("/tmp/upload/ks/gplay_ks.jks")
+            keyAlias "co.samepinch.android.app"
+            storePassword "123456"
+            keyPassword "123456"
+        }
     }
 
     buildTypes {
@@ -116,7 +122,7 @@ dependencies {
     compile 'org.springframework.android:spring-android-rest-template:2.0.0.M1'
     compile 'com.google.android.gms:play-services-plus:7.5.0'
     compile 'com.google.android.gms:play-services-identity:7.5.0'
-    compile 'com.google.android.gms:play-services-base:7.5.0'
+//    compile 'com.google.android.gms:play-services-base:8.1.0'
     compile ('com.facebook.android:facebook-android-sdk:4.1.0')
 
     /* Uncomment if you enable ProGuard and you want to automatically upload symbols on build.

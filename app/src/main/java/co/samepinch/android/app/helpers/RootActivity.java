@@ -12,6 +12,7 @@ import android.transition.Slide;
 import android.transition.TransitionInflater;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ViewSwitcher;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -44,13 +45,11 @@ public class RootActivity extends AppCompatActivity {
 
     private LocalHandler mHandler;
 
-
     @Override
     protected void onResume() {
         super.onResume();
         AppEventsLogger.activateApp(this);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +57,8 @@ public class RootActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.root_activity);
+        setupWindowAnimations();
+
         mHandler = new LocalHandler(RootActivity.this);
 
         final boolean isFirstLaunch = Utils.isAppFirstTime();
@@ -70,7 +71,6 @@ public class RootActivity extends AppCompatActivity {
                 syncStateToParse(isFirstLaunch, isLoggedIn);
             }
         });
-
 
         // has outstanding message?
         final String pendingDialog = Utils.PreferencesManager.getInstance().getValue(AppConstants.APP_INTENT.KEY_ADMIN_COMMAND.getValue());
@@ -136,66 +136,66 @@ public class RootActivity extends AppCompatActivity {
                 return;
             }
         }
+        // show appropriate screen
+        ViewSwitcher vs = (ViewSwitcher) findViewById(R.id.bg_text_switch);
+        vs.setDisplayedChild(isFirstLaunch ? 1 : 0);
+
         launchTargetActivity(isFirstLaunch, isLoggedIn);
     }
 
     private void launchTargetActivity(boolean isFirstLaunch, final boolean isLoggedIn) {
         // target activity to launch
         if (isFirstLaunch) {
-            FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);
-            container.removeAllViews();
-//            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-//                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            Uri bgResourceUri = new Uri.Builder()
-                    .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
-                    .path(String.valueOf(R.drawable.welcome))
-                    .build();
-
-            SIMView bgImageView = new SIMView(getApplicationContext());
-            bgImageView.setIsClickDisabled(Boolean.TRUE);
-            bgImageView.populateImageViewWithAdjustedAspect(bgResourceUri.toString());
-            container.addView(bgImageView);
-
-            // reset first time
-            Utils.PreferencesManager.getInstance().setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent intent;
-                    if (isLoggedIn) {
-                        intent = new Intent(RootActivity.this, MainActivityIn.class);
-                    } else {
-                        intent = new Intent(RootActivity.this, MainActivity.class);
-                    }
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                            Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                            Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
-                    ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
+                    // reset first time
+                    Utils.PreferencesManager.getInstance().setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
+
+                    FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);
+                    container.removeAllViews();
+
+                    Uri bgResourceUri = new Uri.Builder()
+                            .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
+                            .pgath(String.valueOf(R.drawable.welcome))
+                            .build();
+
+                    SIMView bgImageView = new SIMView(getApplicationContext());
+                    bgImageView.setIsClickDisabled(Boolean.TRUE);
+                    bgImageView.populateImageViewWithAdjustedAspect(bgResourceUri.toString());
+                    bgImageView.setDuplicateParentStateEnabled(true);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            RootActivity.this.launchTargetActivity(isLoggedIn);
+                        }
+                    }, 1999);
+                    container.addView(bgImageView);
                 }
             }, 999);
         } else {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent intent;
-                    if (Utils.isLoggedIn()) {
-                        intent = new Intent(RootActivity.this, MainActivityIn.class);
-                    } else {
-                        intent = new Intent(RootActivity.this, MainActivity.class);
-                    }
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                            Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                            Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
-                    ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
+                    RootActivity.this.launchTargetActivity(isLoggedIn);
                 }
             }, 299);
         }
+    }
 
-        setupWindowAnimations();
+    private void launchTargetActivity(final boolean isLoggedIn) {
+        Intent intent;
+        if (isLoggedIn) {
+            intent = new Intent(RootActivity.this, MainActivityIn.class);
+        } else {
+            intent = new Intent(RootActivity.this, MainActivity.class);
+        }
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
+        ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
     }
 
     private void syncStateToParse(boolean isFirstLaunch, boolean isLoggedIn) {
