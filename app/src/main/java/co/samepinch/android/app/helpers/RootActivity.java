@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.TransitionInflater;
 import android.view.Window;
@@ -217,7 +218,7 @@ public class RootActivity extends AppCompatActivity {
             Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_slide);
             getWindow().setEnterTransition(slide);
 
-            Slide fade = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_fade);
+            Fade fade = (Fade) TransitionInflater.from(this).inflateTransition(R.transition.activity_fade);
             getWindow().setExitTransition(fade);
         }
     }
