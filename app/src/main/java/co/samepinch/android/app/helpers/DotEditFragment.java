@@ -154,7 +154,7 @@ public class DotEditFragment extends Fragment {
 
                     mImageTaskMap.clear();
                     mImageTaskMap.put(processedImageUri.toString(), null);
-                    new ImageUploadTask().execute(new String[]{"droid.jpeg", localImageEnc, processedImageUri.toString()});
+                    new ImageUploadTask().execute("droid.jpeg", localImageEnc, processedImageUri.toString());
 
                     mAvatarView.setImageURI(processedImageUri);
                     mAvatarView.refreshDrawableState();
@@ -300,7 +300,7 @@ public class DotEditFragment extends Fragment {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        int nextCheck = (int) delay % 2;
+                        int nextCheck = delay % 2;
                         saveAction(nextCheck > 0 ? nextCheck : 99);
                     }
                 }, delay);
@@ -408,8 +408,6 @@ public class DotEditFragment extends Fragment {
                 }
             } catch (Exception e) {
                 // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
             }
             return null;
         }
@@ -509,7 +507,7 @@ public class DotEditFragment extends Fragment {
 
                         if (!hasErr) {
                             //continue
-                            new ChangePasswordTask().execute(new String[]{curr, nev, confirm});
+                            new ChangePasswordTask().execute(curr, nev, confirm);
                             dialog.dismiss();
                             progressDialog.setMessage("changing password...");
                             progressDialog.show();

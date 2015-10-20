@@ -90,7 +90,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
             }
         });
 
@@ -133,7 +133,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
                 return true;
 
             case R.id.menuitem_comment:
@@ -168,15 +168,13 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
         if (getArguments().containsKey(AppConstants.K.COMMENT.name())) {
             String commentUid = getArguments().getString(AppConstants.K.COMMENT.name());
-            new CommentUpdateTask().execute(new String[]{commentUid, commentTxt.getText().toString(), Boolean.toString(asAnonymous)});
+            new CommentUpdateTask().execute(commentUid, commentTxt.getText().toString(), Boolean.toString(asAnonymous));
 
         } else {
             String postId = getArguments().getString(AppConstants.K.POST.name());
-            new CommentCreateTask().execute(new String[]{postId, commentTxt.getText().toString(), Boolean.toString(asAnonymous)});
+            new CommentCreateTask().execute(postId, commentTxt.getText().toString(), Boolean.toString(asAnonymous));
         }
-
     }
-
 
     private void doLogin() {
         Intent intent = new Intent(getActivity(), LoginActivity.class);

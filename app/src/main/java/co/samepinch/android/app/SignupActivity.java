@@ -159,7 +159,7 @@ public class SignupActivity extends AppCompatActivity {
                     InputStream localImageIS = getContentResolver().openInputStream(Uri.parse(processedImageUri.toString()));
                     byte[] localImageBytes = Utils.getBytes(localImageIS);
                     String localImageEnc = Base64.encodeToString(localImageBytes, Base64.DEFAULT);
-                    new ImageUploadTask().execute(new String[]{"droid.jpeg", localImageEnc});
+                    new ImageUploadTask().execute("droid.jpeg", localImageEnc);
 
                     this.uploadPending = Boolean.TRUE;
 

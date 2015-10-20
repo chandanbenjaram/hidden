@@ -7,6 +7,7 @@ import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
@@ -80,7 +81,7 @@ public class SIMView extends RelativeLayout {
     }
 
     private void initView(Context context) {
-        this.inflate(context, R.layout.widget_sim, this);
+        inflate(context, R.layout.widget_sim, this);
         ButterKnife.bind(this);
     }
 

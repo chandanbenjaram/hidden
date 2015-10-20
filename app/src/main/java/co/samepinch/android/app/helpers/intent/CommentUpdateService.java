@@ -80,12 +80,15 @@ public class CommentUpdateService extends IntentService {
                 } else {
                     Log.e(TAG, "no comment record found to update");
                 }
+            } else if(resp.getBody() !=null && StringUtils.equals(req.getCmd(), "flag")){
+                Map<String, String> eventData = new HashMap<>();
+                String msg = resp.getBody().getMessage() == null ? AppConstants.APP_INTENT.KEY_MSG_GENERIC_ERR.getValue() : resp.getBody().getMessage();
+                eventData.put(AppConstants.K.MESSAGE.name(), msg);
+                BusProvider.INSTANCE.getBus().post(new Events.CommentDetailsRefreshEvent(eventData));
             }
 
         } catch (Exception e) {
             // muted
-            Resp resp = Utils.parseAsRespSilently(e);
-            Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
         }
     }
 }

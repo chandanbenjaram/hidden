@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 mBottomsheet.dismissSheet();
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"));
                 intent.putExtra("sms_body", body);
-                intent.putExtra(intent.EXTRA_TEXT, body);
+                intent.putExtra(Intent.EXTRA_TEXT, body);
                 intent.putExtra(Intent.EXTRA_SUBJECT, subject);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

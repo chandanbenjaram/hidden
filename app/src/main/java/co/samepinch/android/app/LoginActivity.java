@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -237,8 +236,6 @@ public class LoginActivity extends AppCompatActivity implements
         // Could not connect to Google Play Services.  The user needs to select an account,
         // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
         // ConnectionResult to see possible error codes.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-
         if (!mIsResolving && mShouldResolve) {
             if (connectionResult.hasResolution()) {
                 try {
@@ -369,7 +366,7 @@ public class LoginActivity extends AppCompatActivity implements
 
         long i = 0;
         i = System.currentTimeMillis();
-        System.out.println("send over to server..." + i);
+        Log.d(TAG, "send over to server..." + i);
         // Upload the serverAuthCode to the server, which will attempt to exchange it for
         // a refresh token.  This callback occurs on a background thread, so it is OK
         // to perform synchronous network access.  Returning 'false' will fail the
@@ -495,8 +492,6 @@ public class LoginActivity extends AppCompatActivity implements
                 Resp resp = Utils.parseAsRespSilently(e);
                 if (resp != null && resp.getStatus() == 400) {
                     return Boolean.TRUE;
-                } else {
-                    Log.e(TAG, "err validating...");
                 }
             }
             return null;

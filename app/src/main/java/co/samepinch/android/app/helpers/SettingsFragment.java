@@ -102,7 +102,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
             }
         });
         ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
@@ -222,8 +222,6 @@ public class SettingsFragment extends Fragment {
                 }
             } catch (Exception e) {
                 // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp == null ? "null" : resp.getMessage(), e);
             }
             return null;
         }

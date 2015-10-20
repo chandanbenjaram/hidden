@@ -116,7 +116,7 @@ public class TagEditFragment extends Fragment {
 
             // load background view
             SIMView tagImgView = new SIMView(getActivity().getApplicationContext());
-            tagImgView.populateImageViewWithAdjustedAspect(imgUrl, new Integer[]{size.x, size.y});
+            tagImgView.populateImageViewWithAdjustedAspect(imgUrl, size.x, size.y);
             mBGContainer.addView(tagImgView);
         }
 
@@ -160,7 +160,7 @@ public class TagEditFragment extends Fragment {
 
                         // load background view
                         SIMView tagImgView = new SIMView(getActivity().getApplicationContext());
-                        tagImgView.populateImageViewWithAdjustedAspect(imgUrl, new Integer[]{size.x, size.y});
+                        tagImgView.populateImageViewWithAdjustedAspect(imgUrl, size.x, size.y);
 
                         mBGContainer.removeAllViewsInLayout();
                         mBGContainer.addView(tagImgView);

@@ -178,7 +178,7 @@ public class LoginEMailFragment extends android.support.v4.app.Fragment {
         progressDialog.setMessage("resetting password...");
         progressDialog.show();
 
-        new RestPasswordTask().execute(new String[]{email});
+        new RestPasswordTask().execute(email);
     }
 
     private class RestPasswordTask extends AsyncTask<String, Integer, String> {

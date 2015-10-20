@@ -110,6 +110,9 @@ public class MainActivityIn extends AppCompatActivity {
     @Bind(R.id.dot_wall_posts_count)
     TextView mDotPostsCnt;
 
+    @Bind(R.id.dot_wall_blog_wrapper)
+    LinearLayout mDotBlogWrapper;
+
     @Bind(R.id.dot_wall_blog)
     TextView mDotBlog;
 
@@ -243,6 +246,8 @@ public class MainActivityIn extends AppCompatActivity {
         if (StringUtils.isBlank(user.getPhoto())) {
             mVS.setDisplayedChild(1);
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
+            initials = StringUtils.isNotBlank(initials) ? initials : StringUtils.substring(user.getPinchHandle(), 0, 1);
+
             mDotImageText.setText(initials);
             Bitmap blurredBitmap = ImageUtils.blurredDfltBitmap();
             mBackdrop.setImageBitmap(blurredBitmap);
@@ -297,6 +302,7 @@ public class MainActivityIn extends AppCompatActivity {
         }
 
         if (Utils.isValidUri(user.getBlog())) {
+            mDotBlogWrapper.setVisibility(View.VISIBLE);
             mDotBlog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -304,6 +310,8 @@ public class MainActivityIn extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+        }else{
+            mDotBlogWrapper.setVisibility(View.GONE);
         }
 
         if (init) {
@@ -467,7 +475,7 @@ public class MainActivityIn extends AppCompatActivity {
                 mBottomsheet.dismissSheet();
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"));
                 intent.putExtra("sms_body", body);
-                intent.putExtra(intent.EXTRA_TEXT, body);
+                intent.putExtra(Intent.EXTRA_TEXT, body);
                 intent.putExtra(Intent.EXTRA_SUBJECT, subject);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

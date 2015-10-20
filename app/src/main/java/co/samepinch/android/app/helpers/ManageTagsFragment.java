@@ -86,7 +86,7 @@ public class ManageTagsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
             }
         });
         toolbar.setTitle("MANAGE TAGS");

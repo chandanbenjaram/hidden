@@ -190,7 +190,7 @@ public class DotWallFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
             }
         });
 
@@ -335,6 +335,7 @@ public class DotWallFragment extends Fragment {
         if (!Utils.isValidUri(user.getPhoto())) {
             mVS.setDisplayedChild(1);
             String initials = StringUtils.join(StringUtils.substring(fName, 0, 1), StringUtils.substring(lName, 0, 1));
+            initials = StringUtils.isNotBlank(initials) ? initials : StringUtils.substring(user.getPinchHandle(), 0, 1);
             mDotImageText.setText(initials);
 
             Bitmap blurredBitmap = ImageUtils.blurredDfltBitmap();
@@ -452,7 +453,7 @@ public class DotWallFragment extends Fragment {
             public void onClick(View v) {
                 if (Utils.isLoggedIn()) {
                     String command = user.getFollow() == null || !user.getFollow() ? "follow" : "unfollow";
-                    new FollowActionTask().execute(new String[]{user.getUid(), command});
+                    new FollowActionTask().execute(user.getUid(), command);
                 } else {
                     doLogin();
                 }
@@ -551,7 +552,6 @@ public class DotWallFragment extends Fragment {
                 return resp.getBody().getStatus() == 200;
             } catch (Exception e) {
                 // muted
-                Resp resp = Utils.parseAsRespSilently(e);
             }
             return Boolean.FALSE;
         }

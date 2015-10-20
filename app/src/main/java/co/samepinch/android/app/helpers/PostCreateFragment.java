@@ -166,7 +166,7 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
             }
         });
         toolbar.setTitle("NEW");
@@ -373,8 +373,6 @@ public class PostCreateFragment extends Fragment implements PopupMenu.OnMenuItem
                 return resp.getBody();
             } catch (Exception e) {
                 // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp.getMessage(), e);
             }
             return null;
         }

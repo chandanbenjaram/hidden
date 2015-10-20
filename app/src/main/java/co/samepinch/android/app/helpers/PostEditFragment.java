@@ -239,7 +239,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
             @Override
             public void onClick(View v) {
                 // hack to get click working
-                ((AppCompatActivity) getActivity()).onBackPressed();
+                getActivity().onBackPressed();
             }
         });
         toolbar.setTitle("EDIT");
@@ -463,8 +463,6 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 return resp.getBody();
             } catch (Exception e) {
                 // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp.getMessage(), e);
             }
             return null;
         }
@@ -517,8 +515,6 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
                 return resp.getBody().getStatus() == 200;
             } catch (Exception e) {
                 // muted
-                Resp resp = Utils.parseAsRespSilently(e);
-                Log.e(TAG, resp.getMessage(), e);
             }
             return Boolean.FALSE;
         }

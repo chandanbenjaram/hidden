@@ -485,11 +485,15 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void onCommentDetailsRefreshEvent(Events.CommentDetailsRefreshEvent event) {
+    public void onCommentDetailsRefreshEvent(final Events.CommentDetailsRefreshEvent event) {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    String eventMsg;
+                    if(event.getMetaData() !=null && (eventMsg = event.getMetaData().get(AppConstants.K.MESSAGE.name())) !=null){
+                        Snackbar.make(mBottomsheet, eventMsg, Snackbar.LENGTH_SHORT).show();
+                    }
                     ((MergeCursor) mViewAdapter.getCursor()).requery();
                     mViewAdapter.notifyDataSetChanged();
                 } catch (Exception e) {

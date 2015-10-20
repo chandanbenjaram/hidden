@@ -131,10 +131,7 @@ public class ChooseHandleFragment extends android.support.v4.app.Fragment {
                 Resp resp = Utils.parseAsRespSilently(e);
                 if (resp != null && resp.getStatus() == 400) {
                     return Boolean.FALSE;
-                } else {
-                    Log.e(TAG, "err validating...");
                 }
-
             }
 
             return null;
