@@ -28,10 +28,12 @@ import co.samepinch.android.app.MainActivity;
 import co.samepinch.android.app.MainActivityIn;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.intent.ParseSyncService;
+import co.samepinch.android.app.helpers.intent.PostsPullService;
 import co.samepinch.android.app.helpers.widget.SIMView;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.PREF_APP_HELLO_WORLD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_ACCESS_STATE;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_FRESH_DATA_FLAG;
 
 public class RootActivity extends AppCompatActivity {
     public static final String TAG = "RootActivity";
@@ -178,13 +180,21 @@ public class RootActivity extends AppCompatActivity {
                     container.addView(bgImageView);
                 }
             }, 999);
+
+            // call to preload posts
+            Bundle iArgs = new Bundle();
+            iArgs.putBoolean(KEY_FRESH_DATA_FLAG.getValue(), Boolean.TRUE);
+            Intent mServiceIntent =
+                    new Intent(RootActivity.this, PostsPullService.class);
+            mServiceIntent.putExtras(iArgs);
+            startService(mServiceIntent);
         } else {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     RootActivity.this.launchTargetActivity(isLoggedIn);
                 }
-            }, 299);
+            }, 599);
         }
     }
 

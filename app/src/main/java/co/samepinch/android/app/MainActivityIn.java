@@ -58,6 +58,7 @@ public class MainActivityIn extends AppCompatActivity {
     public static final String TAG = "MainActivityIn";
     private static final int INTENT_LOGOUT = 1;
     private static final int TAB_ITEM_COUNT = 2;
+    public static final String DFLT_ZERO = "0";
 
     @Bind(R.id.bottomsheet)
     BottomSheetLayout mBottomsheet;
@@ -286,7 +287,7 @@ public class MainActivityIn extends AppCompatActivity {
         if (user.getFollowersCount() != null) {
             mDotFollowersCnt.setText(Long.toString(user.getFollowersCount()));
         } else {
-            mDotFollowersCnt.setVisibility(View.GONE);
+            mDotFollowersCnt.setText(DFLT_ZERO);
         }
 
         if (StringUtils.isNotBlank(user.getSummary())) {
@@ -298,7 +299,7 @@ public class MainActivityIn extends AppCompatActivity {
         if (user.getPostsCount() != null) {
             mDotPostsCnt.setText(Long.toString(user.getPostsCount()));
         } else {
-            mDotPostsCnt.setVisibility(View.GONE);
+            mDotPostsCnt.setText(DFLT_ZERO);
         }
 
         if (Utils.isValidUri(user.getBlog())) {

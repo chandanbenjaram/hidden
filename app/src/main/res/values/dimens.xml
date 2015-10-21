@@ -20,9 +20,9 @@
     <dimen name="list_item_avatar_size">55dp</dimen>
     <dimen name="signup_avatar_size">99dp</dimen>
 
-    <dimen name="wall_commenter_size">15dp</dimen>
+    <dimen name="wall_commenter_size">25dp</dimen>
     <dimen name="wall_commenter_margin">2dp</dimen>
-    <dimen name="wall_content_image_size">55dp</dimen>
+    <dimen name="wall_content_image_size">99dp</dimen>
 
     <dimen name="elevation_high">12dp</dimen>
     <dimen name="fab_compat_margin">0dp</dimen>

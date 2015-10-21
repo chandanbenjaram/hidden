@@ -126,14 +126,19 @@
 
     <style name="SP_TEXT.METADATA">
         <item name="android:textColor">#dedede</item>
-        <item name="android:textSize">9sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:scrollHorizontally">true</item>
     </style>
 
     <style name="SP_TEXT.METADATA.ABOUTME">
         <item name="android:textColor">@color/white_text_secondary</item>
-        <item name="android:textSize">9sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">italic</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">9</item>
     </style>
 
     <style name="SP_TEXT.BS">
@@ -159,7 +164,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14sp</item>
         <item name="android:color">@color/colorPrimary</item>
-        <item name="android:padding">5dp</item>
+        <item name="android:padding">10dp</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:layout_gravity">center</item>
     </style>

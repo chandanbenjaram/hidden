@@ -41,6 +41,7 @@ import co.samepinch.android.data.dto.User;
  */
 public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
+    public static final String DFLT_ZERO = "0";
     @Bind(R.id.avatar)
     SimpleDraweeView mAvatar;
 
@@ -124,7 +125,7 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
         mAvatarHandle.setText(pinchHandle);
 
         // setup counts
-        mCommentUpvote.setText(StringUtils.defaultString(Integer.toString(commentDetails.getUpvoteCount()), "0"));
+        mCommentUpvote.setText(StringUtils.defaultString(Integer.toString(commentDetails.getUpvoteCount()), DFLT_ZERO));
 
         // setup date
         mCommentDate.setText(TimeUtils.toHumanRelativePeriod(commentDetails.getCreatedAt()));

@@ -4,11 +4,10 @@
     android:id="@+id/layout_post_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:gravity="center_vertical"
     android:paddingBottom="8dp"
-    android:paddingTop="8dp"
-    android:background="@android:color/white"
-    >
+    android:paddingTop="8dp">
 
     <RelativeLayout
         android:id="@+id/header"
@@ -49,7 +48,7 @@
                 android:background="@drawable/rounded_corners"
                 android:clickable="true"
                 android:gravity="center_horizontal|center"
-                android:text="NAME"
+                android:text="@string/hint_name"
                 android:textAllCaps="true"
                 android:textColor="@color/blue_500" />
         </ViewSwitcher>
@@ -65,12 +64,11 @@
             android:gravity="center_vertical"
             android:paddingBottom="15dp"
             android:paddingLeft="2dp"
-            android:text="@string/hint_dot"
-            android:textAllCaps="true" />
+            android:text="@string/hint_dot" />
 
         <TextView
             android:id="@+id/wall_post_date"
-            style="@style/SP_TEXT.BODY.DISABLED.EXTRA_SMALL"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -80,7 +78,8 @@
             android:paddingBottom="15dp"
             android:paddingLeft="2dp"
             android:paddingRight="5dp"
-            android:text="@string/hint_date" />
+            android:text="@string/hint_date"
+            android:textAllCaps="false" />
 
         <TextView
             android:id="@+id/wall_pinch_handle"
@@ -97,7 +96,7 @@
 
         <TextView
             android:id="@+id/wall_post_views"
-            style="@style/SP_TEXT.BODY.DISABLED.EXTRA_SMALL"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -110,7 +109,7 @@
 
         <TextView
             android:id="@+id/wall_post_upvote"
-            style="@style/SP_TEXT.BODY.DISABLED.EXTRA_SMALL"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -124,38 +123,43 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/wall_post_content"
-        style="@style/SP_TEXT.BODY.WALL_POST"
+    <LinearLayout
+        android:id="@+id/wall_post_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/header"
-        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:text="@string/hint_content" />
+        android:paddingRight="5dp">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/wall_post_images"
-        android:layout_width="@dimen/wall_content_image_size"
-        android:layout_height="@dimen/wall_content_image_size"
-        android:layout_below="@id/wall_post_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:adjustViewBounds="true"
-        android:gravity="center"
-        android:padding="5dp"
-        fresco:roundAsCircle="false" />
+        <TextView
+            android:id="@+id/wall_post_content"
+            style="@style/SP_TEXT.BODY.WALL_POST"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:ellipsize="end"
+            android:text="@string/hint_content" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/wall_post_images"
+            android:layout_width="@dimen/wall_content_image_size"
+            android:layout_height="@dimen/wall_content_image_size"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"
+            fresco:roundAsCircle="false" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/wall_tags"
         style="@style/SP_TagTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/wall_post_images"
+        android:layout_below="@id/wall_post_body"
         android:layout_centerHorizontal="true"
-        android:maxLines="5"
-        />
+        android:maxLines="5" />
 
     <LinearLayout
         android:id="@+id/wall_post_commenters"

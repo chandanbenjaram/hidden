@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
             tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
         }
 
-
         Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.sp_icon);
         mBackdrop.setImageBitmap(appIcon);
     }

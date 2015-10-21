@@ -52,6 +52,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  */
 public class PostsPullService extends IntentService {
     public static final String TAG = "PostsPullService";
+    public static final String DFLT_ZERO = "0";
 
     public PostsPullService() {
         super("PostsPullService");
@@ -71,7 +72,7 @@ public class PostsPullService extends IntentService {
             postsReq.setToken(Utils.getNonBlankAppToken());
             postsReq.setCmd("filter");
             // set context args
-            Integer postCount = Integer.parseInt(iArgs.getString(KEY_POST_COUNT.getValue(), "0"));
+            Integer postCount = Integer.parseInt(iArgs.getString(KEY_POST_COUNT.getValue(), DFLT_ZERO));
             postsReq.setPostCount(postCount);
             postsReq.setLastModified(iArgs.getString(KEY_LAST_MODIFIED.getValue(), EMPTY));
             postsReq.setKey(iArgs.getString(KEY_STEP.getValue(), "new"));

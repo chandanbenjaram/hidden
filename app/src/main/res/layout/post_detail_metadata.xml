@@ -10,16 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center|bottom"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true" >
+        android:orientation="horizontal" >
         <TextView
             style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textAllCaps="false"
             android:text="@string/by"
-            android:gravity="center|bottom"
-            android:layout_alignParentBottom="true" />
+            android:gravity="center|bottom"/>
 
         <TextView
             android:id="@+id/post_dot_name"
@@ -27,8 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/loading"
-            android:gravity="center|bottom"
-            android:layout_alignParentBottom="true" />
+            android:gravity="center|bottom"/>
     </LinearLayout>
 
     <LinearLayout
@@ -105,7 +101,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="top|center_horizontal"
             android:orientation="vertical">
 

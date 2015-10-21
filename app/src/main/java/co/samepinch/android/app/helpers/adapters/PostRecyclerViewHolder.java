@@ -34,7 +34,8 @@ import co.samepinch.android.data.dto.User;
  * Created by imaginationcoder on 7/2/15.
  */
 public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
-//    @Bind(R.id.layout_post_item)
+    public static final String DFLT_ZERO = "0";
+    //    @Bind(R.id.layout_post_item)
 //    RelativeLayout mLayoutPostItem;
 
     @Bind(R.id.avatar_image_vs)
@@ -105,10 +106,13 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
             mAvatarName.setText(name);
             mAvatarImgVS.setDisplayedChild(1);
         }
-        mWallPostDotView.setText(StringUtils.join(new String[]{user.getFname(), user.getLname()}, " "));
+        String fName = StringUtils.defaultString(user.getFname()).toLowerCase();
+        String lName = StringUtils.defaultString(user.getLname()).toLowerCase();
+        String name = StringUtils.join(new String[]{StringUtils.capitalize(fName), StringUtils.capitalize(lName), StringUtils.SPACE});
+        mWallPostDotView.setText(StringUtils.defaultString(name, "anonymous"));
         mWallPinchHandleView.setText(String.format(mContext.getString(R.string.pinch_handle), user.getPinchHandle()));
-        mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), "0"));
-        mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), "0"));
+        mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), DFLT_ZERO));
+        mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), DFLT_ZERO));
         mWallPostDateView.setText(TimeUtils.toHumanRelativePeriod(mPost.getCreatedAt()));
         mWallPostContentView.setText(mPost.getWallContent());
         mCommentersCount.setText(String.valueOf(mPost.getCommentCount()));
@@ -133,15 +137,15 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
             View child;
             for (Commenter commenter : commenters) {
                 // check if more than placeholder image reached
-                if(iViewIndex == totalPlaceholderCnt){
+                if (iViewIndex == totalPlaceholderCnt) {
                     break;
                 }
 
-                if(commenter.getAnonymous() !=null && commenter.getAnonymous().booleanValue()){
+                if (commenter.getAnonymous() != null && commenter.getAnonymous().booleanValue()) {
                     commenterImg = anonyImg;
-                }else if(Utils.isValidUri(commenter.getPhoto())){
+                } else if (Utils.isValidUri(commenter.getPhoto())) {
                     commenterImg = commenter.getPhoto();
-                }else{
+                } else {
                     continue;
                 }
 

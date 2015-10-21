@@ -36,7 +36,6 @@
             android:clickable="true"
             android:gravity="center"
             android:textColor="@color/blue_500"
-            android:textAllCaps="true"
             android:layout_margin="5dp"/>
 
         <TextView
