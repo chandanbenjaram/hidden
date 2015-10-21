@@ -40,45 +40,39 @@
 
         <TextView
             android:id="@+id/avatar_handle"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignBaseline="@id/avatar"
-            android:layout_toRightOf="@+id/avatar"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp"
-            android:text="handle" />
+            android:layout_toRightOf="@+id/avatar" />
 
         <TextView
             android:id="@+id/comment_upvote"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/avatar"
             android:layout_toLeftOf="@+id/comment_date"
             android:gravity="center_vertical"
-            android:text="vote"
-            android:drawableLeft="@drawable/thumb_gray_small"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp" />
+            android:drawableLeft="@drawable/thumb_gray_small" />
 
         <TextView
             android:id="@+id/comment_date"
+            style="@style/SP_TEXT.BODY.DISABLED"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/avatar"
             android:layout_toLeftOf="@+id/comment_menu"
             android:gravity="center_vertical"
             android:paddingLeft="2dp"
-            android:text="date"
             android:drawableLeft="@drawable/timer_small"
-            android:textColor="@color/grey_500"
-            android:textSize="10dp" />
+            />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/comment_menu"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
             android:layout_alignParentRight="true"
-            android:adjustViewBounds="true"
             android:paddingLeft="2dp"
             android:paddingRight="5dp"
             android:gravity="center_vertical"
@@ -88,7 +82,6 @@
             android:id="@+id/comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="a comment"
             android:textColor="@color/grey_900"
             android:layout_below="@+id/comment_menu"
             android:layout_toRightOf="@+id/avatar"
