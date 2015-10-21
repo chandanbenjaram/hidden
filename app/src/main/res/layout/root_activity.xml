@@ -1,33 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bg_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_gravity="center">
 
-    <FrameLayout
-        android:id="@+id/bg_container"
+    <ViewSwitcher
+        android:id="@+id/bg_text_switch"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center" >
+        android:layout_height="match_parent">
 
-        <ViewSwitcher
-            android:id="@+id/bg_text_switch"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                style="@style/SP_LANDING"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:text="@string/loading_with_text" />
-            <TextView
-                style="@style/SP_LANDING"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:text="@string/welcome_title" />
-        </ViewSwitcher>
-    </FrameLayout>
-</RelativeLayout>
+        <TextView
+            style="@style/SP_LANDING"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/loading_with_text" />
+
+        <TextView
+            style="@style/SP_LANDING"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/welcome_title" />
+    </ViewSwitcher>
+</FrameLayout>
 

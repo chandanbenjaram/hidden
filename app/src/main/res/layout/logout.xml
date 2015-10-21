@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bg_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
     <TextView
         android:id="@+id/txt_logout_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:text="signing out..."
+        android:text="@string/hint_signing_out"
         android:textColor="@color/blue_500" />
 
     <Button
         android:id="@+id/btn_tryagain"
+        android:layout_below="@+id/txt_logout_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="try again"
-        android:visibility="gone" />
-</LinearLayout>
+        android:text="@string/btn_try_again"/>
+</RelativeLayout>
