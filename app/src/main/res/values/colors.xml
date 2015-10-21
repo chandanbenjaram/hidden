@@ -23,4 +23,6 @@
     <color name="white">#ffffff</color>
     <color name="white_text_secondary">#b3ffffff</color>
     <color name="transparent_bg1">#5978909C</color>
+    <color name="transparent_water">#FFFFFFFF</color>
+
 </resources>

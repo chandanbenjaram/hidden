@@ -145,8 +145,8 @@
             android:id="@+id/wall_post_images"
             android:layout_width="@dimen/wall_content_image_size"
             android:layout_height="@dimen/wall_content_image_size"
-            android:paddingLeft="5dp"
             android:layout_weight="1"
+            android:paddingLeft="5dp"
             fresco:roundAsCircle="false" />
 
     </LinearLayout>
@@ -175,45 +175,45 @@
             android:layout_height="@dimen/wall_commenter_size"
             android:layout_centerVertical="true"
             android:layout_margin="@dimen/wall_commenter_margin"
-            android:adjustViewBounds="true"
+            android:background="@drawable/avatar_square_water_border"
             android:visibility="gone"
-            fresco:roundAsCircle="true" />
+            fresco:roundedCornerRadius="5dp" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/wall_commenter_1"
             android:layout_width="@dimen/wall_commenter_size"
             android:layout_height="@dimen/wall_commenter_size"
             android:layout_margin="@dimen/wall_commenter_margin"
-            android:adjustViewBounds="true"
+            android:background="@drawable/avatar_square_water_border"
             android:visibility="gone"
-            fresco:roundAsCircle="true" />
+            fresco:roundedCornerRadius="5dp" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/wall_commenter_2"
             android:layout_width="@dimen/wall_commenter_size"
             android:layout_height="@dimen/wall_commenter_size"
             android:layout_margin="@dimen/wall_commenter_margin"
-            android:adjustViewBounds="true"
+            android:background="@drawable/avatar_square_water_border"
             android:visibility="gone"
-            fresco:roundAsCircle="true" />
+            fresco:roundedCornerRadius="5dp" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/wall_commenter_3"
             android:layout_width="@dimen/wall_commenter_size"
             android:layout_height="@dimen/wall_commenter_size"
             android:layout_margin="@dimen/wall_commenter_margin"
-            android:adjustViewBounds="true"
+            android:background="@drawable/avatar_square_water_border"
             android:visibility="gone"
-            fresco:roundAsCircle="true" />
+            fresco:roundedCornerRadius="5dp" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/wall_commenter_4"
             android:layout_width="@dimen/wall_commenter_size"
             android:layout_height="@dimen/wall_commenter_size"
             android:layout_margin="@dimen/wall_commenter_margin"
-            android:adjustViewBounds="true"
+            android:background="@drawable/avatar_square_water_border"
             android:visibility="gone"
-            fresco:roundAsCircle="true" />
+            fresco:roundedCornerRadius="5dp" />
 
         <TextView
             android:id="@+id/wall_commenters_count"

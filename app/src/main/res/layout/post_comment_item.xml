@@ -19,8 +19,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:background="@drawable/avatar_square_border"
             android:clickable="true"
+            android:background="@drawable/avatar_square_border"
             fresco:roundedCornerRadius="5dp"
             fresco:viewAspectRatio="1"
             android:layout_margin="5dp"/>
