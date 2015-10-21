@@ -42,6 +42,10 @@ import co.samepinch.android.data.dto.User;
 public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
     public static final String DFLT_ZERO = "0";
+
+    @Bind(R.id.comment_item_layout)
+    View mCommentVew;
+
     @Bind(R.id.avatar)
     SimpleDraweeView mAvatar;
 
@@ -135,66 +139,93 @@ public class PostCommentsRVHolder extends PostDetailsRVHolder {
 
         final List<String> permissions = commentDetails.getPermissions();
         final String commentUID = commentDetails.getUid();
+
+        mCommentUpvote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentActionPrompt(commentDetails, commentUID, permissions);
+
+            }
+        });
+        mCommentDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentActionPrompt(commentDetails, commentUID, permissions);
+            }
+        });
+
         commentMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final BottomSheetLayout bs = (BottomSheetLayout) mView.getRootView().findViewById(R.id.bottomsheet);
-                // prepare menu options
-                View menu = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_menu, bs, false);
-                LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
-                if (commentDetails.getUpvoted() != null && commentDetails.getUpvoted()) {
-                    TextView downVoteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_downvote, null);
-                    layout.addView(downVoteView);
-                    new MenuItemClickListener(downVoteView, "undoVoting", commentUID, bs);
-                } else {
-                    TextView voteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_upvote, null);
-                    layout.addView(voteView);
-                    new MenuItemClickListener(voteView, "upvote", commentUID, bs);
-                }
-
-                if (permissions.contains("edit")) {
-                    final TextView editView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_edit, null);
-                    editView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Map<String, String> metaData = new HashMap<>();
-                            metaData.put(AppConstants.K.COMMENT.name(), commentDetails.getUid());
-                            BusProvider.INSTANCE.getBus().post(new Events.CommentDetailsEditEvent(metaData));
-                            bs.dismissSheet();
-                        }
-                    });
-                    layout.addView(editView);
-                }
-
-                if (permissions.contains("flag")) {
-                    TextView flagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_flag, null);
-                    layout.addView(flagView);
-                    flagView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            new MaterialDialog.Builder(v.getContext())
-                                    .title(R.string.flag_title)
-                                    .items(R.array.flag_choice_arr)
-                                    .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
-                                        @Override
-                                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence reason) {
-                                            Bundle body = new Bundle();
-                                            body.putString("reason", String.valueOf(reason));
-                                            new MenuItemClickListener(v, "flag", commentUID, bs).callRemote(body);
-                                            return true;
-                                        }
-                                    })
-                                    .negativeText(R.string.flag_btn_cancel)
-                                    .positiveText(R.string.flag_btn_choose)
-                                    .show();
-                        }
-                    });
-                }
-
-
-                bs.showWithSheetView(menu);
+                commentActionPrompt(commentDetails, commentUID, permissions);
             }
         });
+
+        mCommentVew.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                commentActionPrompt(commentDetails, commentUID, permissions);
+                return true;
+            }
+        });
+    }
+
+    private void commentActionPrompt(final CommentDetails commentDetails, final String commentUID, List<String> permissions) {
+        final BottomSheetLayout bs = (BottomSheetLayout) mView.getRootView().findViewById(R.id.bottomsheet);
+        // prepare menu options
+        View menu = LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_menu, bs, false);
+        LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
+        if (commentDetails.getUpvoted() != null && commentDetails.getUpvoted()) {
+            TextView downVoteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_downvote, null);
+            layout.addView(downVoteView);
+            new MenuItemClickListener(downVoteView, "undoVoting", commentUID, bs);
+        } else {
+            TextView voteView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_upvote, null);
+            layout.addView(voteView);
+            new MenuItemClickListener(voteView, "upvote", commentUID, bs);
+        }
+
+        if (permissions.contains("edit")) {
+            final TextView editView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_edit, null);
+            editView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Map<String, String> metaData = new HashMap<>();
+                    metaData.put(AppConstants.K.COMMENT.name(), commentDetails.getUid());
+                    BusProvider.INSTANCE.getBus().post(new Events.CommentDetailsEditEvent(metaData));
+                    bs.dismissSheet();
+                }
+            });
+            layout.addView(editView);
+        }
+
+        if (permissions.contains("flag")) {
+            TextView flagView = (TextView) LayoutInflater.from(mView.getContext()).inflate(R.layout.bs_raw_flag, null);
+            layout.addView(flagView);
+            flagView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    new MaterialDialog.Builder(v.getContext())
+                            .title(R.string.flag_title)
+                            .items(R.array.flag_choice_arr)
+                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                                @Override
+                                public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence reason) {
+                                    Bundle body = new Bundle();
+                                    body.putString("reason", String.valueOf(reason));
+                                    new MenuItemClickListener(v, "flag", commentUID, bs).callRemote(body);
+                                    return true;
+                                }
+                            })
+                            .negativeText(R.string.flag_btn_cancel)
+                            .positiveText(R.string.flag_btn_choose)
+                            .show();
+                }
+            });
+        }
+
+
+        bs.showWithSheetView(menu);
     }
 
     private static class MenuItemClickListener implements View.OnClickListener {
