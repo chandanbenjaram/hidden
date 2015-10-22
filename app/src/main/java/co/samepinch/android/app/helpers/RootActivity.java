@@ -12,14 +12,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.TransitionInflater;
+import android.view.View;
 import android.view.Window;
-import android.widget.FrameLayout;
+import android.widget.Button;
 import android.widget.ViewSwitcher;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.appevents.AppEventsLogger;
-import com.facebook.common.util.UriUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,7 +31,6 @@ import co.samepinch.android.app.MainActivityIn;
 import co.samepinch.android.app.R;
 import co.samepinch.android.app.helpers.intent.ParseSyncService;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
-import co.samepinch.android.app.helpers.widget.SIMView;
 
 import static co.samepinch.android.app.helpers.AppConstants.API.PREF_APP_HELLO_WORLD;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_ACCESS_STATE;
@@ -164,27 +163,18 @@ public class RootActivity extends AppCompatActivity {
                     // reset first time
                     Utils.PreferencesManager.getInstance().setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
 
-                    FrameLayout container = (FrameLayout) findViewById(R.id.bg_container);
-                    container.removeAllViews();
-
-                    Uri bgResourceUri = new Uri.Builder()
-                            .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
-                            .path(String.valueOf(R.drawable.welcome))
-                            .build();
-
-                    SIMView bgImageView = new SIMView(getApplicationContext());
-                    bgImageView.setIsClickDisabled(Boolean.TRUE);
-                    bgImageView.populateImageViewWithAdjustedAspect(bgResourceUri.toString());
-                    bgImageView.setDuplicateParentStateEnabled(true);
-                    mHandler.postDelayed(new Runnable() {
+                    ViewSwitcher vs = (ViewSwitcher) findViewById(R.id.content_switch);
+                    vs.setDisplayedChild(1);
+                    Button firstTimeBtn = (Button) vs.getChildAt(1);
+                    firstTimeBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void run() {
+                        public void onClick(View v) {
                             RootActivity.this.launchTargetActivity(isLoggedIn);
                         }
-                    }, 1999);
-                    container.addView(bgImageView);
+                    });
                 }
             }, 999);
+
 
             // call to preload posts
             Bundle iArgs = new Bundle();
@@ -199,7 +189,7 @@ public class RootActivity extends AppCompatActivity {
                 public void run() {
                     RootActivity.this.launchTargetActivity(isLoggedIn);
                 }
-            }, 599);
+            }, 999);
         }
     }
 

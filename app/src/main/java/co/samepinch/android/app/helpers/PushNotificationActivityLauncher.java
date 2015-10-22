@@ -1,6 +1,5 @@
 package co.samepinch.android.app.helpers;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +30,7 @@ public class PushNotificationActivityLauncher extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.root_activity);
+        setContentView(R.layout.empty);
         try {
             // get caller data
             PushNotification notification = SPParsePushBroadcastReceiver.getAppPushNotification(getIntent());

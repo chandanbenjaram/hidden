@@ -3,6 +3,9 @@
     <item android:title="@string/title_the_app">
         <menu>
             <item
+                android:id="@+id/nav_sign_in"
+                android:title="@string/menu_sign_in" />
+            <item
                 android:id="@+id/nav_spread_it"
                 android:title="@string/menu_spread" />
             <item

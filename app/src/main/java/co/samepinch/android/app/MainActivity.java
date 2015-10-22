@@ -1,8 +1,6 @@
 package co.samepinch.android.app;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -18,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,11 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Bind(R.id.viewpager)
     ViewPager mViewPager;
-
-    @Bind(R.id.backdrop)
-    ImageView mBackdrop;
-
-    SPFragmentPagerAdapter adapterViewPager;
 
     @Override
     protected void onResume() {
@@ -99,7 +91,10 @@ public class MainActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         setupDrawerContent(mNavigationView);
-        setupViewPager(mViewPager);
+
+        SPFragmentPagerAdapter adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
+        adapterViewPager.setCount(1);
+        mViewPager.setAdapter(adapterViewPager);
 
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
@@ -109,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
             tab.setCustomView(SPFragmentPagerAdapter.getTabView(getApplicationContext(), i));
         }
 
-        Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.sp_icon);
-        mBackdrop.setImageBitmap(appIcon);
+//        Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.sp_icon);
+//        mBackdrop.setImageBitmap(appIcon);
     }
 
     @Override
@@ -157,12 +152,6 @@ public class MainActivity extends AppCompatActivity {
         BusProvider.INSTANCE.getBus().unregister(this);
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
-        adapterViewPager.setCount(1);
-        viewPager.setAdapter(adapterViewPager);
-    }
-
     private void setupDrawerContent(NavigationView navigationView) {
         setupDrawerNavListener();
     }
@@ -197,6 +186,10 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case R.id.nav_feedback:
                                 doFeedback();
+                                break;
+                            case R.id.nav_sign_in:
+                                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                                startActivityForResult(loginIntent, INTENT_LOGIN);
                                 break;
                             default:
                                 Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());

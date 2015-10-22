@@ -112,6 +112,7 @@
     <string name="menu_sys_status">System Status</string>
     <string name="menu_post">Post</string>
     <string name="menu_tags">Tags</string>
+    <string name="menu_sign_in">Sign In</string>
     <string name="menu_sign_out">Sign Out</string>
     <string name="hint_dot">DOT</string>
     <string name="hint_name">NAME</string>
