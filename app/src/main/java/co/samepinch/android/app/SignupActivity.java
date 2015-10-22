@@ -107,7 +107,7 @@ public class SignupActivity extends AppCompatActivity {
         ButterKnife.bind(SignupActivity.this);
 
         progressDialog = new ProgressDialog(SignupActivity.this,
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
         progressDialog.setIndeterminate(true);
 

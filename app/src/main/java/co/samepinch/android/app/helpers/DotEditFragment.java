@@ -118,7 +118,7 @@ public class DotEditFragment extends Fragment {
 
         // progress dialog properties
         progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
         mHandler = new LocalHandler(this);
 

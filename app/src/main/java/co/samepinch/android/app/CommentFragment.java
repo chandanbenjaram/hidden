@@ -69,7 +69,7 @@ public class CommentFragment extends Fragment implements android.support.v7.widg
 
         // progress dialog properties
         progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);

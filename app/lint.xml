@@ -3,20 +3,11 @@
     <!-- Disable the given check in this project -->
     <issue id="IconMissingDensityFolder" severity="ignore" />
 
-    <!-- Ignore the ObsoleteLayoutParam issue in the specified files -->
-    <issue id="ObsoleteLayoutParam">
-        <ignore path="res/layout/activation.xml" />
-        <ignore path="res/layout-xlarge/activation.xml" />
-    </issue>
-
-    <!--&lt;!&ndash; Ignore the UselessLeaf issue in the specified file &ndash;&gt;-->
-    <!--<issue id="UselessLeaf">-->
-        <!--<ignore path="res/layout/main.xml" />-->
-    <!--</issue>-->
-
     <!-- Change the severity of hardcoded strings to "error" -->
-    <issue id="HardcodedText" severity="error" />
-    <issue id="all">
-        <ignore regexp="target/classes/com/facebook/.*" />
+    <issue id="HardcodedText" severity="warn" />
+    <issue id="InflateParams" severity="ignore"/>
+    <issue id="InvalidPackage">
+        <ignore regexp="okio-1.6.0.jar" />
     </issue>
+    <issue id="PrivateResource" severity="ignore" />
 </lint>

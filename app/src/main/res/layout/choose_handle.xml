@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
@@ -46,7 +44,7 @@
                 android:id="@+id/input_pinchHandle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:capitalize="none"
+                android:inputType="text"
                 android:hint="@string/hint_choose_handle"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>

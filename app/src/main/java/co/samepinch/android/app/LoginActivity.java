@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements
         BusProvider.INSTANCE.getBus().register(this);
 
         progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
 
         gSignInButton.setSize(SignInButton.SIZE_WIDE);

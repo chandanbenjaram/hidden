@@ -51,6 +51,7 @@ import co.samepinch.android.app.helpers.adapters.EndlessRecyclerOnScrollListener
 import co.samepinch.android.app.helpers.adapters.PostCursorRecyclerViewAdapter;
 import co.samepinch.android.app.helpers.intent.DotDetailsService;
 import co.samepinch.android.app.helpers.intent.PostsPullService;
+import co.samepinch.android.app.helpers.intent.TagsPullService;
 import co.samepinch.android.app.helpers.pubsubs.BusProvider;
 import co.samepinch.android.app.helpers.pubsubs.Events;
 import co.samepinch.android.app.helpers.widget.SIMView;
@@ -64,6 +65,8 @@ import co.samepinch.android.rest.RestClient;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_BY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_KEY;
 import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_POSTS_USER;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_FAV;
+import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_TAGS_PULL_TYPE;
 import static co.samepinch.android.app.helpers.AppConstants.K;
 
 public class DotWallFragment extends Fragment {
@@ -114,9 +117,6 @@ public class DotWallFragment extends Fragment {
     @Bind(R.id.dot_wall_switch)
     ViewSwitcher mVS;
 
-    @Bind(R.id.swipeRefreshLayout)
-    SwipeRefreshLayout mRefreshLayout;
-
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
@@ -136,15 +136,30 @@ public class DotWallFragment extends Fragment {
         super.onResume();
         // register to event bus
         BusProvider.INSTANCE.getBus().register(this);
+
+        // refresh
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mViewAdapter != null) {
+                    String dotUid = getArguments().getString(K.KEY_DOT.name());
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
+                    if (cursor.moveToFirst()) {
+                        mViewAdapter.changeCursor(cursor);
+                    } else {
+                        if (!cursor.isClosed()) {
+                            cursor.close();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
-        if (mRefreshLayout.isRefreshing()) {
-            mRefreshLayout.setRefreshing(false);
-        }
     }
 
     @Override
@@ -173,15 +188,6 @@ public class DotWallFragment extends Fragment {
         // clear session data
         Utils.PreferencesManager.getInstance().remove(AppConstants.API.PREF_POSTS_LIST_USER.getValue());
 
-        // grab user
-        final String dotUid = getArguments().getString(K.KEY_DOT.name());
-        Cursor cursor = getActivity().getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
-        if (!cursor.moveToFirst()) {
-            getActivity().finish();
-        }
-        final User user = Utils.cursorToUserEntity(cursor);
-        cursor.close();
-
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -196,9 +202,6 @@ public class DotWallFragment extends Fragment {
 
         mCollapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.TransparentText);
 
-        // about user
-        setUpMetaData(user);
-
         // user posts
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, AppConstants.KV.LOAD_MORE.getIntValue()) {
@@ -208,18 +211,31 @@ public class DotWallFragment extends Fragment {
             }
         });
 
-        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        // grab dot
+        final String dotUid = getArguments().getString(K.KEY_DOT.name());
+        Cursor cursor = getActivity().getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{dotUid}, null);
+        if (!cursor.moveToFirst()) {
+            getActivity().finish();
+        }
+        final User user = Utils.cursorToUserEntity(cursor);
+        cursor.close();
+
+        // about user
+        setUpMetaData(user);
+
+        // setup posts by dot
+        setupRecyclerView();
+
+        // refresher
+        mHandler.post(new Runnable() {
             @Override
-            public void onRefresh() {
+            public void run() {
+                // refresh
+                callForRemoteDOTData();
                 callForRemotePosts(false);
             }
         });
 
-        setupRecyclerView();
-
-        // refresh
-        callForRemoteDOTData();
-        callForRemotePosts(false);
         return view;
     }
 
@@ -229,7 +245,15 @@ public class DotWallFragment extends Fragment {
 
         String dotUid = getArguments().getString(K.KEY_DOT.name());
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        if(cursor.moveToFirst()){
+            mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        }else{
+            if(cursor !=null && !cursor.isClosed()){
+                cursor.close();
+            }
+            mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), null);
+        }
+
         mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setAdapter(mViewAdapter);
     }
@@ -285,28 +309,24 @@ public class DotWallFragment extends Fragment {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        Map<String, String> eMData = event.getMetaData();
+        if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_USER.getValue())) {
+            return;
+        }
+
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        pref.setValue(AppConstants.API.PREF_POSTS_LIST_USER.getValue(), event.getMetaData());
+
+        final String dotUid = getArguments().getString(K.KEY_DOT.name());
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Map<String, String> eMData = event.getMetaData();
-                    if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_USER.getValue())) {
-                        return;
-                    }
-
-                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-                    pref.setValue(AppConstants.API.PREF_POSTS_LIST_USER.getValue(), event.getMetaData());
-
-                    String dotUid = getArguments().getString(K.KEY_DOT.name());
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_OWNER + "=?", new String[]{dotUid}, null);
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
                 } finally {
-                    if (mRefreshLayout.isRefreshing()) {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-
                     Object _state = mRecyclerView.getTag();
                     // prevent unnecessary traffic
                     if (_state != null && (_state instanceof Utils.State)) {

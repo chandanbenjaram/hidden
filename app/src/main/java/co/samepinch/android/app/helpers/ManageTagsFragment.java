@@ -66,7 +66,7 @@ public class ManageTagsFragment extends Fragment {
 
         // progress dialog properties
         progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
 
         // keep current logged in user id

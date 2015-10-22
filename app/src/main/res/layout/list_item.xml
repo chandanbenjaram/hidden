@@ -173,7 +173,6 @@
             android:id="@+id/wall_commenter_0"
             android:layout_width="@dimen/wall_commenter_size"
             android:layout_height="@dimen/wall_commenter_size"
-            android:layout_centerVertical="true"
             android:layout_margin="@dimen/wall_commenter_margin"
             android:background="@drawable/avatar_square_water_border"
             android:visibility="gone"

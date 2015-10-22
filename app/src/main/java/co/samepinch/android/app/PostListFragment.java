@@ -68,7 +68,6 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mHandler = new LocalHandler(this);
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -79,10 +78,13 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
             @Override
             public void run() {
                 if (mViewAdapter != null) {
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, BaseColumns._ID  + " ASC");
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, BaseColumns._ID + " ASC");
                     if (cursor.getCount() > 0) {
                         mViewAdapter.changeCursor(cursor);
                     } else {
+                        if (!cursor.isClosed()) {
+                            cursor.close();
+                        }
                         callForRemotePosts(false);
                     }
                 }
@@ -139,7 +141,7 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, BaseColumns._ID  + " ASC");
+        Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, BaseColumns._ID + " ASC");
         mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
         mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setAdapter(mViewAdapter);
@@ -190,20 +192,19 @@ public class PostListFragment extends Fragment implements FragmentLifecycle {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        Map<String, String> eMData = event.getMetaData();
+        if (eMData != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
+            return;
+        }
+
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Map<String, String> eMData = event.getMetaData();
-                    if (eMData != null && StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_FAV.getValue())) {
-                        return;
-                    }
-
-                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-                    pref.setValue(AppConstants.API.PREF_POSTS_LIST.getValue(), event.getMetaData());
-
-                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, BaseColumns._ID  + " ASC");
-                    mViewAdapter.swapCursor(cursor);
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, SchemaPosts.COLUMN_SRC_WALL + "=?", new String[]{"1"}, BaseColumns._ID + " ASC");
+                    mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     //muted
                 } finally {

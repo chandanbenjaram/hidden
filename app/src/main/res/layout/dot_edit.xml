@@ -6,13 +6,13 @@
     android:layout_height="match_parent">
 
     <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <android.support.v7.widget.Toolbar
@@ -131,7 +131,7 @@
                         android:id="@+id/input_pinchHandle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:capitalize="none"
+                        android:inputType="text"
                         android:enabled="false"
                         android:hint="@string/hint_pinch_handle"
                         android:singleLine="true" />
@@ -171,7 +171,7 @@
                         android:id="@+id/input_blogUrl"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:capitalize="none"
+                        android:inputType="text"
                         android:hint="@string/hint_my_blog"
                         android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>

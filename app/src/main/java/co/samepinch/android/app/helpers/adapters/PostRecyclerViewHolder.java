@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -35,8 +36,6 @@ import co.samepinch.android.data.dto.User;
  */
 public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
     public static final String DFLT_ZERO = "0";
-    //    @Bind(R.id.layout_post_item)
-//    RelativeLayout mLayoutPostItem;
 
     @Bind(R.id.avatar_image_vs)
     ViewSwitcher mAvatarImgVS;
@@ -82,7 +81,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     public PostRecyclerViewHolder(final Context context, View itemView) {
         super(itemView);
-        setIsRecyclable(Boolean.TRUE);
+        setIsRecyclable(Boolean.FALSE);
 
         this.mContext = context;
         ButterKnife.bind(this, itemView);
@@ -106,16 +105,23 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
             mAvatarName.setText(name);
             mAvatarImgVS.setDisplayedChild(1);
         }
-        String fName = StringUtils.defaultString(user.getFname()).toLowerCase();
-        String lName = StringUtils.defaultString(user.getLname()).toLowerCase();
+        String fName = StringUtils.defaultString(user.getFname()).toLowerCase(Locale.getDefault());
+        String lName = StringUtils.defaultString(user.getLname()).toLowerCase(Locale.getDefault());
         String name = StringUtils.join(new String[]{StringUtils.capitalize(fName), StringUtils.capitalize(lName), StringUtils.SPACE});
         mWallPostDotView.setText(StringUtils.defaultString(name, "anonymous"));
         mWallPinchHandleView.setText(String.format(mContext.getString(R.string.pinch_handle), user.getPinchHandle()));
-        mWallPostViewsView.setText(StringUtils.defaultString(Integer.toString(mPost.getViews()), DFLT_ZERO));
-        mWallPostUpvoteView.setText(StringUtils.defaultString(Integer.toString(mPost.getUpvoteCount()), DFLT_ZERO));
-        mWallPostDateView.setText(TimeUtils.toHumanRelativePeriod(mPost.getCreatedAt()));
-        mWallPostContentView.setText(mPost.getWallContent());
-        mCommentersCount.setText(String.valueOf(mPost.getCommentCount()));
+        if(mPost == null){
+            return;
+        }
+        Integer viewsCnt = mPost.getViews();
+        Integer voteCnt = mPost.getUpvoteCount();
+        Integer commentCnt = mPost.getCommentCount();
+        mWallPostViewsView.setText(StringUtils.defaultString(viewsCnt == null ? null : viewsCnt.toString(), StringUtils.EMPTY));
+        mWallPostUpvoteView.setText(StringUtils.defaultString(voteCnt == null ? null : voteCnt.toString(), StringUtils.EMPTY));
+        mCommentersCount.setText(StringUtils.defaultString(commentCnt == null ? null : commentCnt.toString(), StringUtils.EMPTY));
+
+        mWallPostDateView.setText(StringUtils.defaultString(TimeUtils.toHumanRelativePeriod(mPost.getCreatedAt()), StringUtils.EMPTY));
+        mWallPostContentView.setText(StringUtils.defaultString(mPost.getWallContent(), StringUtils.EMPTY));
 
         // hide needed ones
         int commentViewsCount = mWallPostCommentersLayout.getChildCount();
@@ -166,7 +172,9 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
             mWallPostImages.setVisibility(View.VISIBLE);
         }
 
-        Utils.markTags(mContext, mWallTags, mPost.getTagsForDB().split(","));
+        if(StringUtils.isNotBlank(mPost.getTagsForDB())){
+            Utils.markTags(mContext, mWallTags, mPost.getTagsForDB().split(","));
+        }
     }
 
     @OnClick({R.id.avatar, R.id.avatar_name, R.id.wall_post_dot, R.id.wall_pinch_handle})

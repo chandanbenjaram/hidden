@@ -122,7 +122,7 @@ public class PostEditFragment extends Fragment implements PopupMenu.OnMenuItemCl
 
         // progress dialog properties
         progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
 
         // a handler

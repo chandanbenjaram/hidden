@@ -42,18 +42,14 @@
             android:layout_height="match_parent"
             android:gravity="top|center_horizontal"
             android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/new_thumb_up_gray" />
-
             <TextView
                 style="@style/SP_TEXT.METADATA"
                 android:id="@+id/post_vote_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
+                android:gravity="center_horizontal"
+                android:drawableTop="@drawable/new_thumb_up_gray"
                 android:text="@string/loading" />
         </LinearLayout>
 
@@ -63,18 +59,14 @@
             android:layout_weight="1"
             android:gravity="top|center_horizontal"
             android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/new_visibility_gray" />
-
             <TextView
                 style="@style/SP_TEXT.METADATA"
                 android:id="@+id/post_views_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
+                android:gravity="center_horizontal"
+                android:drawableTop="@drawable/new_visibility_gray"
                 android:text="@string/loading" />
         </LinearLayout>
 
@@ -84,18 +76,14 @@
             android:layout_weight="1"
             android:gravity="top|center_horizontal"
             android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/new_bubble_full_gray" />
-
             <TextView
                 style="@style/SP_TEXT.METADATA"
                 android:id="@+id/post_comments_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
+                android:gravity="center_horizontal"
+                android:drawableTop="@drawable/new_bubble_full_gray"
                 android:text="@string/loading" />
         </LinearLayout>
 
@@ -106,16 +94,13 @@
             android:gravity="top|center_horizontal"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/new_time_full_gray" />
-
             <TextView
                 style="@style/SP_TEXT.METADATA"
                 android:id="@+id/post_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:drawableTop="@drawable/new_time_full_gray"
                 android:text="@string/loading" />
         </LinearLayout>
     </LinearLayout>

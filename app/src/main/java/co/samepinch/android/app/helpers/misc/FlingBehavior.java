@@ -21,15 +21,12 @@ public class FlingBehavior extends AppBarLayout.Behavior {
 
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, AppBarLayout child, View target, float velocityX, float velocityY) {
-        Log.d("CB...", "onNestedPreFling 1...");
         return super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY);
     }
 
     @Override
     public boolean onNestedFling(CoordinatorLayout coordinatorLayout, AppBarLayout child, View target, float velocityX, float velocityY, boolean consumed) {
-        Log.d("CB...", "onNestedPreFling 2...");
         if (target instanceof RecyclerView && velocityY < 0) {
-            Log.d("CB...", "onNestedPreFling 3...");
             final RecyclerView recyclerView = (RecyclerView) target;
             final View firstChild = recyclerView.getChildAt(0);
             final int childAdapterPosition = recyclerView.getChildAdapterPosition(firstChild);

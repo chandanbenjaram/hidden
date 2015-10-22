@@ -5,10 +5,10 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +23,7 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -62,9 +63,6 @@ public class TagWallFragment extends Fragment {
     @Bind(R.id.backdrop)
     SimpleDraweeView mBackdrop;
 
-    @Bind(R.id.swipeRefreshLayout)
-    SwipeRefreshLayout mRefreshLayout;
-
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
@@ -79,6 +77,14 @@ public class TagWallFragment extends Fragment {
 
     private PostCursorRecyclerViewAdapter mViewAdapter;
     private LinearLayoutManager mLayoutManager;
+
+    private LocalHandler mHandler;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHandler = new LocalHandler(this);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -123,39 +129,45 @@ public class TagWallFragment extends Fragment {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager, AppConstants.KV.LOAD_MORE.getIntValue()) {
             @Override
             public void onLoadMore(RecyclerView rv, int current_page) {
-                callForRemotePosts(true);
-            }
-        });
-
-        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                callForRemotePosts(false);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callForRemotePosts(true);
+                    }
+                });
             }
         });
 
         Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
-        if(cursor.getCount() == 0){
+        if (cursor.getCount() == 0) {
             ContentValues values = new ContentValues();
             values.put(SchemaTags.COLUMN_NAME, tag);
             getActivity().getContentResolver().insert(SchemaTags.CONTENT_URI, values);
         }
-        if(cursor !=null && !cursor.isClosed()){
+        if (cursor != null && !cursor.isClosed()) {
             cursor.close();
         }
 
+        // setup tag meta data
         setUpMetaData();
+        // set up posts by tag
         setupRecyclerView();
 
-        // refresh
-        callForRemoteTagData();
-        callForRemotePosts(false);
+        // refresher
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // refresh
+                callForRemoteTagData();
+                callForRemotePosts(false);
 
-        // call for intent
-        Intent tagRefreshIntent =
-                new Intent(getActivity().getApplicationContext(), TagsPullService.class);
-        tagRefreshIntent.putExtra(KEY_TAGS_PULL_TYPE.getValue(), KEY_TAGS_PULL_FAV.getValue());
-        getActivity().startService(tagRefreshIntent);
+                // call for intent
+                Intent tagRefreshIntent =
+                        new Intent(getActivity().getApplicationContext(), TagsPullService.class);
+                tagRefreshIntent.putExtra(KEY_TAGS_PULL_TYPE.getValue(), KEY_TAGS_PULL_FAV.getValue());
+                getActivity().startService(tagRefreshIntent);
+            }
+        });
 
         return view;
     }
@@ -166,6 +178,9 @@ public class TagWallFragment extends Fragment {
         try {
             cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, SchemaTags.COLUMN_NAME + "=?", new String[]{tag}, null);
             if (!cursor.moveToFirst()) {
+                if (!cursor.isClosed()) {
+                    cursor.close();
+                }
                 return;
             }
 
@@ -233,7 +248,15 @@ public class TagWallFragment extends Fragment {
 
         String tag = getArguments().getString(K.KEY_TAG.name());
         Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
-        mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        if (cursor.moveToFirst()) {
+            mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), cursor);
+        } else {
+            if(cursor !=null && !cursor.isClosed()){
+                cursor.close();
+            }
+            mViewAdapter = new PostCursorRecyclerViewAdapter(getActivity(), null);
+        }
+        mViewAdapter.setHasStableIds(Boolean.TRUE);
         mRecyclerView.setAdapter(mViewAdapter);
     }
 
@@ -300,28 +323,23 @@ public class TagWallFragment extends Fragment {
 
     @Subscribe
     public void onPostsRefreshedEvent(final Events.PostsRefreshedEvent event) {
+        Map<String, String> eMData = event.getMetaData();
+        if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_TAG.getValue())) {
+            return;
+        }
+        Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
+        pref.setValue(AppConstants.API.PREF_POSTS_LIST_TAG.getValue(), event.getMetaData());
+        final String tag = getArguments().getString(K.KEY_TAG.name());
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Map<String, String> eMData = event.getMetaData();
-                    if ((eMData = event.getMetaData()) == null || !StringUtils.equalsIgnoreCase(eMData.get(KEY_BY.getValue()), KEY_POSTS_TAG.getValue())) {
-                        return;
-                    }
-
-                    Utils.PreferencesManager pref = Utils.PreferencesManager.getInstance();
-                    pref.setValue(AppConstants.API.PREF_POSTS_LIST_TAG.getValue(), event.getMetaData());
-
-                    String tag = getArguments().getString(K.KEY_TAG.name());
                     Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
                     mViewAdapter.changeCursor(cursor);
                 } catch (Exception e) {
                     // muted
-                }finally {
-                    if (mRefreshLayout.isRefreshing()) {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-
+                } finally {
                     Object _state = mRecyclerView.getTag();
                     // prevent unnecessary traffic
                     if (_state != null && (_state instanceof Utils.State)) {
@@ -337,34 +355,42 @@ public class TagWallFragment extends Fragment {
         });
     }
 
-    @Subscribe
-    public void onTagsRefreshedEvent(Events.TagsRefreshedEvent event) {
-        getActivity().runOnUiThread(new Runnable() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        // register to event bus
+        BusProvider.INSTANCE.getBus().register(this);
+
+        // refresh
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
-                try {
-//                    Cursor cursor = getActivity().getContentResolver().query(SchemaTags.CONTENT_URI, null, null, null, SchemaTags.COLUMN_NAME + " ASC");
-//                    mTagsToManageRVAdapter.changeCursor(cursor);
-                } catch (Exception e) {
-                    //e.printStackTrace();
+                if (mViewAdapter != null) {
+                    String tag = getArguments().getString(K.KEY_TAG.name());
+                    Cursor cursor = getActivity().getContentResolver().query(SchemaPosts.CONTENT_URI, null, "tags LIKE ?", new String[]{"%" + tag + "%"}, null);
+                    if (cursor.moveToFirst()) {
+                        mViewAdapter.changeCursor(cursor);
+                    } else {
+                        if (!cursor.isClosed()) {
+                            cursor.close();
+                        }
+                    }
                 }
             }
         });
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // register to event bus
-        BusProvider.INSTANCE.getBus().register(this);
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         BusProvider.INSTANCE.getBus().unregister(this);
-        if (mRefreshLayout.isRefreshing()) {
-            mRefreshLayout.setRefreshing(false);
+    }
+
+    private static final class LocalHandler extends Handler {
+        private final WeakReference<TagWallFragment> mActivity;
+
+        public LocalHandler(TagWallFragment parent) {
+            mActivity = new WeakReference<TagWallFragment>(parent);
         }
     }
 }

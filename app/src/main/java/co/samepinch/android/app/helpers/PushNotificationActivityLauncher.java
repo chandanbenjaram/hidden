@@ -1,10 +1,13 @@
 package co.samepinch.android.app.helpers;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Locale;
 
 import co.samepinch.android.app.ActivityFragment;
 import co.samepinch.android.app.PostDetailActivity;
@@ -41,7 +44,7 @@ public class PushNotificationActivityLauncher extends AppCompatActivity {
 
             // grab target action
             String actionType = StringUtils.defaultString(notificationContext.getType(), TYPE_ROOT);
-            actionType = actionType.toUpperCase();
+            actionType = actionType.toUpperCase(Locale.getDefault());
 
             // args uid
             String uid = notification.getContext().getUid();

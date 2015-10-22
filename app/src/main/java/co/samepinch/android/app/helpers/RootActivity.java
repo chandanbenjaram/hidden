@@ -1,5 +1,6 @@
 package co.samepinch.android.app.helpers;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -23,6 +24,7 @@ import com.facebook.common.util.UriUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 import co.samepinch.android.app.MainActivity;
 import co.samepinch.android.app.MainActivityIn;
@@ -59,9 +61,12 @@ public class RootActivity extends AppCompatActivity {
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
-        supportRequestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            supportRequestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+        }
 
         setContentView(R.layout.root_activity);
         setupWindowAnimations();
@@ -83,7 +88,7 @@ public class RootActivity extends AppCompatActivity {
         final String pendingDialog = Utils.PreferencesManager.getInstance().getValue(AppConstants.APP_INTENT.KEY_ADMIN_COMMAND.getValue());
         if (StringUtils.isNotBlank(pendingDialog)) {
             String pendingDialogMsg;
-            switch (pendingDialog.toUpperCase()) {
+            switch (pendingDialog.toUpperCase(Locale.getDefault())) {
                 case DIALOG_UPDATE:
                     pendingDialogMsg = getApplicationContext().getString(R.string.dialog_update);
                     break;
@@ -223,6 +228,7 @@ public class RootActivity extends AppCompatActivity {
         startService(intent);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setupWindowAnimations() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_slide);

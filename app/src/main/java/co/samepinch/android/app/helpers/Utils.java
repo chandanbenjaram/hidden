@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -467,7 +468,7 @@ public class Utils {
         public void setValue(String key, String val) {
             mPref.edit()
                     .putString(key, val)
-                    .commit();
+                    .apply();
         }
 
         public boolean contains(String key) {
@@ -509,7 +510,7 @@ public class Utils {
         public void remove(String key) {
             mPref.edit()
                     .remove(key)
-                    .commit();
+                    .apply();
         }
 
         public boolean clear() {
@@ -530,7 +531,7 @@ public class Utils {
             return date;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue());
+        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue(), Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         sdf.setLenient(false);
         try {
@@ -546,7 +547,7 @@ public class Utils {
         if (date == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue());
+        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT.getValue(), Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         sdf.setLenient(false);
         return sdf.format(date);

@@ -76,7 +76,7 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 //        FacebookSdk.addLoggingBehavior(LoggingBehavior.REQUESTS);
 
         progressDialog = new ProgressDialog(getActivity(),
-                R.style.Theme_AppCompat_Dialog);
+                R.style.dialog);
         progressDialog.setCancelable(Boolean.FALSE);
 
         // tracker
