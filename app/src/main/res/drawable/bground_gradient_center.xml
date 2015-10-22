@@ -8,7 +8,7 @@
         android:centerX="50%"
         android:centerY="50%"
         android:gradientRadius="100"
-        android:endColor="@color/white"
-        android:startColor="@color/transparent_red_maisa"
+        android:startColor="@color/white"
+        android:endColor="@color/light_blue_500"
         android:type="linear" />
 </shape>
