@@ -109,7 +109,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
@@ -173,7 +172,6 @@ public class LoginFBFragment extends android.support.v4.app.Fragment {
             @Override
             public void onBatchCompleted(GraphRequestBatch graphRequests) {
                 // Application code for when the batch finishes
-                Log.d(TAG, graphRequests == null ? "true" : "false");
                 new CheckExistenceTask().execute(userId);
             }
         });

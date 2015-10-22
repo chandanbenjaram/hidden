@@ -62,11 +62,11 @@ public class RootActivity extends AppCompatActivity {
     @Override
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             supportRequestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         }
 
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.root_activity);
         setupWindowAnimations();
 
@@ -203,9 +203,14 @@ public class RootActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK |
                 Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
-        ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // let the window animations to kick-in
+            startActivity(intent);
+        } else {
+            // back port version
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
+            ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
+        }
     }
 
     private void syncStateToParse(boolean isFirstLaunch, boolean isLoggedIn) {
