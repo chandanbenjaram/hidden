@@ -586,6 +586,7 @@ public class Utils {
                     // intent
                     Intent intent = new Intent(context, ActivityFragment.class);
                     intent.putExtras(args);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     context.startActivity(intent);
                 }

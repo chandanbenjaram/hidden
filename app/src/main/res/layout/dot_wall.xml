@@ -25,7 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                app:layout_collapseParallaxMultiplier="0.5"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -36,9 +37,8 @@
                 android:paddingBottom="9dp"
                 android:paddingTop="35dp"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.5">
-
-                <include layout="@layout/dot_details" />
+                app:layout_collapseParallaxMultiplier="0.1" >
+                <include layout="@layout/dot_details"/>
             </RelativeLayout>
 
             <android.support.v7.widget.Toolbar
