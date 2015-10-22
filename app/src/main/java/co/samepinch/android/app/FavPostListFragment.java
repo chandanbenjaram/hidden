@@ -83,6 +83,9 @@ public class FavPostListFragment extends Fragment implements FragmentLifecycle {
                     if (cursor.getCount() > 0) {
                         mViewAdapter.changeCursor(cursor);
                     } else {
+                        if (!cursor.isClosed()) {
+                            cursor.close();
+                        }
                         callForRemotePosts(false);
                     }
                 }

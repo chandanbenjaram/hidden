@@ -462,6 +462,7 @@ public class PostDetailActivity extends AppCompatActivity {
                         Snackbar.make(mBottomsheet, event.getMetaData().get(AppConstants.K.MESSAGE.name()), Snackbar.LENGTH_SHORT).show();
                     }
 
+                    setUpMetadata();
                     Bundle iArgs = getIntent().getExtras();
                     // call for intent
                     Intent detailsIntent =
