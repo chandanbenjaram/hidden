@@ -81,7 +81,7 @@ public class PostRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     public PostRecyclerViewHolder(final Context context, View itemView) {
         super(itemView);
-        setIsRecyclable(Boolean.FALSE);
+        setIsRecyclable(Boolean.TRUE);
 
         this.mContext = context;
         ButterKnife.bind(this, itemView);

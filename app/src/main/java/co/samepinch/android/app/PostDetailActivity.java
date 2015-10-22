@@ -141,12 +141,12 @@ public class PostDetailActivity extends AppCompatActivity {
         Cursor currComments = getContentResolver().query(SchemaComments.CONTENT_URI, null, SchemaComments.COLUMN_POST_DETAILS + "=?", new String[]{mPostId}, null);
         MergeCursor mergeCursor = new MergeCursor(new Cursor[]{currPost, currComments});
 
-        // setup data
-        setUpMetadata(currPost);
+        // setup meta-data
+        setUpMetadata();
 
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mViewAdapter = new PostDetailsRVAdapter(this, mergeCursor);
-
+        mViewAdapter = new PostDetailsRVAdapter(getApplicationContext(), mergeCursor);
+        mViewAdapter.setHasStableIds(true);
         // recycler view setup
         mRV.setHasFixedSize(true);
         mRV.setLayoutManager(mLayoutManager);
@@ -181,80 +181,87 @@ public class PostDetailActivity extends AppCompatActivity {
         startService(detailsIntent);
     }
 
-    private void setUpMetadata(Cursor currPost) {
-        if (!currPost.moveToFirst()) {
-            return;
-        }
+    private void setUpMetadata() {
+        Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+        try {
+            if (!currPost.moveToFirst()) {
+                return;
+            }
 
-        mPostDetails = Utils.cursorToPostDetailsEntity(currPost);
-        if (mPostDetails == null) {
-            return;
-        }
+            mPostDetails = Utils.cursorToPostDetailsEntity(currPost);
+            if (mPostDetails == null) {
+                return;
+            }
 
-        // post date
-        mPostDate.setText(TimeUtils.toHumanLocal(getApplicationContext(), mPostDetails.getCreatedAt()));
+            // post date
+            mPostDate.setText(TimeUtils.toHumanLocal(getApplicationContext(), mPostDetails.getCreatedAt()));
 
-        // views count
-        if (mPostDetails.getViews() == null) {
-            mPostViewsCount.setText("-o-");
-        } else {
-            mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
-        }
-
-        // vote count
-        if (mPostDetails.getUpvoteCount() == null) {
-            mPostVoteCount.setText("-o-");
-        } else {
-            mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
-        }
-        // comment count
-        if (mPostDetails.getCommentCount() == null) {
-            mPostCommentsCount.setText("-o-");
-        } else {
-            mPostCommentsCount.setText(String.valueOf(mPostDetails.getCommentCount()));
-        }
-
-        String ownerUid = null;
-        int ownerUidIndex;
-        if ((ownerUidIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_OWNER)) != -1) {
-            ownerUid = currPost.getString(ownerUidIndex);
-        }
-        // blank check
-        if (StringUtils.isBlank(ownerUid)) {
-            return;
-        }
-        // get user info
-        Cursor currDot = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{ownerUid}, null);
-        if (currDot.moveToFirst()) {
-            final User user = Utils.cursorToUserEntity(currDot);
-
-            String dotName = null;
-            if (StringUtils.isBlank(user.getPrefName())) {
-                String fName = StringUtils.defaultString(user.getFname(), StringUtils.EMPTY);
-                String lName = StringUtils.defaultString(user.getLname(), StringUtils.EMPTY);
-                dotName = StringUtils.join(new String[]{fName, lName}, StringUtils.SPACE);
+            // views count
+            if (mPostDetails.getViews() == null) {
+                mPostViewsCount.setText("-o-");
             } else {
-                dotName = user.getPrefName();
-            }
-            if (StringUtils.isBlank(dotName)) {
-                String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
-                dotName = pinchHandle;
+                mPostViewsCount.setText(String.valueOf(mPostDetails.getViews()));
             }
 
-            mPostDotName.setText(dotName);
-            mPostDotName.setOnClickListener(null);
-            if (mPostDetails.getAnonymous() == null || !mPostDetails.getAnonymous()) {
-                // onclick take to dot view
-                mPostDotName.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showPostUser(user.getUid());
-                    }
-                });
+            // vote count
+            if (mPostDetails.getUpvoteCount() == null) {
+                mPostVoteCount.setText("-o-");
+            } else {
+                mPostVoteCount.setText(String.valueOf(mPostDetails.getUpvoteCount()));
+            }
+            // comment count
+            if (mPostDetails.getCommentCount() == null) {
+                mPostCommentsCount.setText("-o-");
+            } else {
+                mPostCommentsCount.setText(String.valueOf(mPostDetails.getCommentCount()));
+            }
+
+            String ownerUid = null;
+            int ownerUidIndex;
+            if ((ownerUidIndex = currPost.getColumnIndex(SchemaPostDetails.COLUMN_OWNER)) != -1) {
+                ownerUid = currPost.getString(ownerUidIndex);
+            }
+            // blank check
+            if (StringUtils.isBlank(ownerUid)) {
+                return;
+            }
+            // get user info
+            Cursor currDot = getContentResolver().query(SchemaDots.CONTENT_URI, null, SchemaDots.COLUMN_UID + "=?", new String[]{ownerUid}, null);
+            if (currDot.moveToFirst()) {
+                final User user = Utils.cursorToUserEntity(currDot);
+
+                String dotName = null;
+                if (StringUtils.isBlank(user.getPrefName())) {
+                    String fName = StringUtils.defaultString(user.getFname(), StringUtils.EMPTY);
+                    String lName = StringUtils.defaultString(user.getLname(), StringUtils.EMPTY);
+                    dotName = StringUtils.join(new String[]{fName, lName}, StringUtils.SPACE);
+                } else {
+                    dotName = user.getPrefName();
+                }
+                if (StringUtils.isBlank(dotName)) {
+                    String pinchHandle = String.format(getApplicationContext().getString(R.string.pinch_handle), user.getPinchHandle());
+                    dotName = pinchHandle;
+                }
+
+                mPostDotName.setText(dotName);
+                mPostDotName.setOnClickListener(null);
+                if (mPostDetails.getAnonymous() == null || !mPostDetails.getAnonymous()) {
+                    // onclick take to dot view
+                    mPostDotName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            showPostUser(user.getUid());
+                        }
+                    });
+                }
+            }
+
+            currDot.close();
+        } finally {
+            if (currPost != null && !currPost.isClosed()) {
+                currPost.close();
             }
         }
-
-        currDot.close();
     }
 
     public void showPostUser(String postUserId) {
@@ -414,13 +421,13 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    // meta-data update
+//                    Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
+                    setUpMetadata();
+
                     ((MergeCursor) mViewAdapter.getCursor()).requery();
                     mViewAdapter.notifyDataSetChanged();
-
-                    // meta-data update
-                    Cursor currPost = getContentResolver().query(SchemaPostDetails.CONTENT_URI, null, SchemaPostDetails.COLUMN_UID + "=?", new String[]{mPostId}, null);
-                    setUpMetadata(currPost);
-                    currPost.close();
+//                    currPost.close();
                     invalidateOptionsMenu();
                 } catch (Exception e) {
                     // muted
@@ -491,7 +498,7 @@ public class PostDetailActivity extends AppCompatActivity {
             public void run() {
                 try {
                     String eventMsg;
-                    if(event.getMetaData() !=null && (eventMsg = event.getMetaData().get(AppConstants.K.MESSAGE.name())) !=null){
+                    if (event.getMetaData() != null && (eventMsg = event.getMetaData().get(AppConstants.K.MESSAGE.name())) != null) {
                         Snackbar.make(mBottomsheet, eventMsg, Snackbar.LENGTH_SHORT).show();
                     }
                     ((MergeCursor) mViewAdapter.getCursor()).requery();
