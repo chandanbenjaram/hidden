@@ -6,8 +6,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -46,6 +44,7 @@ public class RootActivity extends AppCompatActivity {
     public static final String DIALOG_REFERRALS = "REFERRALS";
     public static final String DIALOG_LOGIN = "LOGIN";
     public static final String DIALOG_POST = "POST";
+    public static final String FROM_ROOT = "from_root";
 
     private LocalHandler mHandler;
 
@@ -123,7 +122,6 @@ public class RootActivity extends AppCompatActivity {
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                // dialog dismiss
                                 if (materialDialog.isShowing()) {
                                     materialDialog.dismiss();
                                 }
@@ -132,12 +130,12 @@ public class RootActivity extends AppCompatActivity {
                                 if (StringUtils.equalsIgnoreCase(pendingDialog, DIALOG_FORCED_UPDATE)) {
                                     Intent iRate = new Intent(Intent.ACTION_VIEW);
                                     iRate.setData(Uri.parse(AppConstants.API.GPLAY_LINK.getValue()));
-                                    startActivity(iRate);
+                                    Utils.startActivityWithAnimation(iRate, RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
                                     finish();
                                 } else if (StringUtils.equalsIgnoreCase(pendingDialog, DIALOG_REVIEW)) {
                                     Intent iRate = new Intent(Intent.ACTION_VIEW);
                                     iRate.setData(Uri.parse(AppConstants.API.GPLAY_LINK.getValue()));
-                                    startActivity(iRate);
+                                    Utils.startActivityWithAnimation(iRate, RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
                                 } else {
                                     launchTargetActivity(isFirstLaunch, isLoggedIn);
                                 }
@@ -153,6 +151,7 @@ public class RootActivity extends AppCompatActivity {
 
         launchTargetActivity(isFirstLaunch, isLoggedIn);
     }
+
 
     private void launchTargetActivity(boolean isFirstLaunch, final boolean isLoggedIn) {
         // target activity to launch
@@ -200,17 +199,11 @@ public class RootActivity extends AppCompatActivity {
         } else {
             intent = new Intent(RootActivity.this, MainActivity.class);
         }
+        intent.putExtra(FROM_ROOT, true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK |
                 Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // let the window animations to kick-in
-            startActivity(intent);
-        } else {
-            // back port version
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(RootActivity.this, R.anim.fade_in_n_out, R.anim.fade_in_n_out);
-            ActivityCompat.startActivity(RootActivity.this, intent, options.toBundle());
-        }
+        Utils.startActivityWithAnimation(intent, RootActivity.this, R.anim.fade_in_n_out, android.R.anim.fade_out);
     }
 
     private void syncStateToParse(boolean isFirstLaunch, boolean isLoggedIn) {
@@ -229,7 +222,7 @@ public class RootActivity extends AppCompatActivity {
             Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_slide);
             getWindow().setEnterTransition(slide);
 
-            Fade fade = (Fade) TransitionInflater.from(this).inflateTransition(R.transition.activity_fade);
+            Fade fade = (Fade) TransitionInflater.from(this).inflateTransition(android.R.transition.fade);
             getWindow().setExitTransition(fade);
         }
     }

@@ -32,7 +32,7 @@
     <string name="loading">\u2026</string>
     <string name="loading_with_text">Loading\u2026</string>
     <string name="by">post by\u0009</string>
-    <string name="empty"/>
+    <string name="empty" />
     <string name="settings_notifs">Push Notifications</string>
     <string name="settings_notifs_subline">set when you want to get notified</string>
     <string name="settings_notifs_posts">Posts I made</string>
@@ -123,4 +123,7 @@
     <string name="hint_content">CONTENT</string>
     <string name="hint_signing_out">Signing out</string>
     <string name="btn_try_again">try again</string>
+    <string name="hint_more">More options</string>
+    <string name="msg_no_email">Unable to find email application on your device.</string>
+    <string name="msg_login_req">Login to post.</string>
 </resources>

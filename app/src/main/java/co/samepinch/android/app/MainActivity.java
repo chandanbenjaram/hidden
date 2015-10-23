@@ -1,5 +1,6 @@
 package co.samepinch.android.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,10 +20,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.flipboard.bottomsheet.commons.IntentPickerSheetView;
+
+import org.apache.commons.lang3.StringUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import co.samepinch.android.app.helpers.AppConstants;
 import co.samepinch.android.app.helpers.RootActivity;
 import co.samepinch.android.app.helpers.Utils;
@@ -95,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         SPFragmentPagerAdapter adapterViewPager = new SPFragmentPagerAdapter(getSupportFragmentManager());
         adapterViewPager.setCount(1);
         mViewPager.setAdapter(adapterViewPager);
+        mViewPager.setPageTransformer(false, new DepthPageTransformer());
 
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adapterViewPager);
@@ -177,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                                 args.putString(AppConstants.K.TARGET_FRAGMENT.name(), AppConstants.K.FRAGMENT_WEBVIEW.name());
                                 break;
                             case R.id.nav_spread_it:
-                                doSpreadIt();
+                                doSpreadIt(MainActivity.this, mBottomsheet);
                                 break;
                             case R.id.nav_rate_it:
                                 Intent iRate = new Intent(Intent.ACTION_VIEW);
@@ -192,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
                                 startActivityForResult(loginIntent, INTENT_LOGIN);
                                 break;
                             default:
-                                Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
                                 break;
                         }
                         if (!args.isEmpty()) {
@@ -209,34 +214,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void doSpreadIt() {
-        final String subject = getApplicationContext().getString(R.string.share_subject);
-        final String body = getApplicationContext().getString(R.string.share_body);
-
+    protected static void doSpreadIt(final Activity activity, final BottomSheetLayout bs) {
+        final String subject = activity.getString(R.string.share_subject);
+        final String body = activity.getString(R.string.share_body);
         // prepare menu options
-        View menu = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
-        LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
-        // sms
-        TextView viaSMS = (TextView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_raw_sms, null);
-        viaSMS.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBottomsheet.dismissSheet();
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"));
-                intent.putExtra("sms_body", body);
-                intent.putExtra(Intent.EXTRA_TEXT, body);
-                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
-        layout.addView(viaSMS);
+        View menu = LayoutInflater.from(activity).inflate(R.layout.bs_menu, bs, false);
+        final LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
         // email
-        TextView viaEmail = (TextView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_raw_email, null);
+        TextView viaEmail = (TextView) LayoutInflater.from(activity).inflate(R.layout.bs_raw_email, null);
         viaEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mBottomsheet.dismissSheet();
+                if(bs.isSheetShowing()){
+                    bs.dismissSheet();
+                }
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
                 intent.setType("message/rfc822");
@@ -244,21 +235,47 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_TEXT, body);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 try {
-                    startActivity(intent);
+                    activity.startActivity(intent);
                 } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(MainActivity.this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, SPApplication.getContext().getString(R.string.msg_no_email), Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
         layout.addView(viaEmail);
-        mBottomsheet.showWithSheetView(menu);
+
+        // others
+        TextView viaOther = (TextView) LayoutInflater.from(activity).inflate(R.layout.bs_raw_via_other, null);
+        viaOther.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // sms
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                shareIntent.putExtra(Intent.EXTRA_TITLE, subject);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, body);
+
+                shareIntent.setType("text/plain");
+                IntentPickerSheetView sheetView = new IntentPickerSheetView(activity, shareIntent, StringUtils.EMPTY, new IntentPickerSheetView.OnIntentPickedListener() {
+                    @Override
+                    public void onIntentPicked(Intent intent) {
+                        if(bs.isSheetShowing()){
+                            bs.dismissSheet();
+                        }
+                        activity.startActivity(intent);
+                    }
+                });
+                layout.removeAllViews();
+                layout.addView(sheetView);
+            }
+        });
+        layout.addView(viaOther);
+        bs.showWithSheetView(menu);
     }
 
     private void doFeedback() {
-        final String subject = getApplicationContext().getString(R.string.feedback_subject);
-        final String to = getApplicationContext().getString(R.string.feedback_to);
+        final String subject = SPApplication.getContext().getString(R.string.feedback_subject);
+        final String to =SPApplication.getContext().getString(R.string.feedback_to);
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
@@ -269,8 +286,15 @@ public class MainActivity extends AppCompatActivity {
         try {
             startActivity(intent);
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(MainActivity.this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, SPApplication.getContext().getString(R.string.msg_no_email), Toast.LENGTH_SHORT).show();
         }
     }
 
+    @OnClick(R.id.fab)
+    public void onClickFAB() {
+        Toast.makeText(MainActivity.this, SPApplication.getContext().getString(R.string.msg_login_req), Toast.LENGTH_SHORT).show();
+
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivityForResult(loginIntent, INTENT_LOGIN);
+    }
 }

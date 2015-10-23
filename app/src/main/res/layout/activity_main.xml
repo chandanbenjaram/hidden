@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
-            android:background="@drawable/bground_gradient_center"
+            android:background="@drawable/bground_gradient_desc"
             app:menu="@menu/drawer_view" />
     </android.support.v4.widget.DrawerLayout>
 </com.flipboard.bottomsheet.BottomSheetLayout>

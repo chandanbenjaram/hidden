@@ -12,7 +12,10 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
@@ -725,6 +728,28 @@ public class Utils {
 
         public void setPendingLoadMore(boolean pendingLoadMore) {
             this.pendingLoadMore = pendingLoadMore;
+        }
+    }
+
+    public static void startActivityWithAnimation(Intent intent, Activity srcActivity, Integer enterAnimationResId, Integer exitAnimationResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // let the window animations to kick-in
+            srcActivity.startActivity(intent);
+        } else {
+            // back port version
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(srcActivity, enterAnimationResId, exitAnimationResId);
+            ActivityCompat.startActivity(srcActivity, intent, options.toBundle());
+        }
+    }
+
+    public static void startActivityForResultWithAnimation(Intent intent, int reqCode, Activity srcActivity, Integer enterAnimationResId, Integer exitAnimationResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // let the window animations to kick-in
+            srcActivity.startActivityForResult(intent, reqCode);
+        } else {
+            // back port version
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(srcActivity, enterAnimationResId, exitAnimationResId);
+            ActivityCompat.startActivityForResult(srcActivity, intent, reqCode, options.toBundle());
         }
     }
 }

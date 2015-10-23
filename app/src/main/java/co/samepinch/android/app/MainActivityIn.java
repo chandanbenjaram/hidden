@@ -376,7 +376,7 @@ public class MainActivityIn extends AppCompatActivity {
                                 doFeedback();
                                 break;
                             case R.id.nav_spread_it:
-                                doSpreadIt();
+                                MainActivity.doSpreadIt(MainActivityIn.this, mBottomsheet);
                                 break;
 
                             case R.id.nav_sign_out:
@@ -384,7 +384,6 @@ public class MainActivityIn extends AppCompatActivity {
                                 startActivityForResult(logOutIntent, INTENT_LOGOUT);
                                 break;
                             default:
-                                Log.d(TAG, "do not know how to launch :: " + menuItem.getTitle());
                                 break;
                         }
                         if (!args.isEmpty()) {
@@ -461,51 +460,6 @@ public class MainActivityIn extends AppCompatActivity {
         BusProvider.INSTANCE.getBus().unregister(this);
     }
 
-    private void doSpreadIt() {
-        final String subject = getApplicationContext().getString(R.string.share_subject);
-        final String body = getApplicationContext().getString(R.string.share_body);
-
-        // prepare menu options
-        View menu = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_menu, mBottomsheet, false);
-        LinearLayout layout = (LinearLayout) menu.findViewById(R.id.layout_menu_list);
-        // sms
-        TextView viaSMS = (TextView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_raw_sms, null);
-        viaSMS.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBottomsheet.dismissSheet();
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"));
-                intent.putExtra("sms_body", body);
-                intent.putExtra(Intent.EXTRA_TEXT, body);
-                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
-        layout.addView(viaSMS);
-        // email
-        TextView viaEmail = (TextView) LayoutInflater.from(getApplicationContext()).inflate(R.layout.bs_raw_email, null);
-        viaEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBottomsheet.dismissSheet();
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_SEND);
-                intent.setType("message/rfc822");
-                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                intent.putExtra(Intent.EXTRA_TEXT, body);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                try {
-                    startActivity(intent);
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(MainActivityIn.this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        layout.addView(viaEmail);
-        mBottomsheet.showWithSheetView(menu);
-    }
-
     private void doFeedback() {
         final String subject = getApplicationContext().getString(R.string.feedback_subject);
         final String to = getApplicationContext().getString(R.string.feedback_to);
@@ -519,7 +473,7 @@ public class MainActivityIn extends AppCompatActivity {
         try {
             startActivity(intent);
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(MainActivityIn.this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivityIn.this, SPApplication.getContext().getString(R.string.msg_no_email), Toast.LENGTH_SHORT).show();
         }
     }
 
