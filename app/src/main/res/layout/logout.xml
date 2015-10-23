@@ -3,7 +3,8 @@
     android:id="@+id/bg_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="@drawable/bground_gradient_center">
     <TextView
         android:id="@+id/txt_logout_text"
         android:layout_width="wrap_content"
