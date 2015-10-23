@@ -31,11 +31,22 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center" />
 
-        <View
+        <!--<View-->
+            <!--android:id="@+id/divider"-->
+            <!--style="@style/Divider"-->
+            <!--android:layout_below="@+id/email_fragment"-->
+            <!--android:paddingTop="9dp" />-->
+
+        <TextView
             android:id="@+id/divider"
-            style="@style/Divider"
+            style="@style/SP_HINT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_or"
             android:layout_below="@+id/email_fragment"
-            android:paddingTop="9dp" />
+            android:paddingTop="9dp"
+            android:gravity="center"
+            />
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/btn_signin_google"

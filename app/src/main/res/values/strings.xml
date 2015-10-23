@@ -126,4 +126,5 @@
     <string name="hint_more">More options</string>
     <string name="msg_no_email">Unable to find email application on your device.</string>
     <string name="msg_login_req">Login to post.</string>
+    <string name="hint_or">alternatively</string>
 </resources>
