@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.Postprocessor;
@@ -193,8 +192,8 @@ public class MainActivityIn extends AppCompatActivity {
     private void setupViewPager() {
         final TabItemAdapter pagerAdapter = new TabItemAdapter(getSupportFragmentManager(), TAB_ITEM_COUNT);
         mViewPager.setAdapter(pagerAdapter);
-//        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mViewPager.setPageTransformer(false, new ZoomInTransformer());
+
+//        mViewPager.setPageTransformer(false, new FlipHorizontalTransformer());
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -230,6 +229,7 @@ public class MainActivityIn extends AppCompatActivity {
             TabLayout.Tab tab = mTabLayout.getTabAt(i);
             tab.setCustomView(getCustomTabView(i));
         }
+
     }
 
     public View getCustomTabView(int position) {
