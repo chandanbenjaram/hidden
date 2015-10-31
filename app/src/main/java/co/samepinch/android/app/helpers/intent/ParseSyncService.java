@@ -19,6 +19,7 @@ import static co.samepinch.android.app.helpers.AppConstants.APP_INTENT.KEY_APP_A
 public class ParseSyncService extends IntentService {
     public static final String LOG_TAG = "ParseSyncService";
     public static final String CHANNELS = "channels";
+    public static final String PREFX = "sp_";
 
     public ParseSyncService() {
         super("ParseSyncService");
@@ -46,7 +47,7 @@ public class ParseSyncService extends IntentService {
             if (accessState == 1) {
                 Map<String, String> userInfo = Utils.PreferencesManager.getInstance().getValueAsMap(AppConstants.API.PREF_AUTH_USER.getValue());
                 String currUserId = userInfo.get(AppConstants.APP_INTENT.KEY_UID.getValue());
-                ParsePush.subscribeInBackground(currUserId);
+                ParsePush.subscribeInBackground(PREFX.concat(currUserId));
             } else {
                 // non-login state - get rid of all channels
                 List<String> subscribedChannels = installation.getList(CHANNELS);
