@@ -9,13 +9,6 @@
 # The more involved strategy is to specifically provide rules to keep portions of your
 # app's codebase unmodified while allowing proguard to optimize the rest. 
 
-# The first decision is whether or not you want to obfuscate your code. This provides no
-# performance benefit but makes it harder for other people to read your source code. 
-# Unfortunately obfuscation can cause issues for code that uses reflection or a few other
-# techniques. The default is to obfuscate.
-
--dontobfuscate
-
 # Additionally you will need to keep specific classes. A common use case is keeping all
 # of the models that are JSON parsed using something like Jackson.
 
@@ -24,3 +17,16 @@
 -keep public class android.widget.ShareActionProvider {
   public *;
 }
+
+-dontwarn com.facebook.**
+-dontwarn com.facebook.fresco**
+-dontwarn it.sephiroth.**
+-dontwarn com.squareup.**
+-dontwarn org.springframework.**
+-dontwarn org.apache.http.**
+-dontwarn com.parse.**
+-dontwarn com.aviary.android.**
+#-dontwarn org.apache.lang.**
+#-dontwarn org.apache.commons.**
+#-dontwarn com.nhaarman.**
+#-dontwarn se.emilsjolander.**

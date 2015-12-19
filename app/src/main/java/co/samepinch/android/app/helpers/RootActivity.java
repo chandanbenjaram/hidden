@@ -154,6 +154,10 @@ public class RootActivity extends AppCompatActivity {
 
 
     private void launchTargetActivity(boolean isFirstLaunch, final boolean isLoggedIn) {
+        //TODO enable to welcome screen
+//        isFirstLaunch = false;
+//        Utils.PreferencesManager.getInstance().setValue(PREF_APP_HELLO_WORLD.getValue(), StringUtils.EMPTY);
+
         // target activity to launch
         if (isFirstLaunch) {
             mHandler.postDelayed(new Runnable() {

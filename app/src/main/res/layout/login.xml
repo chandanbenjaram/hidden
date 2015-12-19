@@ -20,7 +20,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/icon_login_2x" />
+            android:src="@drawable/logo"/>
 
         <fragment
             android:id="@+id/email_fragment"
